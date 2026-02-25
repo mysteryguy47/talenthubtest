@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/graduation-cap.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- COOP header for Google OAuth compatibility - allows cross-origin postMessage -->
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="unsafe-none" />
+    <title>Talent Hub - Abacus Paper Generator</title>
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+      // Apply theme immediately before React loads to prevent flash
+      (function() {
+        const savedTheme = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = savedTheme === "dark" || savedTheme === "light" 
+          ? savedTheme 
+          : (prefersDark ? "dark" : "light");
+        document.documentElement.classList.add(theme);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

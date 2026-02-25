@@ -1,0 +1,45 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# =========================
+# Environment
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Database / Local files
+# =========================
+*.sqlite
+*.db
+*.log
+
+# =========================
+# Testing / Tools
+# =========================
+.pytest_cache/
+.mypy_cache/
+.coverage
+
+# =========================
+# Editor
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
