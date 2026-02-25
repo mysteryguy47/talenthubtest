@@ -77,6 +77,7 @@ app.add_middleware(
         "https://hi-test.vercel.app",
         "http://localhost:3000",
         "http://127.0.0.1:5173",
+        "https://th.blackmonkey.in",
         "http://127.0.0.1:3000",
         # Add production origins here when deploying
     ],
