@@ -168,10 +168,10 @@ export default function StudentProfile() {
   };
 
   const validateForm = (): string | null => {
-    // Display name validation
+    // Display name validation (optional — empty is allowed)
     if (formData.display_name !== undefined && formData.display_name !== null) {
       const displayName = formData.display_name.trim();
-      if (displayName.length < 2) {
+      if (displayName.length > 0 && displayName.length < 2) {
         return "Display name must be at least 2 characters";
       }
       if (displayName.length > 50) {
@@ -435,7 +435,7 @@ export default function StudentProfile() {
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-black uppercase tracking-widest text-muted-foreground mb-2">
-                      Display Name <span className="text-destructive">*</span>
+                      Display Name
                     </label>
                     {editing ? (
                       <input

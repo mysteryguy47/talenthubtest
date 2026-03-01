@@ -5,16 +5,17 @@ import apiClient from "./apiClient";
 
 export interface User {
   id: number;
-  email: string;
+  email?: string | null;
   name: string;
-  display_name?: string;
-  avatar_url?: string;
+  display_name?: string | null;
+  avatar_url?: string | null;
   role: string;
   total_points: number;
   current_streak: number;
   longest_streak: number;
+  is_archived?: boolean;
   created_at: string;
-  public_id?: string;
+  public_id?: string | null;
 }
 
 export interface LoginResponse {
@@ -318,6 +319,49 @@ export async function getStudentStatsAdmin(studentId: number): Promise<StudentSt
 // Admin: Delete student
 export async function deleteStudent(studentId: number): Promise<{ message: string }> {
   return apiClient.delete<{ message: string }>(`/users/admin/students/${studentId}`);
+}
+
+// ─── Admin Student CRUD ────────────────────────────────────────────────────────
+
+export interface AdminCreateStudentRequest {
+  name: string;
+  email?: string | null;
+  display_name?: string | null;
+  class_name?: string | null;
+  course?: string | null;
+  level_type?: string | null;
+  level?: string | null;
+  branch?: string | null;
+  status?: string;
+  join_date?: string | null;
+  finish_date?: string | null;
+  parent_contact_number?: string | null;
+}
+
+// All fields optional for updates — name/email especially optional
+export interface AdminUpdateStudentRequest {
+  name?: string | null;
+  email?: string | null;
+  display_name?: string | null;
+  class_name?: string | null;
+  course?: string | null;
+  level_type?: string | null;
+  level?: string | null;
+  branch?: string | null;
+  status?: string;
+  join_date?: string | null;
+  finish_date?: string | null;
+  parent_contact_number?: string | null;
+}
+
+// Admin: Create student manually (no OAuth required)
+export async function createStudentAdmin(data: AdminCreateStudentRequest): Promise<User> {
+  return apiClient.post<User>("/users/admin/students", data);
+}
+
+// Admin: Update student basic info + profile in one call
+export async function updateStudentAdmin(studentId: number, data: AdminUpdateStudentRequest): Promise<User> {
+  return apiClient.put<User>(`/users/admin/students/${studentId}/info`, data);
 }
 
 // Admin: Update student points

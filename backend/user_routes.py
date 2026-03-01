@@ -21,7 +21,8 @@ from user_schemas import (
     StudentIDInfo, UpdateStudentIDRequest, UpdateStudentIDResponse,
     PointsLogResponse, PointsSummaryResponse,
     RefreshTokenRequest, RefreshTokenResponse,
-    StudentDashboardData, AdminDashboardData, DatabaseStatsSchema
+    StudentDashboardData, AdminDashboardData, DatabaseStatsSchema,
+    AdminCreateStudentRequest, AdminUpdateStudentRequest, AdminStudentResponse,
 )
 from student_profile_utils import (
     validate_level, validate_course, validate_branch, validate_status,
@@ -81,6 +82,23 @@ async def login(request: Request, login_data: LoginRequest, db: Session = Depend
         
         # Find or create user
         user = db.query(User).filter(User.google_id == user_info["google_id"]).first()
+
+        # ── Pre-created account fallback ─────────────────────────────────────
+        # Admin may have pre-created a student account with an email but no google_id.
+        # When that student logs in via Google OAuth for the first time, link accounts.
+        if not user and user_info.get("email"):
+            preexisting = db.query(User).filter(
+                User.email == user_info["email"],
+                User.google_id == None  # noqa: E711 — SQLAlchemy IS NULL
+            ).first()
+            if preexisting:
+                # Link the Google account to the pre-created record
+                preexisting.google_id = user_info["google_id"]
+                preexisting.name = user_info["name"]  # Update name from Google
+                preexisting.avatar_url = user_info.get("avatar_url")
+                db.commit()
+                user = preexisting
+                print(f"🔗 [LOGIN] Linked pre-created account for {user_info['email']}")
         
         # Check if admin email (you can set this in environment)
         import os
@@ -840,12 +858,12 @@ async def get_admin_stats(
     )
 
 
-@router.get("/admin/students", response_model=List[UserResponse])
+@router.get("/admin/students", response_model=List[AdminStudentResponse])
 async def get_all_students(
     admin: User = Depends(get_current_admin),
     db: Session = Depends(get_db)
 ):
-    """Get all students."""
+    """Get all students (including admin-pre-created accounts)."""
     try:
         students = db.query(User).filter(User.role == "student").order_by(
             User.id.asc()
@@ -870,11 +888,12 @@ async def get_all_students(
                 "total_points": student.total_points,
                 "current_streak": student.current_streak,
                 "longest_streak": student.longest_streak,
+                "is_archived": getattr(student, "is_archived", False),
                 "created_at": student.created_at,
                 "public_id": profiles_map.get(student.id)
             }
 
-            result.append(UserResponse.model_validate(student_dict))
+            result.append(AdminStudentResponse.model_validate(student_dict))
 
         return result
     except Exception as e:
@@ -882,7 +901,150 @@ async def get_all_students(
         raise HTTPException(status_code=500, detail=f"Failed to load students: {str(e)}")
 
 
-@router.get("/admin/students/{student_id}/stats", response_model=StudentStats)
+@router.post("/admin/students", response_model=AdminStudentResponse)
+async def create_student_admin(
+    request_data: AdminCreateStudentRequest,
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Admin creates a student account manually (no OAuth required).
+    The student can later log in via Google OAuth if the email matches.
+    """
+    # Validate email uniqueness if provided
+    if request_data.email:
+        existing_email = db.query(User).filter(User.email == request_data.email).first()
+        if existing_email:
+            raise HTTPException(status_code=409, detail="A user with this email already exists")
+
+    # Create the User record (no google_id needed)
+    new_user = User(
+        google_id=None,
+        email=request_data.email or None,
+        name=request_data.name,
+        display_name=request_data.display_name,
+        role="student",
+        total_points=0,
+        current_streak=0,
+        longest_streak=0,
+        is_archived=False,
+    )
+    db.add(new_user)
+    db.flush()  # Get the new user.id
+
+    # Create associated student profile
+    profile = StudentProfile(
+        user_id=new_user.id,
+        internal_uuid=str(uuid_module.uuid4()),
+        display_name=request_data.display_name,
+        class_name=request_data.class_name,
+        course=request_data.course,
+        level_type=request_data.level_type,
+        level=request_data.level,
+        branch=request_data.branch,
+        status=request_data.status or "active",
+        join_date=request_data.join_date,
+        finish_date=request_data.finish_date,
+        parent_contact_number=request_data.parent_contact_number,
+    )
+    db.add(profile)
+    db.commit()
+    db.refresh(new_user)
+    db.refresh(profile)
+
+    return AdminStudentResponse(
+        id=new_user.id,
+        email=new_user.email,
+        name=new_user.name,
+        display_name=new_user.display_name,
+        avatar_url=new_user.avatar_url,
+        role=new_user.role,
+        total_points=new_user.total_points,
+        current_streak=new_user.current_streak,
+        longest_streak=new_user.longest_streak,
+        is_archived=new_user.is_archived,
+        created_at=new_user.created_at,
+        public_id=profile.public_id,
+    )
+
+
+@router.put("/admin/students/{student_id}/info", response_model=AdminStudentResponse)
+async def update_student_info_admin(
+    student_id: int,
+    request_data: AdminUpdateStudentRequest,
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Admin updates student's basic info (name/email) and profile fields in one call."""
+    student = db.query(User).filter(User.id == student_id, User.role == "student").first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    # Validate email uniqueness if changing email
+    if request_data.email is not None and request_data.email != student.email:
+        if request_data.email:  # Non-empty string
+            existing_email = db.query(User).filter(
+                User.email == request_data.email,
+                User.id != student_id
+            ).first()
+            if existing_email:
+                raise HTTPException(status_code=409, detail="A user with this email already exists")
+        student.email = request_data.email or None
+
+    if request_data.name is not None:
+        student.name = request_data.name
+    if request_data.display_name is not None:
+        student.display_name = request_data.display_name or None
+
+    # Update student profile
+    profile = db.query(StudentProfile).filter(StudentProfile.user_id == student_id).first()
+    if not profile:
+        # Create profile if missing
+        profile = StudentProfile(
+            user_id=student.id,
+            internal_uuid=str(uuid_module.uuid4()),
+        )
+        db.add(profile)
+        db.flush()
+
+    if request_data.display_name is not None:
+        profile.display_name = request_data.display_name or None
+    if request_data.class_name is not None:
+        profile.class_name = request_data.class_name
+    if request_data.course is not None:
+        profile.course = request_data.course
+    if request_data.level_type is not None:
+        profile.level_type = request_data.level_type
+    if request_data.level is not None:
+        profile.level = request_data.level
+    if request_data.branch is not None:
+        profile.branch = request_data.branch
+    if request_data.status is not None:
+        profile.status = request_data.status
+    if request_data.join_date is not None:
+        profile.join_date = request_data.join_date
+    if request_data.finish_date is not None:
+        profile.finish_date = request_data.finish_date
+    if request_data.parent_contact_number is not None:
+        profile.parent_contact_number = request_data.parent_contact_number
+
+    db.commit()
+    db.refresh(student)
+    db.refresh(profile)
+
+    return AdminStudentResponse(
+        id=student.id,
+        email=student.email,
+        name=student.name,
+        display_name=student.display_name,
+        avatar_url=student.avatar_url,
+        role=student.role,
+        total_points=student.total_points,
+        current_streak=student.current_streak,
+        longest_streak=student.longest_streak,
+        is_archived=student.is_archived,
+        created_at=student.created_at,
+        public_id=profile.public_id,
+    )
 async def get_student_stats_admin(
     student_id: int,
     admin: User = Depends(get_current_admin),
@@ -1205,10 +1367,11 @@ async def get_admin_dashboard_data(
             "total_points": student.total_points,
             "current_streak": student.current_streak,
             "longest_streak": student.longest_streak,
+            "is_archived": getattr(student, "is_archived", False),
             "created_at": student.created_at,
             "public_id": profiles_map.get(student.id)
         }
-        students_result.append(UserResponse.model_validate(student_dict))
+        students_result.append(AdminStudentResponse.model_validate(student_dict))
 
     # ── 3. Database Stats ──────────────────────────────────────────────────────
     total_users = db.query(User).count()

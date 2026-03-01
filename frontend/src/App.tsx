@@ -17,6 +17,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import StudentProfile from "./pages/StudentProfile";
 import AdminStudentIDManagement from "./pages/AdminStudentIDManagement";
 import AdminAttendance from "./pages/AdminAttendance";
+import AdminStudentManagement from "./pages/AdminStudentManagement";
 import StudentAttendance from "./pages/StudentAttendance";
 import AbacusCourse from "./pages/AbacusCourse";
 import VedicMathsCourse from "./pages/VedicMathsCourse";
@@ -149,6 +150,11 @@ function AppContent() {
               <Route path="/admin/student-ids">
                 <AdminRoute>
                   <AdminStudentIDManagement />
+                </AdminRoute>
+              </Route>
+              <Route path="/admin/students">
+                <AdminRoute>
+                  <AdminStudentManagement />
                 </AdminRoute>
               </Route>
               <Route path="/admin/attendance">

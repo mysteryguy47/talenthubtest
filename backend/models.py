@@ -29,8 +29,8 @@ class User(Base):
     __tablename__ = "users"
     
     id = Column(Integer, primary_key=True, index=True)
-    google_id = Column(String, unique=True, index=True, nullable=False)
-    email = Column(String, unique=True, index=True, nullable=False)
+    google_id = Column(String, unique=True, index=True, nullable=True)   # nullable for admin-pre-created accounts
+    email = Column(String, unique=True, index=True, nullable=True)        # nullable for accounts without email
     name = Column(String, nullable=False)
     display_name = Column(String, nullable=True)  # Custom display name for practice sessions
     avatar_url = Column(String, nullable=True)
@@ -43,6 +43,7 @@ class User(Base):
     last_grace_skip_date = Column(DateTime, nullable=True)  # Last time grace skip was used
     grace_skip_week_start = Column(DateTime, nullable=True)  # Week start for grace skip tracking
     last_daily_login_bonus_date = Column(Date, nullable=True)  # Last date daily login bonus was given
+    is_archived = Column(Boolean, default=False, nullable=False)  # Soft delete flag
     created_at = Column(DateTime, default=get_utc_now)
     updated_at = Column(DateTime, default=get_utc_now, onupdate=get_utc_now)
     

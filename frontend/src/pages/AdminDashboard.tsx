@@ -3,13 +3,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
 import { 
   getAdminDashboardData, getStudentStatsAdmin, AdminStats, StudentStats,
-  deleteStudent, updateStudentPoints, getDatabaseStats, DatabaseStats,
+  updateStudentPoints, getDatabaseStats, DatabaseStats,
   getStudentPracticeSessionDetailAdmin, PracticeSessionDetail,
   getStudentPaperAttemptDetailAdmin, User, AdminDashboardData,
   getOverallLeaderboard, getWeeklyLeaderboard, LeaderboardEntry,
 } from "../lib/userApi";
 import { PaperAttemptDetail } from "../lib/api";
-import { Shield, Users, BarChart3, Target, TrendingUp, User as UserIcon, Trash2, Edit2, RefreshCw, Database, X, ExternalLink, Brain, FileText, Clock, Eye, CheckCircle2, XCircle, Trophy } from "lucide-react";
+import { Shield, Users, BarChart3, Target, TrendingUp, User as UserIcon, Edit2, RefreshCw, Database, X, Brain, FileText, Clock, Eye, CheckCircle2, XCircle, Trophy } from "lucide-react";
 import Skeleton from "../components/Skeleton";
 import { useLocation } from "wouter";
 import { formatDateToIST, formatDateOnlyToIST } from "../lib/timezoneUtils";
@@ -130,27 +130,6 @@ export default function AdminDashboard() {
       return `${questionData.value}% of ${questionData.of} = ?`;
     }
     return JSON.stringify(questionData);
-  };
-
-  const handleDeleteStudent = async (studentId: number) => {
-    if (!window.confirm("Are you sure you want to delete this student? This action cannot be undone.")) {
-      return;
-    }
-    try {
-      await deleteStudent(studentId);
-      
-      // Clear selected student if deleted
-      if (selectedStudent?.id === studentId) {
-        setSelectedStudent(null);
-        setStudentStats(null);
-      }
-      
-      // ✓ Use React Query invalidation instead of manual fetches
-      await queryClient.invalidateQueries({ queryKey: ["adminDashboard"] });
-    } catch (error) {
-      console.error("Failed to delete student:", error);
-      alert("Failed to delete student. Please try again.");
-    }
   };
 
   const isPaperAnswerCorrect = (studentAnswer: unknown, correctAnswer: unknown): boolean => {
@@ -502,6 +481,13 @@ export default function AdminDashboard() {
                   <span className="text-sm font-bold text-muted-foreground">{students.length} total</span>
                 </div>
                 <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setLocation("/admin/students")}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl text-sm font-bold transition-colors"
+                  >
+                    <Users className="w-4 h-4" />
+                    Manage Students
+                  </button>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as "id" | "name" | "points")}
@@ -511,7 +497,6 @@ export default function AdminDashboard() {
                     <option value="name">Sort by Name</option>
                     <option value="points">Sort by Points</option>
                   </select>
-
                 </div>
               </div>
 
@@ -567,13 +552,6 @@ export default function AdminDashboard() {
                     {selectedStudent.name}
                   </h3>
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setLocation(`/profile?user_id=${selectedStudent.id}`)}
-                      className="p-2 hover:bg-primary/10 rounded-lg transition-colors"
-                      title="View Profile"
-                    >
-                      <ExternalLink className="w-4 h-4 text-primary" />
-                    </button>
                     <button
                       onClick={() => setSelectedStudent(null)}
                       className="p-2 hover:bg-destructive/10 rounded-lg transition-colors"
@@ -816,13 +794,7 @@ export default function AdminDashboard() {
                     )}
                   </div>
 
-                  <button
-                    onClick={() => handleDeleteStudent(selectedStudent.id)}
-                    className="w-full mt-4 px-4 py-2 bg-destructive text-destructive-foreground rounded-xl hover:bg-destructive/90 transition-colors flex items-center justify-center gap-2 font-bold"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Delete Account
-                  </button>
+                  {/* Delete button moved to Student Management page */}
                 </div>
               </div>
             ) : (

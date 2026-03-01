@@ -6,7 +6,7 @@ from timezone_utils import utc_to_ist, IST_TIMEZONE
 
 
 class UserBase(BaseModel):
-    email: EmailStr
+    email: Optional[str] = None       # Optional: admin-created accounts may not have email
     name: str
     display_name: Optional[str] = None
     avatar_url: Optional[str] = None
@@ -23,6 +23,7 @@ class UserResponse(UserBase):
     total_points: int
     current_streak: int
     longest_streak: int
+    is_archived: bool = False
     created_at: datetime
     public_id: Optional[str] = None  # Student public ID (TH-0001 format)
     
@@ -282,6 +283,68 @@ class StudentProfileCreate(StudentProfileBase):
 
 class StudentProfileUpdate(StudentProfileBase):
     pass
+
+
+# ─── Admin Student Creation ────────────────────────────────────────────────────
+
+class AdminCreateStudentRequest(BaseModel):
+    """Request body for admin creating a student manually (no OAuth required)."""
+    name: str
+    email: Optional[str] = None          # Optional – student may not have a Google account yet
+    display_name: Optional[str] = None
+    class_name: Optional[str] = None
+    course: Optional[str] = None          # "Abacus", "Vedic Maths", "Handwriting"
+    level_type: Optional[str] = None      # "Regular", "Junior"
+    level: Optional[str] = None
+    branch: Optional[str] = None          # "Rohini-16", "Rohini-11", "Gurgaon", "Online"
+    status: Optional[str] = "active"      # "active", "inactive", "closed"
+    join_date: Optional[datetime] = None
+    finish_date: Optional[datetime] = None
+    parent_contact_number: Optional[str] = None
+
+
+class AdminUpdateStudentRequest(BaseModel):
+    """Request body for admin updating a student's basic info + profile."""
+    name: Optional[str] = None
+    email: Optional[str] = None
+    display_name: Optional[str] = None
+    class_name: Optional[str] = None
+    course: Optional[str] = None
+    level_type: Optional[str] = None
+    level: Optional[str] = None
+    branch: Optional[str] = None
+    status: Optional[str] = None
+    join_date: Optional[datetime] = None
+    finish_date: Optional[datetime] = None
+    parent_contact_number: Optional[str] = None
+
+
+class AdminStudentResponse(BaseModel):
+    """Response schema for admin-created/managed students (email may be null)."""
+    id: int
+    email: Optional[str] = None
+    name: str
+    display_name: Optional[str] = None
+    avatar_url: Optional[str] = None
+    role: str
+    total_points: int
+    current_streak: int
+    longest_streak: int
+    is_archived: bool = False
+    created_at: datetime
+    public_id: Optional[str] = None
+
+    @field_serializer('created_at')
+    def serialize_created_at(self, dt: datetime, _info) -> str:
+        if dt.tzinfo == IST_TIMEZONE:
+            return dt.isoformat()
+        elif dt.tzinfo is None:
+            utc_dt = dt.replace(tzinfo=timezone.utc)
+            return utc_to_ist(utc_dt).isoformat()
+        else:
+            return utc_to_ist(dt).isoformat()
+
+    model_config = {"from_attributes": True}
 
 
 class StudentProfileResponse(StudentProfileBase):
@@ -609,7 +672,7 @@ class StudentDashboardData(BaseModel):
 class AdminDashboardData(BaseModel):
     """Combined admin dashboard data - replaces 3+ separate API calls."""
     stats: AdminStats
-    students: List[UserResponse]
+    students: List[AdminStudentResponse]
     database_stats: "DatabaseStatsSchema"
 
 
