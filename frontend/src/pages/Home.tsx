@@ -1,22 +1,888 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "../contexts/AuthContext";
-import { 
-  Sparkles, ArrowRight, Brain, Trophy, Calculator, 
-  BookOpen, PenTool, Rocket, Zap, BarChart3, Medal, 
-  CheckCircle2, Flame, Star, ChevronRight, Phone, 
-  Target, Calendar, Heart, Globe, FileText
+import {
+  ArrowRight, Trophy, Zap, BarChart3, Flame, FileText,
+  Target, Brain, Medal, Globe, Calendar, Heart,
+  Calculator, BookOpen, PenTool, Rocket, Phone,
+  MapPin
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// ─────────────────────────────────────────────────────────────
+// HOOKS
+// ─────────────────────────────────────────────────────────────
+function useInView(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); observer.disconnect(); } },
+      { threshold }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [threshold]);
+  return { ref, inView };
+}
+
+function useScrollY() {
+  const [y, setY] = useState(0);
+  useEffect(() => {
+    const handler = () => setY(window.scrollY);
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
+  return y;
+}
+
+// ─────────────────────────────────────────────────────────────
+// ANIMATED COUNTER
+// ─────────────────────────────────────────────────────────────
+function AnimatedCounter({ end, suffix = "", duration = 2000 }: { end: number; suffix?: string; duration?: number }) {
+  const [count, setCount] = useState(0);
+  const { ref, inView } = useInView(0.3);
+  useEffect(() => {
+    if (!inView) return;
+    let start = 0;
+    const step = end / (duration / 16);
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= end) { setCount(end); clearInterval(timer); }
+      else setCount(Math.floor(start));
+    }, 16);
+    return () => clearInterval(timer);
+  }, [inView, end, duration]);
+  return <span ref={ref}>{count}{suffix}</span>;
+}
+
+// ─────────────────────────────────────────────────────────────
+// IN-VIEW WRAPPER
+// ─────────────────────────────────────────────────────────────
+function InView({ children, className = "", delay = 0, direction = "up" }: {
+  children: React.ReactNode; className?: string; delay?: number; direction?: "up" | "left" | "right" | "none";
+}) {
+  const { ref, inView } = useInView();
+  const transforms: Record<string, string> = {
+    up: "translateY(28px)", left: "translateX(-28px)", right: "translateX(28px)", none: "none",
+  };
+  return (
+    <div ref={ref} className={className} style={{
+      opacity: inView ? 1 : 0,
+      transform: inView ? "none" : transforms[direction],
+      transition: `opacity 0.7s cubic-bezier(.4,0,.2,1) ${delay}s, transform 0.7s cubic-bezier(.4,0,.2,1) ${delay}s`,
+    }}>
+      {children}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// GLOBAL STYLES
+// ─────────────────────────────────────────────────────────────
+const GlobalStyles = () => (
+  <style>{`
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --th-bg: #07080F;
+      --th-bg2: #0D0F1C;
+      --th-bg3: #131629;
+      --th-surface: #0F1120;
+      --th-surface2: #151829;
+      --th-border: rgba(255,255,255,0.06);
+      --th-border2: rgba(255,255,255,0.1);
+      --th-purple: #7C3AED;
+      --th-purple2: #A855F7;
+      --th-purple-mid: #9D7FF0;
+      --th-purple-dim: rgba(124,58,237,0.12);
+      --th-purple-glow: rgba(124,58,237,0.25);
+      --th-gold: #F59E0B;
+      --th-gold-dim: rgba(245,158,11,0.12);
+      --th-teal: #0FB8A0;
+      --th-orange: #EA580C;
+      --th-white: #F8FAFC;
+      --th-white2: #94A3B8;
+      --th-muted: #475569;
+      --th-muted2: #636888;
+      --th-font-display: 'Syne', sans-serif;
+      --th-font-body: 'Inter', system-ui, sans-serif;
+      --th-font-mono: 'Space Grotesk', monospace;
+    }
+
+    .th-gradient-text {
+      background: linear-gradient(135deg, var(--th-purple2) 0%, #C084FC 50%, var(--th-purple) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .th-gold-text {
+      background: linear-gradient(135deg, var(--th-gold) 0%, #FCD34D 50%, var(--th-gold) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .th-shimmer-text {
+      background: linear-gradient(90deg, var(--th-white2) 0%, var(--th-white) 25%, var(--th-purple2) 50%, var(--th-white) 75%, var(--th-white2) 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      animation: th-shimmer 4s linear infinite;
+    }
+    .th-section-label {
+      font-family: var(--th-font-mono);
+      font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--th-purple2);
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .th-section-label::before {
+      content: ''; display: block; width: 18px; height: 1px; background: var(--th-purple2);
+    }
+    .th-card-hover {
+      transition: all 0.35s cubic-bezier(.4,0,.2,1);
+    }
+    .th-card-hover:hover {
+      transform: translateY(-5px);
+      border-color: rgba(124,58,237,0.4) !important;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 48px rgba(124,58,237,0.08) !important;
+    }
+    .th-btn-primary {
+      background: linear-gradient(135deg, var(--th-purple) 0%, #5b21b6 100%);
+      color: white; border: none; padding: 14px 28px; border-radius: 14px;
+      font-family: var(--th-font-body); font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: all 0.25s ease;
+      display: inline-flex; align-items: center; gap: 8px;
+      white-space: nowrap; position: relative; overflow: hidden;
+    }
+    .th-btn-primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 16px 40px rgba(124,58,237,0.5); }
+    .th-btn-primary:active { transform: scale(0.98); }
+    .th-btn-secondary {
+      background: transparent; color: var(--th-white2);
+      border: 1px solid var(--th-border2); padding: 14px 28px; border-radius: 14px;
+      font-family: var(--th-font-body); font-size: 15px; font-weight: 500;
+      cursor: pointer; transition: all 0.25s ease;
+      display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+    }
+    .th-btn-secondary:hover {
+      border-color: rgba(124,58,237,0.5); background: rgba(124,58,237,0.08);
+      color: var(--th-white); transform: translateY(-2px);
+    }
+    .th-noise {
+      position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.02;
+    }
+    .th-noise::after {
+      content: ''; position: absolute; inset: -50%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: th-grain 0.5s steps(1) infinite;
+    }
+    .th-glow-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--th-purple-glow), transparent);
+    }
+
+    @keyframes th-shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+    @keyframes th-float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+    @keyframes th-marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    @keyframes th-grain {
+      0%, 100% { transform: translate(0,0); } 10% { transform: translate(-2%,-3%); }
+      20% { transform: translate(3%,2%); } 30% { transform: translate(-1%,4%); }
+      40% { transform: translate(2%,-1%); } 50% { transform: translate(-3%,2%); }
+    }
+    @keyframes th-burst-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(234,88,12,0.4); }
+      50% { box-shadow: 0 0 0 10px rgba(234,88,12,0); }
+    }
+    @keyframes th-spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    @media (max-width: 768px) {
+      .th-hide-mobile { display: none !important; }
+    }
+    @media (min-width: 769px) {
+      .th-hide-desktop { display: none !important; }
+    }
+  `}</style>
+);
+
+// ─────────────────────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────────────────────
+const MARQUEE_ITEMS = [
+  "National Olympiad Winners", "Mental Calculation Champions",
+  "18+ Years of Excellence", "900+ Students Shaped",
+  "Abacus · Vedic Maths · Handwriting · STEM",
+  "Certificates & Medals at Every Level", "Monthly Assessments",
+  "Institute Leaderboard · Real-Time Rankings",
+];
+
+const STATS = [
+  { value: 18, suffix: "+", label: "Years of Excellence" },
+  { value: 900, suffix: "+", label: "Students Developed" },
+  { value: 4, suffix: "", label: "Programs Offered" },
+  { value: 3, suffix: "", label: "Branches in Delhi NCR" },
+];
+
+const COURSES = [
+  {
+    id: "abacus", name: "Study Abacus", tag: "Ages 5–15 · 10 Levels",
+    tagline: "Mental Visualization Engine",
+    desc: "From counting beads to performing complex multi-digit calculations entirely in the mind. Abacus rewires how children think — permanently.",
+    color: "#7C3AED", dimColor: "rgba(124,58,237,0.10)", glowColor: "rgba(124,58,237,0.20)", borderColor: "rgba(124,58,237,0.25)",
+    icon: Calculator, emoji: "🧮",
+    outcomes: ["Mental calculation speed", "Focus & concentration", "Visual memory", "Math confidence"],
+    stat: "10 Levels · 4 Months Each",
+    image: "/imagesproject/homepage/abacus.png", path: "/courses/abacus",
+  },
+  {
+    id: "vedic", name: "Vedic Maths", tag: "Ages 10+ · 4 Levels",
+    tagline: "Ancient Speed. Modern Edge.",
+    desc: "16 sacred sutras from ancient Indian mathematics. Solve 997 × 998 in under 3 seconds. Competitive exam prep unlike anything taught in school.",
+    color: "#F59E0B", dimColor: "rgba(245,158,11,0.10)", glowColor: "rgba(245,158,11,0.20)", borderColor: "rgba(245,158,11,0.25)",
+    icon: BookOpen, emoji: "🕉",
+    outcomes: ["Exam speed tactics", "Complex mental arithmetic", "LCM, GCD, roots", "Competitive edge"],
+    stat: "4 Levels · 4 Months Each",
+    image: "/imagesproject/homepage/Vedic-Maths.png", path: "/courses/vedic-maths",
+  },
+  {
+    id: "handwriting", name: "Handwriting", tag: "All Ages · 3 Months",
+    tagline: "Precision. Clarity. Confidence.",
+    desc: "English and Hindi tracks. Fine motor control meets cognitive rhythm. Students see measurable improvement within weeks — not months.",
+    color: "#0FB8A0", dimColor: "rgba(15,184,160,0.10)", glowColor: "rgba(15,184,160,0.20)", borderColor: "rgba(15,184,160,0.25)",
+    icon: PenTool, emoji: "✍️",
+    outcomes: ["Legibility & speed", "English & Hindi tracks", "Creative calligraphy", "Exam handwriting"],
+    stat: "1 Level · 3 Months",
+    image: "/imagesproject/homepage/handwriting.png", path: "/courses/handwriting",
+  },
+  {
+    id: "stem", name: "STEM", tag: "Ages 4–18 · 5 Courses",
+    tagline: "Engineers Start Here.",
+    desc: "From paper circuits at age 4 to drone engineering at 18. Five progressive courses under the Black Monkey umbrella. Hands-on, project-based, real.",
+    color: "#EA580C", dimColor: "rgba(234,88,12,0.10)", glowColor: "rgba(234,88,12,0.20)", borderColor: "rgba(234,88,12,0.25)",
+    icon: Rocket, emoji: "🤖",
+    outcomes: ["Robotics & IoT", "Drone engineering", "AI & Machine learning", "Real-world projects"],
+    stat: "5 Courses · 8–12 Weeks Each",
+    image: "/imagesproject/homepage/stem.png", path: "/courses/stem",
+    external: true, externalLabel: "Powered by Black Monkey ↗",
+  },
+];
+
+const WHY_ITEMS = [
+  {
+    icon: Brain, label: "COGNITIVE REWIRING",
+    title: "Not just math — it's brain training.",
+    desc: "Abacus and Vedic Maths develop the visualization, focus, and working memory that improve performance across every subject — permanently. Not a shortcut. A rewire.",
+    color: "#7C3AED", stat: "2× Faster", statLabel: "average mental calculation speed after Level 3",
+  },
+  {
+    icon: Trophy, label: "PROVEN RESULTS",
+    title: "18 years. 900+ students. Medals to prove it.",
+    desc: "Every year, our students compete in national and international olympiads — and win. Tablets, cycles, cash prizes, and the confidence that comes from beating your best self.",
+    color: "#F59E0B", stat: "900+", statLabel: "students developed across 18 years",
+  },
+  {
+    icon: Target, label: "STRUCTURED PROGRESSION",
+    title: "Every level earned, never given.",
+    desc: "Monthly tests, level completions with certificates and medals, and regular activities that make practice genuinely engaging — not the rote drilling found elsewhere.",
+    color: "#0FB8A0", stat: "100%", statLabel: "structured curriculum with monthly assessment",
+  },
+];
+
+const TOOLKIT_ITEMS = [
+  {
+    icon: FileText, title: "Live Paper Attempt",
+    desc: "Exam-mode practice with real Abacus and Vedic Maths papers. Timed, scored, and reviewed instantly.",
+    color: "#7C3AED", cta: "Attempt Now", path: "/create", featured: true,
+  },
+  {
+    icon: Brain, title: "Mental Math Practice",
+    desc: "Targeted drills by operation, level, and difficulty. Track accuracy and speed across sessions.",
+    color: "#7C3AED", cta: "Practice", path: "/mental", featured: false,
+  },
+  {
+    icon: Zap, title: "Burst Mode",
+    desc: "60 seconds. Maximum questions. Compete against yourself and the institute leaderboard.",
+    color: "#EA580C", cta: "Start Burst", path: "/burst", featured: false, pulse: true,
+  },
+  {
+    icon: BarChart3, title: "Progress Dashboard",
+    desc: "Detailed analytics on accuracy, speed, and consistency. See exactly where to improve.",
+    color: "#0FB8A0", cta: "View Dashboard", path: "/dashboard", featured: false,
+  },
+  {
+    icon: Trophy, title: "Leaderboard",
+    desc: "Institute-wide rankings updated in real time. Compete for the top spot every week.",
+    color: "#F59E0B", cta: "See Rankings", path: "/leaderboard", featured: false,
+  },
+  {
+    icon: Flame, title: "Streaks & Rewards",
+    desc: "Daily streaks, badges, and milestone rewards. Consistency becomes its own motivation.",
+    color: "#7C3AED", cta: "View Badges", path: "/dashboard", featured: false,
+  },
+];
+
+const TESTIMONIALS = [
+  {
+    quote: "My daughter completed Level 4 Abacus in 14 months and can now mentally add 5-digit numbers faster than I can on a calculator. The focus improvement is real — her school results show it.",
+    name: "Shikha Khandelwal", role: "Parent · Rohini Sector 16", initials: "SK", course: "Abacus", courseColor: "#7C3AED", stars: 5,
+  },
+  {
+    quote: "Abacus is a very good and effective technique to speed up calculations. The confidence level of my child is also boosted. Ms. Khurana's method is genuinely different.",
+    name: "Neha Khanna", role: "Parent · Rohini Sector 11", initials: "NK", course: "Abacus", courseColor: "#7C3AED", stars: 5,
+  },
+  {
+    quote: "Vedic Maths changed how my son prepares for competitive exams. He was struggling with calculation speed — now he finishes sections 20 minutes early. Unbelievable improvement.",
+    name: "Rahul Mehta", role: "Parent · Gurgaon", initials: "RM", course: "Vedic Maths", courseColor: "#F59E0B", stars: 5,
+  },
+  {
+    quote: "Children are being nurtured well. I hope that Talent Hub and parents continually make sure children grow beyond just being prize-oriented — and this school does exactly that.",
+    name: "Yash", role: "Student, Talent Hub", initials: "Y", course: "Abacus", courseColor: "#7C3AED", stars: 5,
+  },
+];
+
+const ACHIEVEMENTS = [
+  { title: "National & International Olympiads", desc: "Compete and win at prestigious math olympiads every year", icon: Globe, image: "/imagesproject/homepage/olympiads.jpeg" },
+  { title: "Medals & Certificates", desc: "Earn recognition for achievements and milestones at every level", icon: Medal, image: "/imagesproject/homepage/medals_certificates.jpeg" },
+  { title: "Monthly Tests", desc: "Regular assessments every last Sunday to track precise progress", icon: Calendar, image: "/imagesproject/homepage/monthly_tests.jpeg" },
+  { title: "Fun & Co-curricular Activities", desc: "Engaging activities that make the learning journey enjoyable", icon: Heart, image: "/imagesproject/homepage/fun_activities.jpeg" },
+];
+
+// ─────────────────────────────────────────────────────────────
+// MARQUEE BAR
+// ─────────────────────────────────────────────────────────────
+function MarqueeBar() {
+  const items = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
+  return (
+    <div style={{ overflow: "hidden", borderTop: "1px solid var(--th-border)", borderBottom: "1px solid var(--th-border)", background: "var(--th-bg2)", padding: "13px 0" }}>
+      <div style={{ display: "flex", animation: "th-marquee 30s linear infinite", width: "max-content" }}>
+        {items.map((item, i) => (
+          <span key={i} style={{ display: "flex", alignItems: "center", gap: 20, padding: "0 20px", fontFamily: "var(--th-font-mono)", fontSize: 12, color: "var(--th-muted)", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>
+            <span style={{ color: "var(--th-purple)", opacity: 0.7 }}>✦</span>
+            {item}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// STATS BAR
+// ─────────────────────────────────────────────────────────────
+function StatsBar() {
+  return (
+    <section style={{ padding: "72px 24px", background: "var(--th-bg)" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, borderRadius: 20, overflow: "hidden", border: "1px solid var(--th-border)" }}>
+          {STATS.map((stat, i) => (
+            <InView key={i} delay={i * 0.1}>
+              <div style={{ background: "var(--th-surface)", padding: "36px 28px", borderRight: i < 3 ? "1px solid var(--th-border)" : "none", textAlign: "center" }}>
+                <div style={{ fontFamily: "var(--th-font-display)", fontSize: "clamp(36px, 4vw, 52px)", fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 8 }} className="th-gradient-text">
+                  <AnimatedCounter end={stat.value} suffix={stat.suffix} />
+                </div>
+                <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, color: "var(--th-muted)", letterSpacing: "0.1em", textTransform: "uppercase" }}>{stat.label}</div>
+              </div>
+            </InView>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// PROGRAMS SECTION
+// ─────────────────────────────────────────────────────────────
+function Programs() {
+  const [hovered, setHovered] = useState<number | null>(null);
+  const [, setLocation] = useLocation();
+
+  return (
+    <section style={{ padding: "96px 24px", background: "var(--th-bg2)", position: "relative" }}>
+      <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "50%", height: 1, background: "linear-gradient(90deg, transparent, var(--th-purple-glow), transparent)" }} />
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        <InView>
+          <div style={{ marginBottom: 56 }}>
+            <div className="th-section-label" style={{ marginBottom: 14 }}>What We Teach</div>
+            <h2 style={{ fontFamily: "var(--th-font-display)", fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.1, maxWidth: 520, color: "var(--th-white)" }}>
+              Four Pathways to{" "}
+              <span className="th-gradient-text">Sharper Thinking</span>
+            </h2>
+            <p style={{ color: "var(--th-white2)", fontSize: 17, lineHeight: 1.7, maxWidth: 500, marginTop: 14 }}>
+              Structured, progressive, and built for real cognitive growth — not shortcuts.
+            </p>
+          </div>
+        </InView>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 18 }}>
+          {COURSES.map((course, i) => (
+            <InView key={course.id} delay={i * 0.1} direction={i % 2 === 0 ? "left" : "right"}>
+              <div
+                className="th-card-hover"
+                onMouseEnter={() => setHovered(i)}
+                onMouseLeave={() => setHovered(null)}
+                onClick={() => course.external ? window.open("https://blackmonkey.in", "_blank") : setLocation(course.path)}
+                style={{
+                  background: hovered === i ? `linear-gradient(135deg, ${course.dimColor.replace("0.10","0.18")}, var(--th-surface))` : "var(--th-surface)",
+                  border: `1px solid ${hovered === i ? course.borderColor : "var(--th-border)"}`,
+                  borderRadius: 22, padding: "32px",
+                  boxShadow: hovered === i ? `0 24px 60px rgba(0,0,0,0.45), 0 0 48px ${course.glowColor}` : "none",
+                  position: "relative", overflow: "hidden", cursor: "pointer",
+                  transition: "all 0.35s cubic-bezier(.4,0,.2,1)",
+                }}
+              >
+                <div style={{ position: "absolute", top: -48, right: -48, width: 180, height: 180, borderRadius: "50%", background: `radial-gradient(circle, ${course.glowColor} 0%, transparent 70%)`, opacity: hovered === i ? 1 : 0, transition: "opacity 0.35s ease", pointerEvents: "none" }} />
+
+                {course.external && (
+                  <div style={{ position: "absolute", top: 18, right: 18, background: "rgba(234,88,12,0.15)", border: "1px solid rgba(234,88,12,0.3)", borderRadius: 8, padding: "4px 10px", fontFamily: "var(--th-font-mono)", fontSize: 10, color: "#EA580C", letterSpacing: "0.04em" }}>
+                    ↗ blackmonkey.in
+                  </div>
+                )}
+
+                <div style={{ width: 50, height: 50, borderRadius: 15, marginBottom: 18, background: course.dimColor, border: `1px solid ${course.borderColor}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
+                  {course.emoji}
+                </div>
+
+                <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", color: course.color, textTransform: "uppercase", marginBottom: 6 }}>{course.tag}</div>
+                <h3 style={{ fontFamily: "var(--th-font-display)", fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 4, color: "var(--th-white)" }}>{course.name}</h3>
+                <div style={{ fontFamily: "var(--th-font-body)", fontSize: 13, fontWeight: 500, color: course.color, marginBottom: 14, opacity: 0.85 }}>{course.tagline}</div>
+                <p style={{ color: "var(--th-white2)", fontSize: 14, lineHeight: 1.65, marginBottom: 20 }}>{course.desc}</p>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 14px", marginBottom: 22 }}>
+                  {course.outcomes.map((o, oi) => (
+                    <div key={oi} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--th-white2)" }}>
+                      <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke={course.color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      {o}
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 18, borderTop: "1px solid var(--th-border)" }}>
+                  <span style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, color: "var(--th-muted)", letterSpacing: "0.05em" }}>{course.stat}</span>
+                  <button style={{ background: "none", border: "none", cursor: "pointer", color: course.color, fontFamily: "var(--th-font-body)", fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, padding: 0, transition: "gap 0.2s ease" }}
+                    onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.gap = "10px"}
+                    onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.gap = "6px"}
+                  >
+                    {course.external ? "Visit blackmonkey.in" : "Learn More"}
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+              </div>
+            </InView>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// WHY TALENT HUB
+// ─────────────────────────────────────────────────────────────
+function WhySection() {
+  return (
+    <section style={{ padding: "96px 24px", background: "var(--th-bg)" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        <InView>
+          <div style={{ marginBottom: 56, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 20 }}>
+            <div>
+              <div className="th-section-label" style={{ marginBottom: 14 }}>Why Choose Us</div>
+              <h2 style={{ fontFamily: "var(--th-font-display)", fontSize: "clamp(30px, 3.5vw, 48px)", fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.1, color: "var(--th-white)" }}>
+                The Talent Hub <span className="th-gradient-text">Difference</span>
+              </h2>
+            </div>
+            <p style={{ color: "var(--th-muted)", fontSize: 15, maxWidth: 300, lineHeight: 1.65 }}>
+              18 years of refining our methods — here's what makes our students stand apart.
+            </p>
+          </div>
+        </InView>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {WHY_ITEMS.map((item, i) => (
+            <InView key={i} delay={i * 0.12}>
+              <div style={{
+                display: "grid", gridTemplateColumns: "1fr 2fr 1fr", gap: 40, alignItems: "center",
+                padding: "36px 36px", background: "var(--th-surface)", borderRadius: 20, border: "1px solid var(--th-border)", cursor: "default",
+                transition: "all 0.3s cubic-bezier(.4,0,.2,1)",
+              }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.borderColor = `${item.color}50`; el.style.transform = "translateX(5px)"; el.style.background = "var(--th-surface2)"; }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.borderColor = "var(--th-border)"; el.style.transform = "none"; el.style.background = "var(--th-surface)"; }}
+              >
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ width: 46, height: 46, borderRadius: 13, background: `linear-gradient(135deg, ${item.color}25, ${item.color}10)`, border: `1px solid ${item.color}30`, display: "flex", alignItems: "center", justifyContent: "center", color: item.color }}>
+                    <item.icon size={20} strokeWidth={1.6} />
+                  </div>
+                  <div className="th-section-label" style={{ color: item.color, fontSize: 10 }}>{item.label}</div>
+                </div>
+                <div>
+                  <h3 style={{ fontFamily: "var(--th-font-display)", fontSize: "clamp(17px, 2vw, 23px)", fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 10, color: "var(--th-white)" }}>{item.title}</h3>
+                  <p style={{ color: "var(--th-white2)", fontSize: 15, lineHeight: 1.7 }}>{item.desc}</p>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontFamily: "var(--th-font-display)", fontSize: "clamp(28px, 3vw, 42px)", fontWeight: 800, letterSpacing: "-0.04em", color: item.color, lineHeight: 1 }}>{item.stat}</div>
+                  <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, color: "var(--th-muted)", letterSpacing: "0.04em", marginTop: 6, lineHeight: 1.5 }}>{item.statLabel}</div>
+                </div>
+              </div>
+            </InView>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// TOOLKIT SECTION
+// ─────────────────────────────────────────────────────────────
+function Toolkit() {
+  const [, setLocation] = useLocation();
+  return (
+    <section style={{ padding: "96px 24px", background: "var(--th-bg2)", position: "relative" }}>
+      <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "50%", height: 1, background: "linear-gradient(90deg, transparent, var(--th-purple-glow), transparent)" }} />
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        <InView>
+          <div style={{ textAlign: "center", marginBottom: 56 }}>
+            <div className="th-section-label" style={{ justifyContent: "center", marginBottom: 14 }}>The Platform</div>
+            <h2 style={{ fontFamily: "var(--th-font-display)", fontSize: "clamp(30px, 4vw, 52px)", fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: 14, color: "var(--th-white)" }}>
+              Practice That <span className="th-gradient-text">Actually Works</span>
+            </h2>
+            <p style={{ color: "var(--th-white2)", fontSize: 17, maxWidth: 480, margin: "0 auto", lineHeight: 1.7 }}>
+              Every tool is engineered to reinforce real learning — not just keep students busy.
+            </p>
+          </div>
+        </InView>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+          {TOOLKIT_ITEMS.map((item, i) => (
+            <InView key={i} delay={i * 0.08}>
+              <div
+                onClick={() => setLocation(item.path)}
+                style={{
+                  background: item.featured ? "linear-gradient(145deg, rgba(124,58,237,0.13), rgba(124,58,237,0.04))" : "var(--th-surface)",
+                  border: item.featured ? "1px solid rgba(124,58,237,0.35)" : "1px solid var(--th-border)",
+                  borderRadius: 20, padding: "26px",
+                  cursor: "pointer", position: "relative", overflow: "hidden",
+                  boxShadow: item.featured ? "0 0 48px rgba(124,58,237,0.1)" : "none",
+                  transition: "all 0.3s cubic-bezier(.4,0,.2,1)",
+                }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = "translateY(-5px)"; el.style.borderColor = item.featured ? "rgba(124,58,237,0.6)" : "rgba(124,58,237,0.3)"; }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = "none"; el.style.borderColor = item.featured ? "rgba(124,58,237,0.35)" : "var(--th-border)"; }}
+              >
+                {item.featured && (
+                  <div style={{ position: "absolute", top: 14, right: 14, background: "rgba(124,58,237,0.2)", border: "1px solid rgba(124,58,237,0.35)", borderRadius: 6, padding: "3px 8px", fontFamily: "var(--th-font-mono)", fontSize: 9, color: "var(--th-purple2)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Featured</div>
+                )}
+                <div style={{
+                  width: 46, height: 46, borderRadius: 13, marginBottom: 16,
+                  background: `linear-gradient(135deg, ${item.color}25, ${item.color}10)`,
+                  border: `1px solid ${item.color}30`,
+                  display: "flex", alignItems: "center", justifyContent: "center", color: item.color,
+                  animation: (item as any).pulse ? "th-burst-pulse 2s ease-in-out infinite" : "none",
+                }}>
+                  <item.icon size={20} strokeWidth={1.6} />
+                </div>
+                <h3 style={{ fontFamily: "var(--th-font-display)", fontSize: 17, fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 8, color: "var(--th-white)" }}>{item.title}</h3>
+                <p style={{ color: "var(--th-white2)", fontSize: 14, lineHeight: 1.65, marginBottom: 18 }}>{item.desc}</p>
+                <button style={{ background: "none", border: "none", cursor: "pointer", color: item.color, fontFamily: "var(--th-font-body)", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, padding: 0, transition: "gap 0.2s ease" }}
+                  onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.gap = "10px"}
+                  onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.gap = "6px"}
+                >
+                  {item.cta} <ArrowRight size={13} />
+                </button>
+              </div>
+            </InView>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// ACHIEVEMENTS SECTION
+// ─────────────────────────────────────────────────────────────
+function AchievementsSection() {
+  const [hovered, setHovered] = useState<number | null>(null);
+  return (
+    <section style={{ padding: "96px 24px", background: "var(--th-bg)" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        <InView>
+          <div style={{ marginBottom: 56 }}>
+            <div className="th-section-label" style={{ marginBottom: 14 }}>Compete & Win</div>
+            <h2 style={{ fontFamily: "var(--th-font-display)", fontSize: "clamp(30px, 4vw, 52px)", fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.1, color: "var(--th-white)" }}>
+              Olympiads &amp; <span className="th-gradient-text">Achievements</span>
+            </h2>
+            <p style={{ color: "var(--th-white2)", fontSize: 17, lineHeight: 1.7, maxWidth: 500, marginTop: 14 }}>
+              Structured assessments and national-level competitions that recognize consistent effort and excellence.
+            </p>
+          </div>
+        </InView>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+          {ACHIEVEMENTS.map((a, i) => (
+            <InView key={i} delay={i * 0.1}>
+              <div
+                onMouseEnter={() => setHovered(i)}
+                onMouseLeave={() => setHovered(null)}
+                style={{ position: "relative", height: 360, borderRadius: 22, overflow: "hidden", border: "1px solid var(--th-border)", cursor: "pointer", transition: "all 0.35s cubic-bezier(.4,0,.2,1)", transform: hovered === i ? "translateY(-5px)" : "none", boxShadow: hovered === i ? "0 24px 64px rgba(0,0,0,0.5), 0 0 48px rgba(124,58,237,0.1)" : "none" }}
+              >
+                <img src={a.image} alt={a.title} loading="lazy" decoding="async" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", transform: hovered === i ? "scale(1.06)" : "scale(1)", transition: "transform 0.6s cubic-bezier(.4,0,.2,1)" }} />
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(7,8,15,0.95) 0%, rgba(7,8,15,0.4) 50%, transparent 100%)" }} />
+                <div style={{ position: "absolute", bottom: 22, left: 22, right: 22 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(255,255,255,0.1)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10, color: "white" }}>
+                    <a.icon size={16} strokeWidth={1.6} />
+                  </div>
+                  <h3 style={{ fontFamily: "var(--th-font-display)", fontSize: 15, fontWeight: 700, color: "white", marginBottom: 5, lineHeight: 1.3 }}>{a.title}</h3>
+                  <p style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", lineHeight: 1.5 }}>{a.desc}</p>
+                </div>
+              </div>
+            </InView>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// TESTIMONIALS
+// ─────────────────────────────────────────────────────────────
+function Testimonials() {
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setActive(a => (a + 1) % TESTIMONIALS.length), 5000);
+    return () => clearInterval(t);
+  }, []);
+
+  const current = TESTIMONIALS[active];
+  const others = TESTIMONIALS.filter((_, i) => i !== active).slice(0, 2);
+
+  return (
+    <section style={{ padding: "96px 24px", background: "var(--th-bg2)" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        <InView>
+          <div style={{ textAlign: "center", marginBottom: 56 }}>
+            <div className="th-section-label" style={{ justifyContent: "center", marginBottom: 14 }}>Parent Voices</div>
+            <h2 style={{ fontFamily: "var(--th-font-display)", fontSize: "clamp(30px, 4vw, 52px)", fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.1, color: "var(--th-white)" }}>
+              What Parents <span className="th-gradient-text">Actually Say</span>
+            </h2>
+          </div>
+        </InView>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+          {/* Featured quote */}
+          <InView direction="left">
+            <div style={{ background: "linear-gradient(145deg, var(--th-surface), var(--th-bg3))", border: "1px solid var(--th-border2)", borderRadius: 22, padding: "36px", gridRow: "span 2", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: 340, position: "relative", overflow: "hidden" }}>
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${current.courseColor}, transparent)` }} />
+              <div style={{ fontSize: 64, lineHeight: 1, color: "rgba(124,58,237,0.15)", fontFamily: "Georgia,serif", marginBottom: 4 }}>"</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", gap: 3, marginBottom: 16 }}>
+                  {Array.from({ length: current.stars }).map((_, i) => <svg key={i} width="14" height="14" viewBox="0 0 14 14" fill="#F59E0B"><path d="M7 1l1.8 3.6L13 5.3l-3 2.9.7 4.1L7 10.5l-3.7 1.8.7-4.1-3-2.9 4.2-.7L7 1z"/></svg>)}
+                </div>
+                <AnimatePresence mode="wait">
+                  <motion.p key={active} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.4 }}
+                    style={{ fontSize: "clamp(15px, 1.5vw, 17px)", lineHeight: 1.75, color: "var(--th-white)", fontFamily: "var(--th-font-body)", fontWeight: 300 }}>
+                    {current.quote}
+                  </motion.p>
+                </AnimatePresence>
+              </div>
+              <div style={{ marginTop: 28, display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 13, background: `linear-gradient(135deg, ${current.courseColor}40, ${current.courseColor}20)`, border: `1px solid ${current.courseColor}40`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--th-font-display)", fontSize: 15, fontWeight: 800, color: "var(--th-white)" }}>
+                  {current.initials}
+                </div>
+                <div>
+                  <div style={{ fontFamily: "var(--th-font-display)", fontSize: 14, fontWeight: 700, color: "var(--th-white)" }}>{current.name}</div>
+                  <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, color: "var(--th-muted)", letterSpacing: "0.04em", marginTop: 2 }}>{current.role}</div>
+                </div>
+                <div style={{ marginLeft: "auto" }}>
+                  <span style={{ background: `${current.courseColor}20`, border: `1px solid ${current.courseColor}30`, borderRadius: 7, padding: "3px 9px", fontFamily: "var(--th-font-mono)", fontSize: 10, color: current.courseColor, letterSpacing: "0.06em" }}>{current.course}</span>
+                </div>
+              </div>
+              {/* Dots */}
+              <div style={{ display: "flex", gap: 5, marginTop: 20 }}>
+                {TESTIMONIALS.map((_, i) => (
+                  <button key={i} onClick={() => setActive(i)} style={{ width: active === i ? 22 : 6, height: 6, borderRadius: 3, background: active === i ? "var(--th-purple)" : "var(--th-surface2)", border: "none", cursor: "pointer", padding: 0, transition: "all 0.3s ease" }} />
+                ))}
+              </div>
+            </div>
+          </InView>
+
+          {/* Right mini cards */}
+          {others.map((t, i) => (
+            <InView key={t.name} delay={i * 0.15} direction="right">
+              <div onClick={() => setActive(TESTIMONIALS.indexOf(t))}
+                style={{ background: "var(--th-surface)", border: "1px solid var(--th-border)", borderRadius: 20, padding: "22px", cursor: "pointer", transition: "all 0.3s ease" }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.borderColor = "rgba(124,58,237,0.3)"; el.style.transform = "translateY(-4px)"; }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.borderColor = "var(--th-border)"; el.style.transform = "none"; }}
+              >
+                <div style={{ display: "flex", gap: 3, marginBottom: 12 }}>
+                  {Array.from({ length: t.stars }).map((_, si) => <svg key={si} width="13" height="13" viewBox="0 0 14 14" fill="#F59E0B"><path d="M7 1l1.8 3.6L13 5.3l-3 2.9.7 4.1L7 10.5l-3.7 1.8.7-4.1-3-2.9 4.2-.7L7 1z"/></svg>)}
+                </div>
+                <p style={{ fontSize: 14, lineHeight: 1.65, color: "var(--th-white2)", marginBottom: 18, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{t.quote}</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 9, background: `${t.courseColor}25`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--th-font-display)", fontSize: 12, fontWeight: 800, color: "var(--th-white)" }}>{t.initials}</div>
+                  <div>
+                    <div style={{ fontFamily: "var(--th-font-display)", fontSize: 13, fontWeight: 700, color: "var(--th-white)" }}>{t.name}</div>
+                    <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 10, color: "var(--th-muted)" }}>{t.role}</div>
+                  </div>
+                </div>
+              </div>
+            </InView>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// CTA BANNER
+// ─────────────────────────────────────────────────────────────
+function CTABanner() {
+  const [, setLocation] = useLocation();
+  return (
+    <section style={{ padding: "72px 24px", background: "var(--th-bg)" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        <InView>
+          <div style={{ position: "relative", borderRadius: 26, overflow: "hidden", background: "linear-gradient(135deg, #2d1a6e 0%, #1a1040 40%, #0d0820 100%)", border: "1px solid rgba(124,58,237,0.25)", padding: "64px 56px", boxShadow: "0 48px 100px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)" }}>
+            <div style={{ position: "absolute", top: -80, left: -80, width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(124,58,237,0.28) 0%, transparent 70%)", pointerEvents: "none" }} />
+            <div style={{ position: "absolute", bottom: -60, right: -60, width: 240, height: 240, borderRadius: "50%", background: "radial-gradient(circle, rgba(168,85,247,0.18) 0%, transparent 70%)", pointerEvents: "none" }} />
+            <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize: "48px 48px", pointerEvents: "none" }} />
+
+            <div style={{ position: "relative", textAlign: "center", maxWidth: 640, margin: "0 auto" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 100, padding: "5px 14px", marginBottom: 24 }}>
+                <span style={{ fontSize: 13 }}>🎯</span>
+                <span style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, color: "rgba(255,255,255,0.55)", letterSpacing: "0.1em", textTransform: "uppercase" }}>One free session. No commitment.</span>
+              </div>
+              <h2 style={{ fontFamily: "var(--th-font-display)", fontSize: "clamp(30px, 5vw, 58px)", fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.0, marginBottom: 18, color: "white" }}>
+                Ready to Begin{" "}
+                <span className="th-shimmer-text">the Journey?</span>
+              </h2>
+              <p style={{ fontSize: 17, color: "rgba(255,255,255,0.62)", lineHeight: 1.7, marginBottom: 36 }}>
+                The first step to mathematical mastery begins with a single session. See the Talent Hub difference yourself — before committing to anything.
+              </p>
+              <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+                <button onClick={() => setLocation("/login")} style={{ background: "white", color: "#1a1040", border: "none", padding: "14px 30px", borderRadius: 13, fontFamily: "var(--th-font-body)", fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "all 0.25s ease" }}
+                  onMouseEnter={e => { const el = e.currentTarget as HTMLButtonElement; el.style.transform = "translateY(-2px) scale(1.02)"; el.style.boxShadow = "0 14px 40px rgba(255,255,255,0.2)"; }}
+                  onMouseLeave={e => { const el = e.currentTarget as HTMLButtonElement; el.style.transform = "none"; el.style.boxShadow = "none"; }}
+                >
+                  Get Started Free <ArrowRight size={16} />
+                </button>
+                <a href="tel:+919266117055" style={{ background: "transparent", color: "white", border: "1px solid rgba(255,255,255,0.2)", padding: "14px 26px", borderRadius: 13, fontFamily: "var(--th-font-body)", fontSize: 16, fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none", transition: "all 0.25s ease" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.4)"; (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.06)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.2)"; (e.currentTarget as HTMLAnchorElement).style.background = "transparent"; }}
+                >
+                  <Phone size={16} /> Call Us Now
+                </a>
+              </div>
+              <div style={{ marginTop: 28, display: "flex", gap: 22, justifyContent: "center", flexWrap: "wrap" }}>
+                {["No registration fee", "Free trial class", "Flexible batch timings"].map((trust) => (
+                  <div key={trust} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "rgba(255,255,255,0.42)" }}>
+                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke="rgba(255,255,255,0.4)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    {trust}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </InView>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// FOOTER
+// ─────────────────────────────────────────────────────────────
+function Footer() {
+  return (
+    <footer style={{ background: "var(--th-bg2)", borderTop: "1px solid var(--th-border)", padding: "60px 24px 28px" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 48, marginBottom: 44 }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+              <div style={{ width: 32, height: 32, borderRadius: 10, background: "linear-gradient(135deg, var(--th-purple), #5b21b6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 5h8M8 5v6M5 11h6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </div>
+              <div>
+                <div style={{ fontFamily: "var(--th-font-display)", fontWeight: 700, fontSize: 15, color: "var(--th-white)" }}>Talent Hub</div>
+                <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 9, letterSpacing: "0.12em", color: "var(--th-muted)", textTransform: "uppercase" }}>Excellence Lab</div>
+              </div>
+            </div>
+            <p style={{ fontSize: 14, color: "var(--th-muted)", lineHeight: 1.7, maxWidth: 270, marginBottom: 16 }}>
+              Transforming how children learn and think through proven, structured, and genuinely engaging programs since 2006.
+            </p>
+            <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, color: "var(--th-muted2)", letterSpacing: "0.05em" }}>18+ Years · 900+ Students · 3 Branches</div>
+          </div>
+
+          <div>
+            <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--th-muted)", marginBottom: 18 }}>Programs</div>
+            {[["Abacus", "/courses/abacus"], ["Vedic Maths", "/courses/vedic-maths"], ["Handwriting", "/courses/handwriting"], ["STEM", "/courses/stem"]].map(([p, path]) => (
+              <div key={p} style={{ marginBottom: 10 }}>
+                <Link href={path as string}>
+                  <a style={{ fontSize: 14, color: "var(--th-white2)", textDecoration: "none", transition: "color 0.2s" }}
+                    onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = "white"}
+                    onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = "var(--th-white2)"}
+                  >{p}</a>
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          <div>
+            <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--th-muted)", marginBottom: 18 }}>Tools</div>
+            {[["Mental Math", "/mental"], ["Create Papers", "/create"], ["Burst Mode", "/burst"], ["Dashboard", "/dashboard"], ["Leaderboard", "/leaderboard"]].map(([t, path]) => (
+              <div key={t} style={{ marginBottom: 10 }}>
+                <Link href={path as string}>
+                  <a style={{ fontSize: 14, color: "var(--th-white2)", textDecoration: "none", transition: "color 0.2s" }}
+                    onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = "white"}
+                    onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = "var(--th-white2)"}
+                  >{t}</a>
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          <div>
+            <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--th-muted)", marginBottom: 18 }}>Branches</div>
+            {[{ name: "Rohini Sector 16", city: "New Delhi" }, { name: "Rohini Sector 11", city: "New Delhi" }, { name: "Gurgaon", city: "Haryana" }].map((b) => (
+              <div key={b.name} style={{ marginBottom: 14, display: "flex", gap: 7 }}>
+                <MapPin size={13} style={{ color: "var(--th-purple2)", marginTop: 2, flexShrink: 0 }} />
+                <div>
+                  <div style={{ fontSize: 14, color: "var(--th-white2)" }}>{b.name}</div>
+                  <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, color: "var(--th-muted)" }}>{b.city}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="th-glow-line" style={{ marginBottom: 22 }} />
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
+          <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 12, color: "var(--th-muted)" }}>
+            © {new Date().getFullYear()} Talent Hub Excellence Lab. All rights reserved.
+          </div>
+          <div style={{ display: "flex", gap: 18 }}>
+            {["Privacy Policy", "Terms of Service", "Contact"].map((link) => (
+              <a key={link} href="#" style={{ fontFamily: "var(--th-font-mono)", fontSize: 12, color: "var(--th-muted)", textDecoration: "none", transition: "color 0.2s" }}
+                onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = "var(--th-white2)"}
+                onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = "var(--th-muted)"}
+              >{link}</a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// MAIN HOME COMPONENT
+// ─────────────────────────────────────────────────────────────
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
-
+  const scrollY = useScrollY();
+  const [loaded, setLoaded] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [shuffledImages, setShuffledImages] = useState<string[]>([]);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Static image list (never changes)
   const carouselImages = useMemo(() => [
     "1.jpg","4.jpg","6.jpg","7.jpg","8.jpg","9.jpg","10.jpg","11.jpg","12.jpg","13.jpg","14.jpg",
     "0O9A8432.JPG","0O9A8434.JPG","0O9A8502.JPG","0O9A8564.JPG","0O9A8654.JPG","0O9A8660.JPG","0O9A8663.JPG",
@@ -24,395 +890,223 @@ export default function Home() {
     "2G4A0060.JPG","2G4A0559.JPG","2G4A0567.JPG","2G4A0742.JPG","773A1293.JPG","773A1317.JPG","773A1605.JPG","773A1606.JPG"
   ], []);
 
-  // Fisher-Yates shuffle (industry standard)
-  const shuffleArray = (array: string[]) => {
-    const arr = [...array];
-    for (let i = arr.length - 1; i > 0; i--) {
+  const shuffleArray = (arr: string[]) => {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
+      [a[i], a[j]] = [a[j], a[i]];
     }
-    return arr;
+    return a;
   };
 
-  // ⭐ Shuffle once on load
-  useEffect(() => {
-    setShuffledImages(shuffleArray(carouselImages));
-  }, [carouselImages]);
+  useEffect(() => { setShuffledImages(shuffleArray(carouselImages)); }, [carouselImages]);
+  useEffect(() => { const t = setTimeout(() => setLoaded(true), 80); return () => clearTimeout(t); }, []);
 
-  // ⭐ Preload next images (optimized & correct)
-// ⭐ Preload next images (optimized & correct)
   useEffect(() => {
     if (!shuffledImages.length) return;
+    const preload = (src: string) => { const img = new Image(); img.src = `/imagesproject/${src}`; };
+    preload(shuffledImages[(currentImageIndex + 1) % shuffledImages.length]);
+    preload(shuffledImages[(currentImageIndex + 2) % shuffledImages.length]);
+  }, [currentImageIndex, shuffledImages]);
 
-    const preload = (src: string) => {
-      const img = new Image();
-      img.src = `/imagesproject/${src}`;
-    };
-
-    const next1 = (currentImageIndex + 1) % shuffledImages.length;
-    const next2 = (currentImageIndex + 2) % shuffledImages.length;
-
-    preload(shuffledImages[next1]);
-    preload(shuffledImages[next2]);
-  }, [currentImageIndex, shuffledImages.length]);
-
-  // ⭐ Slideshow timer
   useEffect(() => {
-    if (!shuffledImages.length) return ;
-
-    const timer = setInterval(() => {
-      setCurrentImageIndex(prev => (prev + 1) % shuffledImages.length);
-    }, 5000);
-
+    if (!shuffledImages.length) return;
+    const timer = setInterval(() => setCurrentImageIndex(p => (p + 1) % shuffledImages.length), 5000);
     return () => clearInterval(timer);
   }, [shuffledImages]);
 
-
-
-  const reviews = [
-    { name: "Shikha Khandelwal", role: "Parent", text: "Very good institute for Abacus and vedic maths. My son's numeracy skills have considerably developed under the guidance of Ms. Sunita Khurana.", rating: 5 },
-    { name: "Neha Khanna", role: "Parent", text: "Abacus is a very good and effective technique to speed up calculations. The confidence level of my child is also boosted.", rating: 5 },
-    { name: "Yash", role: "Student", text: "Children are being nurtured well thanks for that🙏🏾, and I just request and hope that Talent Hub organisation and Parents continously makes sure that the children do not get prize-oriented alone.", rating: 5 }
-  ];
-
-  const courses = [
-    { id: "abacus", title: "Study Abacus", icon: Calculator, color: "from-blue-500 to-indigo-600", path: "/courses/abacus", desc: "Age 5-15 • The foundation of mental visualization.", image: "/imagesproject/homepage/abacus.png" },
-    { id: "vedic", title: "Vedic Maths", icon: BookOpen, color: "from-purple-500 to-pink-600", path: "/courses/vedic-maths", desc: "Age 10+ • Ancient sutras for modern rapid calculations.", image: "/imagesproject/homepage/Vedic-Maths.png" },
-    { id: "handwriting", title: "Handwriting", icon: PenTool, color: "from-emerald-500 to-teal-600", path: "/courses/handwriting", desc: "Develop Clear & Confident handwriting through guided practice.", image: "/imagesproject/homepage/handwriting.png" },
-    { id: "stem", title: "STEM", icon: Rocket, color: "from-orange-500 to-red-600", path: "/courses/stem", desc: "Future-ready learning through hands-on science & tech.", image: "/imagesproject/homepage/stem.png" }
-  ];
-
-  const tools = [
-    { 
-      title: "Mental Math Practice", 
-      desc: "Timed challenges to sharpen calculation speed. Practice complex operations mentally and track your improvement.", 
-      icon: Zap, 
-      action: "Try it now", 
-      path: "/mental",
-      color: "blue"
-    },
-    { 
-      title: "Live Paper Attempt", 
-      desc: "Real exam-style practice papers with instant feedback. Simulate actual test conditions and improve performance.", 
-      icon: FileText, 
-      action: "Create paper", 
-      path: "/create",
-      color: "purple"
-    },
-    { 
-      title: "Progress Tracking", 
-      desc: "Detailed analytics showing your improvement over time. See exactly where you excel and where to focus.", 
-      icon: BarChart3, 
-      action: "View dashboard", 
-      path: "/dashboard",
-      color: "emerald"
-    },
-    { 
-      title: "Points & Progress", 
-      desc: "Earn points for every practice session. Track your improvement and see how your hard work pays off.", 
-      icon: Flame, 
-      action: "View dashboard", 
-      path: "/dashboard",
-      color: "orange"
-    },
-    { 
-      title: "Speed & Accuracy", 
-      desc: "Every tool is designed to improve both speed and accuracy. Track your metrics and see real improvement.", 
-      icon: Target, 
-      action: "Built into every practice", 
-      path: "/mental",
-      color: "rose"
-    }
-  ];
-
-  const achievements = [
-    { 
-      title: "National & International Olympiads", 
-      desc: "Participate in prestigious math olympiads every year", 
-      icon: Globe,
-      image: "/imagesproject/homepage/olympiads.jpeg"
-    },
-    { 
-      title: "Medals & Certificates", 
-      desc: "Earn recognition for your achievements and milestones", 
-      icon: Medal,
-      image: "/imagesproject/homepage/medals_certificates.jpeg"
-    },
-    { 
-      title: "Monthly Tests", 
-      desc: "Regular assessments every last Sunday to track progress", 
-      icon: Calendar,
-      image: "/imagesproject/homepage/monthly_tests.jpeg"
-    },
-    { 
-      title: "Fun & Co-curricular Activities", 
-      desc: "Engaging activities that make learning enjoyable", 
-      icon: Heart,
-      image: "/imagesproject/homepage/fun_activities.jpeg"
-    }
-  ]; 
   if (!shuffledImages.length) return null;
-  return (
-    <div className="min-h-screen bg-background text-left">
-      {/* Dynamic Hero Section */}
-      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[120px] animate-pulse" />
-        </div>
 
-        <div className="container relative z-10 mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary border border-border text-xs font-bold tracking-widest uppercase mb-8">
-              <Sparkles className="w-4 h-4 text-primary" /> 18+ Years of Excellence
+  const scrolled = scrollY > 40;
+
+  const NAV_LINKS = [
+    { label: "Courses", path: "/#courses" },
+    { label: "Papers", path: "/create" },
+    { label: "Mental Math", path: "/mental" },
+    { label: "Burst", path: "/burst", badge: "NEW" },
+  ];
+
+  return (
+    <div style={{ background: "var(--th-bg)", color: "var(--th-white)", fontFamily: "var(--th-font-body)", overflowX: "hidden" }}>
+      <GlobalStyles />
+      <div className="th-noise" />
+
+      {/* ── NAVIGATION ─────────────────────────────────────────── */}
+      <nav style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, padding: "0 24px",
+        borderBottom: scrolled ? "1px solid var(--th-border)" : "1px solid transparent",
+        backdropFilter: scrolled ? "blur(22px)" : "none",
+        background: scrolled ? "rgba(7,8,15,0.88)" : "transparent",
+        transition: "all 0.3s ease",
+      }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", height: 66, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <button onClick={() => setLocation("/")} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 9 }}>
+            <div style={{ width: 30, height: 30, borderRadius: 9, background: "linear-gradient(135deg, var(--th-purple), #5b21b6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M4 5h8M8 5v6M5 11h6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
-            <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-[0.9]">
-              Crafting <span className="text-gradient">Genius</span> <br />
-              One Beat at <br /> a Time.
-            </h1>
-            <p className="text-xl text-muted-foreground mb-12 max-w-lg leading-relaxed">
-              Strong basics, regular practice, and confidence that shows — in class and beyond.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link href="/create">
-                <button className="px-10 py-5 bg-primary text-primary-foreground rounded-full font-black text-lg shadow-2xl shadow-primary/20 hover:scale-105 transition-all flex items-center gap-3">
-                  Start Training <ArrowRight className="w-5 h-5" />
-                </button>
-              </Link>
-              <button 
-                onClick={() => document.getElementById("courses-section")?.scrollIntoView({ behavior: "smooth" })}
-                className="px-10 py-5 bg-secondary text-secondary-foreground border border-border rounded-full font-black text-lg hover:bg-muted transition-all"
+            <div>
+              <div style={{ fontFamily: "var(--th-font-display)", fontWeight: 700, fontSize: 15, letterSpacing: "-0.02em", color: "var(--th-white)", lineHeight: 1 }}>Talent Hub</div>
+              <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 8, letterSpacing: "0.14em", color: "var(--th-muted)", textTransform: "uppercase" }}>Excellence Lab</div>
+            </div>
+          </button>
+
+          <div className="th-hide-mobile" style={{ display: "flex", alignItems: "center", gap: 2 }}>
+            {NAV_LINKS.map((item) => (
+              <button key={item.label} onClick={() => setLocation(item.path)} style={{ background: "none", border: "none", color: "var(--th-white2)", fontFamily: "var(--th-font-body)", fontSize: 14, fontWeight: 500, cursor: "pointer", padding: "7px 13px", borderRadius: 8, display: "flex", alignItems: "center", gap: 5, transition: "color 0.2s, background 0.2s" }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "white"; (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.05)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--th-white2)"; (e.currentTarget as HTMLButtonElement).style.background = "none"; }}
               >
+                {item.label}
+                {item.badge && <span style={{ background: "var(--th-orange)", color: "white", fontSize: 9, fontWeight: 700, padding: "2px 5px", borderRadius: 4, letterSpacing: "0.05em" }}>{item.badge}</span>}
+              </button>
+            ))}
+          </div>
+
+          <div className="th-hide-mobile" style={{ display: "flex", alignItems: "center", gap: 9 }}>
+            <button className="th-btn-secondary" onClick={() => setLocation("/login")} style={{ padding: "8px 17px", fontSize: 14, borderRadius: 10 }}>Sign In</button>
+            <button className="th-btn-primary" onClick={() => setLocation(isAuthenticated ? "/dashboard" : "/login")} style={{ padding: "8px 17px", fontSize: 14, borderRadius: 10 }}>
+              Get Started <ArrowRight size={14} />
+            </button>
+          </div>
+
+          <button className="th-hide-desktop" onClick={() => setMobileMenuOpen(true)} style={{ background: "none", border: "none", color: "white", cursor: "pointer", padding: 4 }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile menu overlay */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+            style={{ position: "fixed", inset: 0, zIndex: 2000, background: "var(--th-bg2)", display: "flex", flexDirection: "column", padding: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 36 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg, var(--th-purple), #5b21b6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 5h8M8 5v6M5 11h6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </div>
+                <span style={{ fontFamily: "var(--th-font-display)", fontWeight: 700, fontSize: 15, color: "var(--th-white)" }}>Talent Hub</span>
+              </div>
+              <button onClick={() => setMobileMenuOpen(false)} style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            {NAV_LINKS.map((item) => (
+              <button key={item.label} onClick={() => { setLocation(item.path); setMobileMenuOpen(false); }} style={{ background: "none", border: "none", color: "var(--th-white2)", fontFamily: "var(--th-font-body)", fontSize: 20, fontWeight: 600, cursor: "pointer", padding: "14px 0", textAlign: "left", borderBottom: "1px solid var(--th-border)" }}>
+                {item.label}
+              </button>
+            ))}
+            <div style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 10 }}>
+              <button className="th-btn-secondary" onClick={() => { setLocation("/login"); setMobileMenuOpen(false); }} style={{ width: "100%", justifyContent: "center" }}>Sign In</button>
+              <button className="th-btn-primary" onClick={() => { setLocation(isAuthenticated ? "/dashboard" : "/login"); setMobileMenuOpen(false); }} style={{ width: "100%", justifyContent: "center" }}>Get Started <ArrowRight size={14} /></button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── HERO SECTION ──────────────────────────────────────────── */}
+      <section style={{ position: "relative", minHeight: "100vh", display: "flex", alignItems: "center", overflow: "hidden", paddingTop: 80 }}>
+        <div style={{ position: "absolute", top: "8%", left: "3%", width: 650, height: 650, borderRadius: "50%", background: "radial-gradient(circle, rgba(124,58,237,0.10) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", bottom: "8%", right: "3%", width: 420, height: 420, borderRadius: "50%", background: "radial-gradient(circle, rgba(124,58,237,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", backgroundImage: "linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px)", backgroundSize: "60px 60px", maskImage: "radial-gradient(ellipse at 50% 50%, black 30%, transparent 80%)" }} />
+
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", width: "100%", display: "grid", gridTemplateColumns: "55% 42%", gap: 60, alignItems: "center" }}>
+          <div>
+            <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(14px)", transition: "all 0.6s cubic-bezier(.4,0,.2,1) 0.1s", display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(124,58,237,0.10)", border: "1px solid rgba(124,58,237,0.22)", borderRadius: 100, padding: "7px 14px", marginBottom: 24 }}>
+              <span style={{ color: "var(--th-purple2)", fontSize: 11 }}>✦</span>
+              <span style={{ fontFamily: "var(--th-font-mono)", fontSize: 12, fontWeight: 500, color: "var(--th-purple2)", letterSpacing: "0.04em" }}>18+ Years of Excellence</span>
+              <span style={{ width: 1, height: 11, background: "rgba(124,58,237,0.3)" }} />
+              <span style={{ fontFamily: "var(--th-font-mono)", fontSize: 12, color: "var(--th-muted)" }}>900+ Students</span>
+            </div>
+
+            <h1 style={{ fontFamily: "var(--th-font-display)", fontWeight: 800, lineHeight: 1.01, letterSpacing: "-0.03em", marginBottom: 20, opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(22px)", transition: "all 0.7s cubic-bezier(.4,0,.2,1) 0.2s" }}>
+              <span style={{ display: "block", fontSize: "clamp(48px, 5.8vw, 82px)", color: "var(--th-white)" }}>Crafting</span>
+              <span style={{ display: "block", fontSize: "clamp(48px, 5.8vw, 82px)" }} className="th-gradient-text">Genius</span>
+              <span style={{ display: "block", fontSize: "clamp(48px, 5.8vw, 82px)", color: "var(--th-white)" }}>One Beat</span>
+              <span style={{ display: "block", fontSize: "clamp(48px, 5.8vw, 82px)", color: "var(--th-white)" }}>at a Time.</span>
+            </h1>
+
+            <p style={{ fontSize: 17, lineHeight: 1.72, color: "var(--th-white2)", maxWidth: 440, marginBottom: 32, opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(18px)", transition: "all 0.7s cubic-bezier(.4,0,.2,1) 0.35s" }}>
+              Strong basics, regular practice, and the confidence that shows — in class, in exams, and beyond. We build thinkers, not test-takers.
+            </p>
+
+            <div style={{ display: "flex", gap: 11, flexWrap: "wrap", opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(14px)", transition: "all 0.7s cubic-bezier(.4,0,.2,1) 0.45s" }}>
+              <button className="th-btn-primary" onClick={() => setLocation(isAuthenticated ? "/dashboard" : "/login")} style={{ fontSize: 15, padding: "13px 26px" }}>
+                Start Your Journey <ArrowRight size={15} />
+              </button>
+              <button className="th-btn-secondary" onClick={() => document.getElementById("courses-section")?.scrollIntoView({ behavior: "smooth" })} style={{ fontSize: 15, padding: "13px 26px" }}>
                 Explore Programs
               </button>
             </div>
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="relative aspect-square"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-purple-500/20 rounded-[4rem] blur-2xl" />
-            <div className="relative h-full w-full rounded-[4rem] overflow-hidden border border-border bg-card shadow-2xl group">
-              <AnimatePresence mode="wait">
-              <motion.div
-                key={currentImageIndex}
-                initial={{ opacity: 0, scale: 1.1 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 1 }}
-                className="absolute inset-0"
-              >
-                <img
-                  src={`/imagesproject/${shuffledImages[currentImageIndex]}`}
-                  className="w-full h-full object-cover"
-                  alt="Talent Hub Excellence"
-                  loading={currentImageIndex === 0 ? "eager" : "lazy"}
-                  decoding="async"
-                  {...(currentImageIndex === 0 ? { fetchpriority: "high" as const } : {})}
-                />
-              </motion.div>
-            </AnimatePresence>
-
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-12 left-12 right-12">
-                <div className="flex items-center gap-4 text-white">
-                  <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
-                    <Trophy className="w-6 h-6" />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="font-bold text-xl leading-none">900+ Students</h3>
-                    <p className="text-white/60 text-sm mt-1">Guided over the years.</p>
-                  </div>
+            <div style={{ display: "flex", gap: 28, marginTop: 40, opacity: loaded ? 1 : 0, transition: "opacity 0.7s cubic-bezier(.4,0,.2,1) 0.6s", paddingTop: 28, borderTop: "1px solid var(--th-border)" }}>
+              {[{ val: "18+", label: "Years Active" }, { val: "900+", label: "Students Shaped" }, { val: "4", label: "Programs" }].map((s) => (
+                <div key={s.label}>
+                  <div style={{ fontFamily: "var(--th-font-display)", fontSize: 28, fontWeight: 800, letterSpacing: "-0.03em", color: "var(--th-white)" }}>{s.val}</div>
+                  <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 10, color: "var(--th-muted)", letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 2 }}>{s.label}</div>
                 </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Courses Section */}
-      <section id="courses-section" className="py-32">
-        <div className="container mx-auto px-6 text-left">
-          <div className="max-w-3xl mb-24">
-            <h2 className="text-5xl font-black tracking-tighter mb-8 uppercase italic">Our Programs</h2>
-            <p className="text-xl text-muted-foreground">Four structured pathways to sharper thinking. Built for real improvement, not shortcuts.</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {courses.map((c) => (
-              <motion.div
-                key={c.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                className="group relative h-[450px] rounded-[3rem] overflow-hidden border border-border"
-              >
-                <img 
-                  src={c.image} 
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                  alt={c.title}
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-                <div className="absolute bottom-10 left-10 right-10">
-                  <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-6 border border-white/30">
-                    <c.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-2 leading-tight">{c.title}</h3>
-                  <p className="text-white/70 text-sm leading-relaxed">{c.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Tools Section */}
-      <section className="py-32 bg-secondary/30">
-        <div className="container mx-auto px-6 text-left">
-          <div className="max-w-3xl mb-24">
-            <h2 className="text-5xl font-black tracking-tighter mb-8 uppercase italic">The Toolkit</h2>
-            <p className="text-xl text-muted-foreground">Every tool on this platform is built to track, measure, and improve real learning outcomes.</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {tools.map((tool, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                viewport={{ once: true }}
-                className="group p-10 rounded-[2.5rem] bg-card border border-border hover:border-primary/50 transition-all hover:shadow-2xl"
-              >
-                <div className={`w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-8 group-hover:bg-primary group-hover:text-white transition-all`}>
-                  <tool.icon className="w-7 h-7" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4">{tool.title}</h3>
-                <p className="text-muted-foreground mb-10 leading-relaxed text-sm">{tool.desc}</p>
-                <Link href={tool.path}>
-                  <button className="flex items-center gap-2 font-black text-xs uppercase tracking-widest group-hover:text-primary transition-colors">
-                    {tool.action} <ArrowRight className="w-4 h-4" />
-                  </button>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Olympiads & Achievements */}
-      <section className="py-32">
-        <div className="container mx-auto px-6 text-left">
-          <div className="max-w-3xl mb-24">
-            <h2 className="text-5xl font-black tracking-tighter mb-8 uppercase italic">Olympiads & Achievements</h2>
-            <p className="text-xl text-muted-foreground">Structured assessments and national-level competitions that recognize consistent effort and excellence.</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {achievements.map((a, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                className="group relative h-[450px] rounded-[3rem] overflow-hidden border border-border"
-              >
-                <img 
-                  src={a.image} 
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                  alt={a.title}
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-                <div className="absolute bottom-10 left-10 right-10">
-                  <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-6 border border-white/30">
-                    <a.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-2 leading-tight">{a.title}</h3>
-                  <p className="text-white/70 text-sm leading-relaxed">{a.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Premium Testimonials */}
-      <section className="py-32 bg-slate-950 text-white overflow-hidden relative">
-        <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none">
-          <div className="absolute top-0 left-[20%] w-[1px] h-full bg-white/10" />
-          <div className="absolute top-0 left-[40%] w-[1px] h-full bg-white/10" />
-          <div className="absolute top-0 left-[60%] w-[1px] h-full bg-white/10" />
-          <div className="absolute top-0 left-[80%] w-[1px] h-full bg-white/10" />
-        </div>
-        
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-4xl text-left">
-            <h2 className="text-4xl md:text-6xl font-black mb-24 tracking-tighter italic uppercase">Testimonials</h2>
-            <div className="space-y-16">
-              {reviews.map((r, i) => (
-                <motion.div 
-                  key={i}
-                  initial={{ opacity: 0, x: -30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.2 }}
-                  viewport={{ once: true }}
-                  className="relative pl-12"
-                >
-                  <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary to-transparent" />
-                  <p className="text-2xl md:text-4xl font-medium mb-10 leading-tight opacity-90 italic">"{r.text}"</p>
-                  <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center font-bold text-2xl text-primary border border-primary/30">
-                      {r.name.charAt(0)}
-                    </div>
-                    <div className="text-left">
-                      <h4 className="font-bold text-xl uppercase tracking-tight">{r.name}</h4>
-                      <p className="text-xs uppercase tracking-[0.3em] text-primary mt-1">{r.role}</p>
-                    </div>
-                  </div>
-                </motion.div>
               ))}
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* CTA Excellence */}
-      <section className="py-32">
-        <div className="container mx-auto px-6">
-          <div className="relative rounded-[4rem] overflow-hidden bg-primary py-24 px-12 text-center border border-white/10 shadow-2xl">
-            <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
-            <div className="relative z-10 max-w-3xl mx-auto">
-              <h2 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter italic">READY TO BEGIN THE JOURNEY?</h2>
-              <p className="text-white/80 text-xl mb-12 font-medium">
-                The first step to mathematical mastery begins with a single session. Join the legacy.
-              </p>
-              <div className="flex flex-wrap justify-center gap-6">
-                <Link href="/login">
-                  <button className="px-12 py-5 bg-white text-primary rounded-full font-black text-xl hover:scale-105 transition-all shadow-2xl">
-                    Get Started Free
-                  </button>
-                </Link>
-                <a href="tel:+919266117055">
-                  <button className="px-12 py-5 bg-transparent border-2 border-white/30 text-white rounded-full font-black text-xl hover:bg-white/10 transition-all flex items-center gap-3">
-                    <Phone className="w-6 h-6" /> Connect
-                  </button>
-                </a>
+          {/* Right visual */}
+          <div className="th-hide-mobile" style={{ position: "relative", opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateX(28px)", transition: "all 0.9s cubic-bezier(.4,0,.2,1) 0.3s" }}>
+            <div style={{ background: "linear-gradient(145deg, var(--th-surface), var(--th-bg3))", border: "1px solid var(--th-border2)", borderRadius: 26, overflow: "hidden", height: 460, position: "relative", boxShadow: "0 48px 100px rgba(0,0,0,0.55), 0 0 60px rgba(124,58,237,0.12)" }}>
+              <AnimatePresence mode="wait">
+                <motion.div key={currentImageIndex} initial={{ opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.9 }} style={{ position: "absolute", inset: 0 }}>
+                  <img
+                    src={`/imagesproject/${shuffledImages[currentImageIndex]}`}
+                    className="w-full h-full object-cover"
+                    alt="Talent Hub Excellence"
+                    loading={currentImageIndex === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    {...(currentImageIndex === 0 ? { fetchPriority: "high" } : {})}
+                  />
+                </motion.div>
+              </AnimatePresence>
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(7,8,15,0.75) 0%, rgba(7,8,15,0.1) 50%, transparent 100%)" }} />
+              <div style={{ position: "absolute", bottom: 18, left: 18, right: 18, background: "rgba(7,8,15,0.82)", backdropFilter: "blur(16px)", border: "1px solid rgba(124,58,237,0.22)", borderRadius: 14, padding: "13px 16px", display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 38, height: 38, borderRadius: 11, background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.25)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--th-purple2)", flexShrink: 0 }}>
+                  <Trophy size={17} strokeWidth={1.6} />
+                </div>
+                <div>
+                  <div style={{ fontFamily: "var(--th-font-display)", fontSize: 16, fontWeight: 800, color: "var(--th-white)" }}>900+ Students Guided</div>
+                  <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 10, color: "var(--th-muted)", letterSpacing: "0.05em" }}>Across 18 years of excellence</div>
+                </div>
               </div>
+            </div>
+
+            <div style={{ position: "absolute", top: -14, right: -14, background: "var(--th-purple)", borderRadius: 13, padding: "9px 14px", fontFamily: "var(--th-font-display)", fontWeight: 700, fontSize: 13, color: "white", boxShadow: "0 8px 30px rgba(124,58,237,0.45)", animation: "th-float 4s ease-in-out infinite", zIndex: 2 }}>
+              🏆 Olympiad Winners
+            </div>
+
+            <div style={{ position: "absolute", bottom: 92, left: -18, background: "rgba(7,8,15,0.88)", backdropFilter: "blur(16px)", border: "1px solid rgba(245,158,11,0.22)", borderRadius: 13, padding: "11px 14px", animation: "th-float 5s ease-in-out infinite 1.2s", boxShadow: "0 8px 30px rgba(0,0,0,0.4)", zIndex: 2 }}>
+              <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 9, color: "var(--th-gold)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 3 }}>Latest Achievement</div>
+              <div style={{ fontFamily: "var(--th-font-display)", fontSize: 14, fontWeight: 700, color: "white" }}>National Olympiad 🥇</div>
             </div>
           </div>
         </div>
+
+        <div style={{ position: "absolute", bottom: 28, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 5, opacity: loaded ? 0.35 : 0, transition: "opacity 1s ease 1.4s" }}>
+          <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 9, letterSpacing: "0.12em", color: "var(--th-muted)", textTransform: "uppercase" }}>Scroll</div>
+          <div style={{ width: 1, height: 36, background: "linear-gradient(to bottom, var(--th-muted), transparent)" }} />
+        </div>
       </section>
+
+      {/* ── REST OF SECTIONS ─────────────────────────────────────── */}
+      <MarqueeBar />
+      <StatsBar />
+
+      <div id="courses-section">
+        <Programs />
+      </div>
+
+      <WhySection />
+      <Toolkit />
+      <AchievementsSection />
+      <Testimonials />
+      <CTABanner />
+      <Footer />
     </div>
   );
 }

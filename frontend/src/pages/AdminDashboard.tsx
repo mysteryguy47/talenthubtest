@@ -489,7 +489,7 @@ export default function AdminDashboard() {
                     Manage Students
                   </button>
                   <button
-                    onClick={() => setLocation("/student-ids")}
+                    onClick={() => setLocation("/admin/student-ids")}
                     className="flex items-center gap-1.5 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-xl text-sm font-bold transition-colors"
                   >
                     <IdCard className="w-4 h-4" />
