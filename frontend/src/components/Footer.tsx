@@ -1,225 +1,203 @@
-import { Link, useLocation } from "wouter";
-import { GraduationCap, MapPin, Heart, Calculator, BookOpen, PenTool, Rocket, FileText, Brain, Trophy, BarChart3, Phone, Mail, Instagram } from "lucide-react";
+import type { CSSProperties, ReactNode, MouseEvent as RMouseEvent } from "react";
+import { Link } from "wouter";
+import { GraduationCap, Phone, Mail, Instagram, MapPin } from "lucide-react";
 
+/** Dark premium footer — always-dark design that works on any page. */
 export default function Footer() {
-  const [location, setLocation] = useLocation();
+  const D = {
+    bg:      "#09090f",
+    border:  "rgba(255,255,255,0.07)",
+    white:   "#f0f0f8",
+    white2:  "rgba(240,240,248,0.70)",
+    muted:   "rgba(240,240,248,0.38)",
+    muted2:  "rgba(240,240,248,0.22)",
+    purple2: "#a78bfa",
+  };
 
-  // Handle logo click - scroll to hero section
-  const handleLogoClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (location === "/") {
-      // Already on home page, scroll to top
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      // Navigate to home, then scroll to top
-      setLocation("/");
-      // Small delay to ensure page loads before scrolling
-      setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }, 100);
-    }
+  const fontDisplay = "'Plus Jakarta Sans','Syne',system-ui,sans-serif";
+  const fontMono    = "'DM Mono','JetBrains Mono',monospace";
+  const fontBody    = "'DM Sans','Outfit',system-ui,sans-serif";
+
+  const linkStyle: CSSProperties = {
+    display: "flex", alignItems: "center", gap: 8,
+    fontSize: 14, color: D.white2, textDecoration: "none",
+    marginBottom: 10, fontFamily: fontBody, transition: "color 0.2s",
+  };
+
+  const sectionLabel: CSSProperties = {
+    fontFamily: fontMono, fontSize: 10, fontWeight: 600,
+    letterSpacing: "0.14em", textTransform: "uppercase",
+    color: D.muted, marginBottom: 18,
+  };
+
+  const contactBtn: CSSProperties = {
+    width: 36, height: 36, borderRadius: 10,
+    border: `1px solid ${D.border}`,
+    background: "rgba(255,255,255,0.04)",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    color: D.muted, textDecoration: "none",
+    transition: "all 0.2s ease",
+  };
+
+  const onConEnter = (e: RMouseEvent<HTMLAnchorElement>) => {
+    const el = e.currentTarget;
+    el.style.background = "rgba(124,58,237,0.15)";
+    el.style.borderColor = "rgba(124,58,237,0.35)";
+    el.style.color = D.purple2;
+    el.style.transform = "translateY(-2px)";
+  };
+  const onConLeave = (e: RMouseEvent<HTMLAnchorElement>) => {
+    const el = e.currentTarget;
+    el.style.background = "rgba(255,255,255,0.04)";
+    el.style.borderColor = D.border;
+    el.style.color = D.muted;
+    el.style.transform = "none";
+  };
+
+  const onLinkEnter = (e: RMouseEvent<HTMLAnchorElement>) => {
+    e.currentTarget.style.color = D.white;
+  };
+  const onLinkLeave = (e: RMouseEvent<HTMLAnchorElement>) => {
+    e.currentTarget.style.color = D.white2;
   };
 
   return (
-    <footer className="relative bg-gradient-to-br from-slate-900 via-purple-900/30 to-slate-950 dark:from-slate-950 dark:via-purple-950/50 dark:to-slate-950 text-foreground overflow-hidden border-t border-border/20">
-      {/* Subtle background gradient overlay */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
-        <div className="absolute top-0 left-1/4 w-64 h-64 premium-gradient rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-64 h-64 premium-gradient rounded-full blur-3xl"></div>
-      </div>
+    <footer style={{ background: D.bg, borderTop: `1px solid ${D.border}`, padding: "64px 24px 28px", fontFamily: fontBody }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
 
-      <div className="relative container mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12 mb-6">
-          {/* Column 1: Brand */}
-          <div className="lg:col-span-2">
-            <a 
-              href="/" 
-              onClick={handleLogoClick}
-              className="flex items-center gap-3 mb-4 group cursor-pointer"
-            >
-              <img 
-                src="/imagesproject/logo.ico.jpg" 
-                alt="Talent Hub Logo" 
-                className="w-11 h-11 rounded-xl object-cover shadow-lg group-hover:shadow-xl transition-all duration-300"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  const fallback = target.nextElementSibling as HTMLElement;
-                  if (fallback) fallback.style.display = 'flex';
-                }}
-              />
-              <div className="w-11 h-11 rounded-xl premium-gradient items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 hidden">
-                <GraduationCap className="w-6 h-6 text-primary-foreground" />
+        {/* Main grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1.4fr 1fr", gap: "48px 40px", marginBottom: 48 }}>
+
+          {/* Brand */}
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+              <div style={{ position: "relative", flexShrink: 0 }}>
+                <img
+                  src="/imagesproject/logo.ico.jpg"
+                  alt="Talent Hub Logo"
+                  style={{ width: 40, height: 40, borderRadius: 12, objectFit: "cover" }}
+                  onError={(e) => {
+                    const t = e.target as HTMLImageElement;
+                    t.style.display = "none";
+                    const fb = t.nextElementSibling as HTMLElement;
+                    if (fb) fb.style.display = "flex";
+                  }}
+                />
+                <div style={{
+                  width: 40, height: 40, borderRadius: 12,
+                  background: "linear-gradient(135deg,#7c3aed,#5b21b6)",
+                  display: "none", alignItems: "center", justifyContent: "center",
+                }}>
+                  <GraduationCap size={18} color="white" />
+                </div>
               </div>
               <div>
-                <div className="text-xl font-extrabold text-primary-foreground tracking-tight">
-                  Talent Hub
-                </div>
-                <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em]">Excellence Lab</div>
+                <div style={{ fontFamily: fontDisplay, fontWeight: 700, fontSize: 16, color: D.white, lineHeight: 1.1 }}>Talent Hub</div>
+                <div style={{ fontFamily: fontMono, fontSize: 9, letterSpacing: "0.16em", color: D.muted, textTransform: "uppercase" }}>Excellence Lab</div>
               </div>
-            </a>
-            <p className="text-muted-foreground text-sm leading-relaxed max-w-sm mb-4">
-              Transforming mathematics learning through innovative tools and personalized practice.
+            </div>
+
+            <p style={{ fontSize: 13.5, color: D.muted, lineHeight: 1.72, maxWidth: 260, marginBottom: 18 }}>
+              Transforming how children learn and think through proven, structured, and genuinely engaging programs since 2006.
             </p>
-            <p className="text-muted-foreground/70 text-xs font-medium mb-4">
-              18+ Years of Teaching Excellence
-            </p>
-            
-            {/* Social Icons */}
-            <div className="flex items-center gap-3">
-              <a 
-                href="tel:+919266117055" 
-                className="w-10 h-10 rounded-lg bg-secondary/50 backdrop-blur-sm hover:bg-primary/20 flex items-center justify-center transition-all duration-200 group border border-border/50"
-                title="Call us: 9266117055"
-              >
-                <Phone className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:scale-110 transition-all" />
-              </a>
-              <a 
-                href="mailto:ayushkhurana47@gmail.com" 
-                className="w-10 h-10 rounded-lg bg-secondary/50 backdrop-blur-sm hover:bg-primary/20 flex items-center justify-center transition-all duration-200 group border border-border/50"
-                title="Email us: ayushkhurana47@gmail.com"
-              >
-                <Mail className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:scale-110 transition-all" />
-              </a>
-              <a 
-                href="https://www.instagram.com/talenthub16?igsh=NzRkcHpyY2N2bTVh" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-secondary/50 backdrop-blur-sm hover:bg-primary/20 flex items-center justify-center transition-all duration-200 group border border-border/50"
-                title="Follow us on Instagram"
-              >
-                <Instagram className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:scale-110 transition-all" />
-              </a>
-              <a 
-                href="https://share.google/FtlKId4blBwgX9Q0w" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-secondary/50 backdrop-blur-sm hover:bg-primary/20 flex items-center justify-center transition-all duration-200 group border border-border/50"
-                title="Find us on Google Maps"
-              >
-                <MapPin className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:scale-110 transition-all" />
-              </a>
+
+            <div style={{ fontFamily: fontMono, fontSize: 11, color: D.muted2, letterSpacing: "0.05em", marginBottom: 22 }}>
+              🏆 18+ Years &nbsp;·&nbsp; 👥 900+ Students &nbsp;·&nbsp; 📍 3 Branches
+            </div>
+
+            {/* Contact buttons */}
+            <div style={{ display: "flex", gap: 8 }}>
+              {([
+                ["tel:+919266117055", "📞 Call", <Phone size={15} key="p" />],
+                ["mailto:ayushkhurana47@gmail.com", "📧 Mail", <Mail size={15} key="m" />],
+                ["https://www.instagram.com/talenthub16?igsh=NzRkcHpyY2N2bTVh", "📸 Instagram", <Instagram size={15} key="i" />],
+                ["https://share.google/FtlKId4blBwgX9Q0w", "📍 Directions", <MapPin size={15} key="d" />],
+              ] as [string, string, ReactNode][]).map(([href, title, icon]) => (
+                <a key={title} href={href} style={contactBtn} title={title}
+                  target={href.startsWith("http") ? "_blank" : undefined}
+                  rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  onMouseEnter={onConEnter} onMouseLeave={onConLeave}>
+                  {icon}
+                </a>
+              ))}
             </div>
           </div>
 
-          {/* Column 2: Programs */}
+          {/* Programs */}
           <div>
-            <h3 className="text-xs font-black mb-4 text-primary-foreground uppercase tracking-widest">Programs</h3>
-            <ul className="space-y-2.5">
-              <li>
-                <Link href="/courses/abacus">
-                  <span className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer flex items-center gap-2">
-                    <Calculator className="w-3.5 h-3.5" />
-                    Abacus
-                  </span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/courses/vedic-maths">
-                  <span className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer flex items-center gap-2">
-                    <BookOpen className="w-3.5 h-3.5" />
-                    Vedic Maths
-                  </span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/courses/handwriting">
-                  <span className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer flex items-center gap-2">
-                    <PenTool className="w-3.5 h-3.5" />
-                    Handwriting
-                  </span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/courses/stem">
-                  <span className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer flex items-center gap-2">
-                    <Rocket className="w-3.5 h-3.5" />
-                    STEM
-                  </span>
-                </Link>
-              </li>
-            </ul>
+            <div style={sectionLabel}>Programs</div>
+            {([
+              ["🧮 Study Abacus",  "/courses/abacus"],
+              ["🕉️ Vedic Maths",  "/courses/vedic-maths"],
+              ["✍️ Handwriting",  "/courses/handwriting"],
+              ["🤖 STEM",         "/courses/stem"],
+            ] as [string, string][]).map(([label, href]) => (
+              <Link href={href} key={href}>
+                <a style={linkStyle} onMouseEnter={onLinkEnter} onMouseLeave={onLinkLeave}>{label}</a>
+              </Link>
+            ))}
           </div>
 
-          {/* Column 3: Tools */}
+          {/* Practice & Games */}
           <div>
-            <h3 className="text-xs font-black mb-4 text-primary-foreground uppercase tracking-widest">Tools</h3>
-            <ul className="space-y-2.5">
-              <li>
-                <Link href="/create">
-                  <span className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer flex items-center gap-2">
-                    <FileText className="w-3.5 h-3.5" />
-                    Create Papers
-                  </span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/mental">
-                  <span className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer flex items-center gap-2">
-                    <Brain className="w-3.5 h-3.5" />
-                    Mental Math
-                  </span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/dashboard">
-                  <span className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer flex items-center gap-2">
-                    <Trophy className="w-3.5 h-3.5" />
-                    Dashboard
-                  </span>
-                </Link>
-              </li>
-              <li>
-                <span className="text-sm text-muted-foreground/50 cursor-default flex items-center gap-2">
-                  <BarChart3 className="w-3.5 h-3.5" />
-                  Coming Soon
-                </span>
-              </li>
-            </ul>
+            <div style={sectionLabel}>Practice &amp; Games</div>
+            {([
+              ["📄 Create Papers",   "/create"],
+              ["🧠 Mental Math",     "/mental"],
+              ["⚡ Burst Mode",      "/burst"],
+              ["🧮 Soroban Abacus",  "/tools/soroban"],
+              ["⊞ Vedic Grid",       "/tools/gridmaster"],
+              ["✨ Magic Square",    "/tools/gridmaster?tab=magic"],
+            ] as [string, string][]).map(([label, href]) => (
+              <Link href={href} key={label}>
+                <a style={linkStyle} onMouseEnter={onLinkEnter} onMouseLeave={onLinkLeave}>{label}</a>
+              </Link>
+            ))}
           </div>
 
-          {/* Column 4: Contact & Branches */}
+          {/* Branches */}
           <div>
-            <h3 className="text-xs font-black mb-4 text-primary-foreground uppercase tracking-widest">Branches</h3>
-            <ul className="space-y-3 mb-4">
-              <li className="flex items-start gap-2">
-                <MapPin className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+            <div style={sectionLabel}>Branches</div>
+            {[
+              { name: "Rohini Sector 16", city: "New Delhi" },
+              { name: "Rohini Sector 11", city: "New Delhi" },
+              { name: "Gurgaon",          city: "Haryana" },
+            ].map((b) => (
+              <div key={b.name} style={{ display: "flex", gap: 7, marginBottom: 16 }}>
+                <MapPin size={13} color={D.purple2} style={{ marginTop: 3, flexShrink: 0 }} />
                 <div>
-                  <p className="text-sm text-primary-foreground font-medium">Rohini Sector - 16</p>
-                  <p className="text-xs text-muted-foreground">New Delhi</p>
+                  <div style={{ fontSize: 13.5, color: D.white2, lineHeight: 1.3 }}>📍 {b.name}</div>
+                  <div style={{ fontFamily: fontMono, fontSize: 10.5, color: D.muted, marginTop: 2 }}>{b.city}</div>
                 </div>
-              </li>
-              <li className="flex items-start gap-2">
-                <MapPin className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-sm text-primary-foreground font-medium">Rohini Sector - 11</p>
-                  <p className="text-xs text-muted-foreground">New Delhi</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-2">
-                <MapPin className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-sm text-primary-foreground font-medium">Gurgaon</p>
-                  <p className="text-xs text-muted-foreground">Haryana</p>
-                </div>
-              </li>
-            </ul>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-border/20 pt-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-muted-foreground/70">
-            © 2026 Talent Hub.
-          </p>
-          <div className="flex-1"></div>
-          <p className="text-xs text-muted-foreground/70">
-            Made with <Heart className="w-3 h-3 text-red-500 fill-red-500 inline" /> and consistency for learning.
-          </p>
+        {/* Divider */}
+        <div style={{ height: 1, background: `linear-gradient(90deg,transparent,${D.border} 20%,${D.border} 80%,transparent)`, marginBottom: 22 }} />
+
+        {/* Bottom bar */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+          <div style={{ fontFamily: fontMono, fontSize: 12, color: D.muted }}>
+            © {new Date().getFullYear()} Talent Hub Excellence Lab. Made with ❤️ &amp; consistency.
+          </div>
+          <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
+            {([
+              ["🔒 Privacy Policy",   "#"],
+              ["📜 Terms of Service", "#"],
+              ["📬 Contact",          "mailto:ayushkhurana47@gmail.com"],
+            ] as [string, string][]).map(([label, href]) => (
+              <a key={label} href={href}
+                style={{ fontFamily: fontMono, fontSize: 11.5, color: D.muted, textDecoration: "none", transition: "color 0.2s" }}
+                onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = D.white2}
+                onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = D.muted}
+              >{label}</a>
+            ))}
+          </div>
         </div>
+
       </div>
     </footer>
   );
 }
-
-

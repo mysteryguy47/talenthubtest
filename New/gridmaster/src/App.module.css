@@ -1,0 +1,120 @@
+/* ─────────────────────────────────────────────
+   App Layout
+───────────────────────────────────────────── */
+
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ── Nav ── */
+.nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px; height: 64px;
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(24px);
+  background: rgba(9,9,16,0.88);
+  position: sticky; top: 0; z-index: 100;
+}
+
+.navLogo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 900; letter-spacing: -0.4px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--teal) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  display: flex; align-items: center; gap: 8px;
+  white-space: nowrap;
+}
+.logoGlyph { font-size: 22px; }
+
+.navTabs {
+  display: flex; gap: 3px;
+  background: var(--surface2); padding: 4px;
+  border-radius: 50px; border: 1px solid var(--border);
+}
+.navTab {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 20px; border-radius: 50px; border: none;
+  background: transparent; color: var(--text2);
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.22s; white-space: nowrap;
+  user-select: none;
+}
+.navTab:hover:not(.navTabActive):not(.navTabActiveMagic) {
+  color: var(--text); background: var(--surface3);
+}
+.navTabActive {
+  background: linear-gradient(135deg, var(--teal) 0%, #35b5ac 100%) !important;
+  color: #090910 !important; font-weight: 600;
+  box-shadow: 0 2px 12px rgba(78,205,196,0.3);
+}
+.navTabActiveMagic {
+  background: linear-gradient(135deg, var(--gold) 0%, #c9a84c 100%) !important;
+  color: #090910 !important; font-weight: 600;
+  box-shadow: 0 2px 12px rgba(232,201,126,0.3);
+}
+.tabIcon { font-size: 14px; }
+
+.navRight { display: flex; align-items: center; }
+.navBadge {
+  padding: 3px 10px; border-radius: 20px;
+  background: var(--gold-dim); border: 1px solid rgba(232,201,126,0.25);
+  color: var(--gold); font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+
+/* ── Hero ── */
+.hero {
+  text-align: center;
+  padding: 52px 20px 36px;
+}
+.heroBadge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 16px; border-radius: 50px;
+  background: var(--gold-dim); border: 1px solid rgba(232,201,126,0.2);
+  font-size: 11px; font-weight: 700; letter-spacing: 1.6px;
+  color: var(--gold); text-transform: uppercase; margin-bottom: 18px;
+}
+.heroTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(38px, 5vw, 68px);
+  font-weight: 900; line-height: 1.05; letter-spacing: -1.5px;
+  margin-bottom: 14px; color: var(--text);
+}
+.heroAccentTeal { color: var(--teal); }
+.heroAccentGold { color: var(--gold); }
+.heroSub {
+  color: var(--text2); font-size: 15px;
+  max-width: 520px; margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ── Main ── */
+.main {
+  flex: 1;
+  max-width: 920px; margin: 0 auto;
+  width: 100%; padding: 0 20px 60px;
+}
+
+/* ── Footer ── */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 20px 40px;
+  text-align: center;
+  color: var(--text3);
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .nav { padding: 0 16px; }
+  .navLogo { font-size: 18px; }
+  .navTab { padding: 6px 14px; font-size: 12px; }
+  .hero { padding: 36px 16px 24px; }
+  .main { padding: 0 12px 40px; }
+  .navRight { display: none; }
+}
+
+@media (max-width: 460px) {
+  .navTabs { gap: 2px; padding: 3px; }
+  .navTab { padding: 5px 10px; }
+  .tabIcon { display: none; }
+}

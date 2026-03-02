@@ -419,6 +419,60 @@ export default function BurstMode() {
   // Tracks the last N question texts to prevent immediate repeats
   const recentTextsRef = useRef<string[]>([]);
 
+  // ── CSS Injection ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    const id = "burst-design-tokens";
+    if (document.getElementById(id)) return;
+    const style = document.createElement("style");
+    style.id = id;
+    style.textContent = `
+      @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+      :root {
+        --bm-bg: #06070F; --bm-bg2: #0B0D1A; --bm-surf: #0F1120; --bm-surf2: #141729; --bm-surf3: #1A1F38;
+        --bm-bdr: rgba(255,255,255,0.06); --bm-bdr2: rgba(255,255,255,0.10);
+        --bm-burst: #F97316; --bm-burst2: #FB923C; --bm-burst3: #FED7AA;
+        --bm-burstdim: rgba(249,115,22,0.12); --bm-burstglow: rgba(249,115,22,0.22);
+        --bm-purple: #7B5CE5; --bm-purple2: #9D7FF0;
+        --bm-green: #10B981; --bm-gdim: rgba(16,185,129,0.12);
+        --bm-red: #EF4444; --bm-rdim: rgba(239,68,68,0.12);
+        --bm-gold: #F59E0B; --bm-white: #F0F2FF; --bm-white2: #B8BDD8; --bm-muted: #525870;
+        --bm-fd: 'Syne', sans-serif; --bm-fb: 'DM Sans', sans-serif; --bm-fm: 'JetBrains Mono', monospace;
+      }
+      @keyframes bm-fade-up { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:none} }
+      @keyframes bm-fade-in { from{opacity:0} to{opacity:1} }
+      @keyframes bm-scale-in { from{opacity:0;transform:scale(.88)} to{opacity:1;transform:scale(1)} }
+      @keyframes bm-scale-pop { 0%{transform:scale(1)} 45%{transform:scale(1.1)} 100%{transform:scale(1)} }
+      @keyframes bm-number-slam { 0%{opacity:0;transform:scale(.55) translateY(20px)} 55%{transform:scale(1.07) translateY(-3px)} 100%{opacity:1;transform:scale(1) translateY(0)} }
+      @keyframes bm-burst-pulse { 0%,100%{box-shadow:0 0 0 0 var(--bm-burstglow)} 60%{box-shadow:0 0 0 14px transparent} }
+      @keyframes bm-timer-shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-3px)} 40%{transform:translateX(3px)} 60%{transform:translateX(-2px)} 80%{transform:translateX(2px)} }
+      @keyframes bm-correct-ring { 0%{outline-color:rgba(16,185,129,0)} 40%{outline-color:rgba(16,185,129,.5)} 100%{outline-color:rgba(16,185,129,0)} }
+      @keyframes bm-wrong-ring { 0%{outline-color:rgba(239,68,68,0)} 40%{outline-color:rgba(239,68,68,.6)} 100%{outline-color:rgba(239,68,68,0)} }
+      @keyframes bm-streak-pop { 0%{transform:scale(1)} 50%{transform:scale(1.25) rotate(-3deg)} 100%{transform:scale(1)} }
+      @keyframes bm-progress-drain { from{width:100%} to{width:0%} }
+      @keyframes bm-count-up { from{opacity:0;transform:translateY(10px) scale(.85)} to{opacity:1;transform:none} }
+      @keyframes bm-lightning-in { from{opacity:0;transform:rotate(-10deg) scale(.6)} to{opacity:1;transform:rotate(0) scale(1)} }
+      @keyframes bm-bg-breathe { 0%,100%{opacity:.6} 50%{opacity:1} }
+      @keyframes bm-card-hover-glow { 0%,100%{box-shadow:0 0 20px rgba(249,115,22,0)} 50%{box-shadow:0 0 28px rgba(249,115,22,.18)} }
+      .bm-mode-card { all: unset; display: block; box-sizing: border-box; }
+      .bm-mode-card:hover { transform: translateY(-6px) !important; border-color: rgba(249,115,22,.3) !important; box-shadow: 0 16px 48px rgba(0,0,0,.35), 0 0 32px rgba(249,115,22,.08) !important; animation: bm-card-hover-glow 2s ease infinite !important; }
+      .bm-mode-card:active { transform: translateY(-3px) scale(.98) !important; }
+      .bm-mode-card:hover .bm-card-accent { opacity: 1 !important; }
+      .bm-mode-card:hover .bm-card-icon { background: var(--bm-burstdim) !important; border-color: rgba(249,115,22,.3) !important; box-shadow: 0 0 20px rgba(249,115,22,.15) !important; }
+      .bm-diff-btn { all: unset; box-sizing: border-box; display: block; width: 100%; padding: 14px 12px; border-radius: 12px; border: 1px solid var(--bm-bdr2); background: var(--bm-surf2); font-family: var(--bm-fm); font-size: 15px; font-weight: 600; color: var(--bm-white2); cursor: pointer; text-align: center; transition: all .2s cubic-bezier(.4,0,.2,1); }
+      .bm-diff-btn:hover { border-color: rgba(249,115,22,.3) !important; background: rgba(249,115,22,.06) !important; color: var(--bm-white) !important; transform: translateY(-1px); }
+      .bm-diff-btn.selected { background: rgba(249,115,22,.12) !important; border: 1.5px solid rgba(249,115,22,.5) !important; color: var(--bm-burst2) !important; font-weight: 700 !important; box-shadow: 0 0 20px rgba(249,115,22,.12) !important; animation: bm-scale-pop .2s ease both; }
+      .bm-input { background: var(--bm-surf); border: 2px solid var(--bm-bdr2); border-radius: 16px; padding: 18px 22px; font-family: var(--bm-fm); font-size: 24px; font-weight: 700; color: var(--bm-white); text-align: center; outline: none; outline-offset: 3px; outline-width: 3px; outline-style: solid; outline-color: transparent; transition: border-color .15s ease, box-shadow .15s ease, background .15s ease; width: 100%; box-sizing: border-box; }
+      .bm-input::placeholder { color: rgba(255,255,255,.1); font-size: 20px; font-weight: 400; }
+      .bm-input:focus { border-color: rgba(249,115,22,.45); box-shadow: 0 0 0 3px rgba(249,115,22,.08); }
+      .bm-input.correct { border-color: rgba(16,185,129,.6); background: rgba(16,185,129,.06); animation: bm-correct-ring .4s ease both; }
+      .bm-input.wrong { border-color: rgba(239,68,68,.6); background: rgba(239,68,68,.06); animation: bm-wrong-ring .4s ease both; }
+      .bm-skip-btn { background: var(--bm-surf2); border: 1px solid var(--bm-bdr2); border-radius: 14px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 22px; color: var(--bm-muted); transition: all .2s ease; flex-shrink: 0; }
+      .bm-skip-btn:hover { background: rgba(249,115,22,.08); border-color: rgba(249,115,22,.3); color: var(--bm-burst2); }
+      .bm-skip-btn:active { transform: scale(.92); }
+    `;
+    document.head.appendChild(style);
+  }, []);
+
   // ── Config phase ─────────────────────────────────────────────────────────
 
   const handleSelectOperation = (op: BurstOperationType) => {
@@ -636,50 +690,79 @@ export default function BurstMode() {
   // Selection phase
   if (phase === "select") {
     return (
-      <div className="min-h-screen bg-background pt-28 pb-20 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-3 mb-4">
-              <div className="relative">
-                <Zap className="w-10 h-10 text-amber-500" />
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-ping" />
-              </div>
-              <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-foreground">
-                BURST MODE
-              </h1>
+      <div style={{ minHeight: "100vh", background: "var(--bm-bg)", position: "relative", overflow: "hidden" }}>
+        {/* Atmospheric glow */}
+        <div style={{
+          position: "absolute", top: -100, left: "50%", transform: "translateX(-50%)",
+          width: 700, height: 500, borderRadius: "50%", pointerEvents: "none",
+          background: "radial-gradient(ellipse, rgba(249,115,22,.07) 0%, rgba(123,92,229,.05) 50%, transparent 70%)",
+          animation: "bm-bg-breathe 6s ease-in-out infinite"
+        }} />
+        {/* Grid pattern */}
+        <div style={{
+          position: "absolute", inset: 0, opacity: .3, pointerEvents: "none",
+          backgroundImage: "linear-gradient(rgba(249,115,22,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(249,115,22,.04) 1px, transparent 1px)",
+          backgroundSize: "56px 56px",
+          WebkitMaskImage: "radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 75%)",
+          maskImage: "radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 75%)"
+        }} />
+
+        <div style={{ position: "relative", zIndex: 1 }}>
+          {/* Hero header */}
+          <div style={{ textAlign: "center", padding: "72px 24px 48px", position: "relative" }}>
+            <div style={{ animation: "bm-lightning-in .5s cubic-bezier(.34,1.56,.64,1) both", marginBottom: 16 }}>
+              <Zap style={{ width: 48, height: 48, color: "var(--bm-burst2)", display: "block", margin: "0 auto" }} />
             </div>
-            <p className="text-muted-foreground text-lg max-w-lg mx-auto">
+            <h1 style={{
+              fontFamily: "var(--bm-fd)", fontSize: "clamp(36px, 6vw, 72px)", fontWeight: 800,
+              letterSpacing: "-.04em", lineHeight: 1, margin: "0 0 12px",
+              background: "linear-gradient(135deg, var(--bm-burst3) 0%, var(--bm-burst2) 35%, var(--bm-burst) 70%, #C2410C 100%)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text"
+            }}>Burst Mode</h1>
+            <p style={{ fontFamily: "var(--bm-fb)", fontSize: 17, fontWeight: 300, color: "var(--bm-white2)", maxWidth: 460, margin: "0 auto 16px", lineHeight: 1.65 }}>
               60 seconds. Unlimited questions. Push your speed to the limit.
             </p>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--bm-burstdim)", border: "1px solid rgba(249,115,22,.22)", borderRadius: 100, padding: "6px 16px", fontFamily: "var(--bm-fm)", fontSize: 12, color: "var(--bm-burst2)" }}>
+              ⚡ 10 modes available · 60s each
+            </div>
           </div>
 
-          {/* Operations Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          {/* Mode cards grid */}
+          <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 16px", display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 14 }}>
             {(Object.entries(BURST_OPERATIONS) as [BurstOperationType, BurstConfig][]).map(
-              ([key, config]) => (
+              ([key, config], index) => (
                 <button
                   key={key}
                   onClick={() => handleSelectOperation(key)}
-                  className="group relative bg-card border-2 border-border hover:border-primary/50 rounded-2xl p-5 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1"
+                  className="bm-mode-card"
+                  style={{
+                    background: "var(--bm-surf)", border: "1px solid var(--bm-bdr)", borderRadius: 18,
+                    padding: "28px 16px", textAlign: "center", cursor: "pointer",
+                    transition: "all .3s cubic-bezier(.4,0,.2,1)",
+                    animation: `bm-fade-up .5s ease ${index * 0.05}s both`,
+                    position: "relative", overflow: "hidden"
+                  }}
                 >
-                  <div className={`text-3xl mb-3 transition-transform group-hover:scale-110`}>
+                  <div className="bm-card-accent" style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, var(--bm-burst), transparent)", opacity: 0, transition: "opacity .3s ease" }} />
+                  <div className="bm-card-icon" style={{ width: 52, height: 52, borderRadius: 16, margin: "0 auto 16px", background: "var(--bm-surf2)", border: "1px solid var(--bm-bdr)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, transition: "all .3s ease" }}>
                     {config.icon}
                   </div>
-                  <h3 className="font-bold text-sm text-card-foreground mb-1">{config.label}</h3>
-                  <p className="text-[11px] text-muted-foreground leading-tight">{config.description}</p>
-                  <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${config.gradient} opacity-0 group-hover:opacity-[0.04] transition-opacity`} />
+                  <div style={{ fontFamily: "var(--bm-fd)", fontSize: 16, fontWeight: 700, color: "var(--bm-white)", marginBottom: 6, lineHeight: 1.2 }}>{config.label}</div>
+                  <div style={{ fontFamily: "var(--bm-fb)", fontSize: 12, fontWeight: 300, color: "var(--bm-muted)", lineHeight: 1.5 }}>{config.description}</div>
                 </button>
               )
             )}
           </div>
 
           {/* Back link */}
-          <div className="text-center mt-10">
+          <div style={{ textAlign: "center", margin: "40px 0 24px" }}>
             <Link href="/dashboard">
-              <span className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1">
-                <ArrowLeft className="w-4 h-4" />
-                Back to Dashboard
+              <span
+                style={{ display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "var(--bm-fb)", fontSize: 14, fontWeight: 500, color: "var(--bm-muted)", textDecoration: "none", cursor: "pointer", transition: "color .2s, gap .2s" }}
+                onMouseEnter={(e) => { const el = e.currentTarget as HTMLSpanElement; el.style.color = "var(--bm-white2)"; el.style.gap = "12px"; }}
+                onMouseLeave={(e) => { const el = e.currentTarget as HTMLSpanElement; el.style.color = "var(--bm-muted)"; el.style.gap = "8px"; }}
+              >
+                ← Back to Dashboard
               </span>
             </Link>
           </div>
@@ -692,69 +775,75 @@ export default function BurstMode() {
   if (phase === "config" && selectedOp) {
     const config = BURST_OPERATIONS[selectedOp];
     return (
-      <div className="min-h-screen bg-background pt-28 pb-20 px-4 sm:px-6">
-        <div className="max-w-lg mx-auto">
-          <button onClick={resetToSelect} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8">
-            <ArrowLeft className="w-5 h-5" />
-            <span className="text-sm font-medium">Back</span>
-          </button>
+      <div style={{ minHeight: "100vh", background: "var(--bm-bg)", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px", position: "relative" }}>
+        {/* Backdrop atmosphere */}
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", backdropFilter: "blur(16px)", animation: "bm-fade-in .2s ease both" }} />
 
-          <div className="bg-card border-2 border-border rounded-3xl p-8 shadow-xl">
-            <div className="text-center mb-8">
-              <div className="text-4xl mb-3">{config.icon}</div>
-              <h2 className="text-2xl font-black text-card-foreground">{config.label}</h2>
-              <p className="text-muted-foreground mt-1">{config.description}</p>
+        {/* Modal card */}
+        <div style={{ position: "relative", maxWidth: 480, width: "100%", background: "var(--bm-surf)", border: "1px solid var(--bm-bdr2)", borderRadius: 24, overflow: "hidden", animation: "bm-scale-in .28s cubic-bezier(.4,0,.2,1) both", boxShadow: "0 40px 100px rgba(0,0,0,.55), 0 0 60px rgba(249,115,22,.04)" }}>
+          {/* Top accent bar */}
+          <div style={{ height: 3, background: "linear-gradient(90deg, var(--bm-burst), var(--bm-burst2), transparent)" }} />
+
+          {/* Header */}
+          <div style={{ padding: "28px 28px 20px", textAlign: "center", position: "relative" }}>
+            <button
+              onClick={resetToSelect}
+              style={{ position: "absolute", top: 20, right: 20, width: 32, height: 32, borderRadius: 9, background: "var(--bm-surf2)", border: "1px solid var(--bm-bdr)", color: "var(--bm-muted)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 16, lineHeight: 1, transition: "all .2s" }}
+              onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "rgba(239,68,68,.1)"; b.style.borderColor = "rgba(239,68,68,.25)"; b.style.color = "var(--bm-red)"; }}
+              onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "var(--bm-surf2)"; b.style.borderColor = "var(--bm-bdr)"; b.style.color = "var(--bm-muted)"; }}
+            >×</button>
+            <div style={{ fontSize: 36, marginBottom: 8 }}>{config.icon}</div>
+            <h2 style={{ fontFamily: "var(--bm-fd)", fontSize: 24, fontWeight: 800, letterSpacing: "-.03em", color: "var(--bm-white)", margin: "0 0 4px" }}>{config.label}</h2>
+            <p style={{ fontFamily: "var(--bm-fb)", fontSize: 14, fontWeight: 300, color: "var(--bm-muted)", margin: 0 }}>{config.description}</p>
+          </div>
+
+          {/* Difficulty section */}
+          <div style={{ padding: "0 24px 8px" }}>
+            <div style={{ fontFamily: "var(--bm-fm)", fontSize: 10, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--bm-muted)", marginBottom: 12 }}>Choose Difficulty</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              {config.options.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setSelectedOption(opt.value)}
+                  className={`bm-diff-btn${selectedOption === opt.value ? " selected" : ""}`}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
+          </div>
 
-            {/* Difficulty options */}
-            <div className="space-y-2 mb-8">
-              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                Choose Difficulty
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                {config.options.map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setSelectedOption(opt.value)}
-                    className={`px-4 py-3 rounded-xl text-sm font-bold transition-all border-2 ${
-                      selectedOption === opt.value
-                        ? "border-primary bg-primary/10 text-primary shadow-md"
-                        : "border-border text-card-foreground hover:border-primary/30"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
+          {/* How it works */}
+          <div style={{ margin: "16px 24px", background: "rgba(123,92,229,.06)", border: "1px solid rgba(123,92,229,.14)", borderRadius: 14, padding: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <Flame style={{ width: 16, height: 16, color: "var(--bm-burst2)", flexShrink: 0 }} />
+              <span style={{ fontFamily: "var(--bm-fd)", fontSize: 14, fontWeight: 700, color: "var(--bm-burst2)" }}>How it works</span>
             </div>
-
-            {/* Rules */}
-            <div className="bg-primary/5 rounded-2xl p-5 mb-8 border border-primary/10">
-              <h3 className="font-bold text-sm text-primary mb-3 flex items-center gap-2">
-                <Flame className="w-4 h-4" /> How it works
-              </h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <Clock className="w-4 h-4 mt-0.5 text-primary/70 flex-shrink-0" />
-                  60-second countdown timer
-                </li>
-                <li className="flex items-start gap-2">
-                  <Zap className="w-4 h-4 mt-0.5 text-primary/70 flex-shrink-0" />
-                  Answer as many questions as possible
-                </li>
-                <li className="flex items-start gap-2">
-                  <Trophy className="w-4 h-4 mt-0.5 text-primary/70 flex-shrink-0" />
-                  See your final scorecard when time's up
-                </li>
-              </ul>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 8 }}>
+              <Clock style={{ width: 14, height: 14, color: "var(--bm-purple2)", flexShrink: 0, marginTop: 2 }} />
+              <span style={{ fontFamily: "var(--bm-fb)", fontSize: 13, color: "var(--bm-white2)", lineHeight: 1.5 }}>60-second countdown timer</span>
             </div>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 8 }}>
+              <Zap style={{ width: 14, height: 14, color: "var(--bm-purple2)", flexShrink: 0, marginTop: 2 }} />
+              <span style={{ fontFamily: "var(--bm-fb)", fontSize: 13, color: "var(--bm-white2)", lineHeight: 1.5 }}>Answer as many questions as possible</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+              <Trophy style={{ width: 14, height: 14, color: "var(--bm-purple2)", flexShrink: 0, marginTop: 2 }} />
+              <span style={{ fontFamily: "var(--bm-fb)", fontSize: 13, color: "var(--bm-white2)", lineHeight: 1.5 }}>See your final scorecard when time's up</span>
+            </div>
+          </div>
 
-            {/* Start button */}
+          {/* Start button */}
+          <div style={{ margin: "16px 24px 24px" }}>
             <button
               onClick={startCountdown}
-              className={`w-full py-4 rounded-2xl text-lg font-black uppercase tracking-widest text-white bg-gradient-to-r ${config.gradient} hover:opacity-90 shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3`}
+              className="bm-burst-pulse"
+              style={{ width: "100%", background: "linear-gradient(135deg, var(--bm-burst) 0%, #C2410C 100%)", border: "none", borderRadius: 14, padding: 17, color: "white", fontFamily: "var(--bm-fd)", fontSize: 17, fontWeight: 800, letterSpacing: "-.01em", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, boxShadow: "0 8px 32px rgba(249,115,22,.3), inset 0 1px 0 rgba(255,255,255,.1)", cursor: "pointer", transition: "all .25s ease" }}
+              onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = "translateY(-3px)"; b.style.boxShadow = "0 16px 48px rgba(249,115,22,.45), inset 0 1px 0 rgba(255,255,255,.12)"; b.style.animation = "none"; }}
+              onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = ""; b.style.boxShadow = "0 8px 32px rgba(249,115,22,.3), inset 0 1px 0 rgba(255,255,255,.1)"; b.style.animation = ""; }}
+              onMouseDown={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)"; }}
             >
-              <Play className="w-6 h-6" />
+              <Play style={{ width: 20, height: 20 }} />
               START BURST
             </button>
           </div>
@@ -766,120 +855,131 @@ export default function BurstMode() {
   // Countdown phase
   if (phase === "countdown") {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative">
-            <div
-              key={countdownNum}
-              className="text-[12rem] font-black text-primary animate-[pulse_0.8s_ease-in-out]"
-              style={{ lineHeight: 1 }}
-            >
-              {countdownNum}
-            </div>
-          </div>
-          <p className="text-xl font-bold text-muted-foreground mt-4 uppercase tracking-widest">
-            Get Ready
-          </p>
+      <div style={{ minHeight: "100vh", background: "var(--bm-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
+        <div
+          key={countdownNum}
+          style={{ fontFamily: "var(--bm-fm)", fontSize: "clamp(120px,20vw,200px)", fontWeight: 800, lineHeight: 1, color: "var(--bm-burst2)", animation: "bm-scale-in .35s cubic-bezier(.34,1.56,.64,1) both", letterSpacing: "-.04em" }}
+        >
+          {countdownNum}
         </div>
+        <p style={{ fontFamily: "var(--bm-fb)", fontSize: 18, fontWeight: 500, color: "var(--bm-muted)", letterSpacing: ".16em", textTransform: "uppercase", marginTop: 24, animation: "bm-fade-up .4s ease .1s both" }}>
+          Get Ready
+        </p>
       </div>
     );
   }
 
   // Playing phase
   if (phase === "playing" && currentQuestion) {
-    const config = selectedOp ? BURST_OPERATIONS[selectedOp] : null;
+    const progressColor = timerPercent > 33
+      ? "linear-gradient(90deg, var(--bm-green), #34D399)"
+      : timerPercent > 15
+      ? "linear-gradient(90deg, var(--bm-gold), #FCD34D)"
+      : "linear-gradient(90deg, var(--bm-red), #F87171)";
+    const timerStyle: React.CSSProperties = timeLeft <= 10
+      ? { color: "var(--bm-red)", transition: "color .5s ease", animation: "bm-timer-shake .4s ease" }
+      : timeLeft <= 20
+      ? { color: "var(--bm-gold)", transition: "color .5s ease" }
+      : { color: "var(--bm-green)", transition: "color .5s ease" };
+
     return (
-      <div
-        className={`min-h-screen flex flex-col transition-colors duration-150 ${
-          flashColor === "green"
-            ? "bg-emerald-50 dark:bg-emerald-950/30"
-            : flashColor === "red"
-            ? "bg-red-50 dark:bg-red-950/30"
-            : "bg-background"
-        }`}
-      >
+      <div style={{ minHeight: "100vh", background: "var(--bm-bg)", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
+        {/* Background atmosphere */}
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 50% 40% at 50% 60%, rgba(249,115,22,.04) 0%, transparent 65%)", pointerEvents: "none" }} />
+
+        {/* Red vignette when < 10s */}
+        {timeLeft < 10 && (
+          <div style={{ position: "fixed", inset: 0, background: "radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, rgba(239,68,68,.04) 100%)", pointerEvents: "none", zIndex: 1 }} />
+        )}
+
         {/* Exit confirmation modal */}
         {exitConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-card border-2 border-border rounded-3xl p-8 max-w-sm mx-4 shadow-2xl">
-              <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
-              <h3 className="text-xl font-black text-center text-card-foreground mb-2">Exit Burst Mode?</h3>
-              <p className="text-sm text-muted-foreground text-center mb-6">
+          <div style={{ position: "fixed", inset: 0, zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,.75)", backdropFilter: "blur(16px)" }}>
+            <div style={{ background: "var(--bm-surf)", border: "1px solid var(--bm-bdr2)", borderRadius: 24, padding: 36, maxWidth: 360, width: "calc(100vw - 48px)", boxShadow: "0 40px 80px rgba(0,0,0,.5)", animation: "bm-scale-in .2s ease both" }}>
+              <AlertTriangle style={{ width: 44, height: 44, color: "var(--bm-gold)", display: "block", margin: "0 auto 16px" }} />
+              <h3 style={{ fontFamily: "var(--bm-fd)", fontSize: 22, fontWeight: 800, textAlign: "center", color: "var(--bm-white)", margin: "0 0 8px" }}>Exit Burst Mode?</h3>
+              <p style={{ fontFamily: "var(--bm-fb)", fontSize: 14, color: "var(--bm-muted)", textAlign: "center", margin: "0 0 24px", lineHeight: 1.6 }}>
                 {results.length > 0
                   ? `You've answered ${results.length} question${results.length !== 1 ? "s" : ""}. Your progress will be saved.`
                   : "Your session will be lost."}
               </p>
-              <div className="flex gap-3">
+              <div style={{ display: "flex", gap: 10 }}>
                 <button
                   onClick={() => setExitConfirm(false)}
-                  className="flex-1 py-3 rounded-xl font-bold text-sm border-2 border-border text-card-foreground hover:bg-secondary transition-colors"
-                >
-                  Continue
-                </button>
+                  style={{ flex: 1, padding: "12px 0", borderRadius: 12, border: "1px solid var(--bm-bdr2)", background: "var(--bm-surf2)", fontFamily: "var(--bm-fb)", fontSize: 14, fontWeight: 600, color: "var(--bm-white2)", cursor: "pointer", transition: "all .2s" }}
+                >Continue</button>
                 <button
                   onClick={confirmExit}
-                  className="flex-1 py-3 rounded-xl font-bold text-sm bg-destructive text-destructive-foreground hover:opacity-90 transition-opacity"
-                >
-                  Exit
-                </button>
+                  style={{ flex: 1, padding: "12px 0", borderRadius: 12, border: "none", background: "linear-gradient(135deg, var(--bm-red), #B91C1C)", fontFamily: "var(--bm-fb)", fontSize: 14, fontWeight: 600, color: "white", cursor: "pointer", transition: "all .2s" }}
+                >Exit</button>
               </div>
             </div>
           </div>
         )}
 
         {/* Top bar */}
-        <div className="w-full px-4 sm:px-8 pt-4 sm:pt-6">
-          <div className="max-w-3xl mx-auto flex items-center justify-between">
-            <button onClick={handleBack} className="text-muted-foreground hover:text-foreground transition-colors p-2">
-              <ArrowLeft className="w-6 h-6" />
-            </button>
+        <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(6,7,15,.9)", backdropFilter: "blur(20px)", borderBottom: "1px solid var(--bm-bdr)", height: 64, display: "grid", gridTemplateColumns: "80px 1fr 120px", alignItems: "center", padding: "0 24px" }}>
+          {/* Back button */}
+          <button
+            onClick={handleBack}
+            style={{ width: 36, height: 36, borderRadius: 10, background: "var(--bm-surf2)", border: "1px solid var(--bm-bdr)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--bm-muted)", cursor: "pointer", transition: "all .2s" }}
+            onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor = "rgba(249,115,22,.3)"; b.style.color = "var(--bm-burst2)"; b.style.background = "rgba(249,115,22,.06)"; }}
+            onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor = "var(--bm-bdr)"; b.style.color = "var(--bm-muted)"; b.style.background = "var(--bm-surf2)"; }}
+          >
+            <ArrowLeft style={{ width: 16, height: 16 }} />
+          </button>
 
-            {/* Timer */}
-            <div className="flex items-center gap-3">
-              <div className={`text-4xl sm:text-5xl font-black tabular-nums ${timerColor} transition-colors`}>
-                {formatTime(timeLeft)}
-              </div>
-            </div>
-
-            {/* Score counter */}
-            <div className="flex items-center gap-4 text-sm font-bold">
-              <span className="text-emerald-500">{correctCount} ✓</span>
-              <span className="text-red-400">{wrongCount} ✗</span>
-            </div>
+          {/* Timer */}
+          <div style={{ textAlign: "center" }}>
+            <span style={{ fontFamily: "var(--bm-fm)", fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 800, letterSpacing: "-.02em", display: "inline-block", ...timerStyle }}>
+              {formatTime(timeLeft)}
+            </span>
           </div>
 
-          {/* Timer progress bar */}
-          <div className="max-w-3xl mx-auto mt-3">
-            <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all duration-1000 ease-linear ${
-                  timeLeft <= 10
-                    ? "bg-red-500"
-                    : timeLeft <= 20
-                    ? "bg-amber-500"
-                    : "bg-emerald-500"
-                }`}
-                style={{ width: `${timerPercent}%` }}
-              />
+          {/* Live scores */}
+          <div style={{ display: "flex", alignItems: "center", gap: 14, justifyContent: "flex-end" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <span style={{ fontFamily: "var(--bm-fm)", fontSize: 16, fontWeight: 800, color: "var(--bm-green)" }}>{correctCount}</span>
+              <CheckCircle2 style={{ width: 13, height: 13, color: "var(--bm-green)" }} />
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <span style={{ fontFamily: "var(--bm-fm)", fontSize: 16, fontWeight: 800, color: "var(--bm-red)" }}>{wrongCount}</span>
+              <XCircle style={{ width: 13, height: 13, color: "var(--bm-red)" }} />
             </div>
           </div>
         </div>
 
+        {/* Progress drain bar */}
+        <div style={{ height: 4, position: "relative", overflow: "hidden", background: "var(--bm-bdr2)" }}>
+          <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${timerPercent}%`, background: progressColor, transition: "background .8s ease, width 1s linear", boxShadow: "2px 0 12px currentColor" }} />
+        </div>
+
         {/* Question area */}
-        <div className="flex-1 flex items-center justify-center px-4">
-          <div className="w-full max-w-2xl text-center">
-            {/* Question number */}
-            <div className="text-sm font-bold text-muted-foreground mb-4 uppercase tracking-widest">
-              Question #{results.length + 1}
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, textAlign: "center", position: "relative", zIndex: 2 }}>
+          <div style={{ width: "100%", maxWidth: 600 }}>
+            {/* Question label */}
+            <div style={{ fontFamily: "var(--bm-fm)", fontSize: 11, fontWeight: 600, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--bm-muted)", marginBottom: 20 }}>
+              QUESTION <span style={{ color: "var(--bm-burst2)" }}>#{results.length + 1}</span>
             </div>
 
-            {/* Question text */}
-            <div className="text-5xl sm:text-7xl lg:text-8xl font-black text-foreground mb-10 tracking-tight leading-none">
-              {currentQuestion.text.replace(" =", "")}
+            {/* Question expression */}
+            <div
+              key={currentQuestion.id}
+              className="bm-number-slam"
+              style={{ fontFamily: "var(--bm-fm)", fontSize: "clamp(56px, 10vw, 110px)", fontWeight: 800, letterSpacing: "-.03em", lineHeight: 1, marginBottom: 32, display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: "0 2px" }}
+            >
+              {currentQuestion.text.replace(" =", "").split(" ").map((token, i) => {
+                const isOp = ["÷", "×", "+", "−", "-", "of"].includes(token);
+                return (
+                  <span key={i} style={{ color: isOp ? "var(--bm-burst2)" : "var(--bm-white)", fontSize: isOp ? "0.65em" : undefined, verticalAlign: isOp ? "middle" : undefined, display: "inline-block", margin: "0 2px" }}>
+                    {token}
+                  </span>
+                );
+              })}
             </div>
 
-            {/* Answer input */}
-            <div className="flex items-center justify-center gap-4 max-w-md mx-auto">
+            {/* Answer input row */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", maxWidth: 500, margin: "0 auto" }}>
               <input
                 ref={inputRef}
                 type="text"
@@ -894,18 +994,19 @@ export default function BurstMode() {
                 onKeyDown={handleKeyDown}
                 placeholder="?"
                 autoComplete="off"
-                className="flex-1 text-center text-4xl sm:text-5xl font-black py-4 px-6 bg-card border-3 border-border rounded-2xl focus:border-primary focus:ring-4 focus:ring-primary/20 outline-none transition-all placeholder:text-muted-foreground/30"
+                className={`bm-input${flashColor === "green" ? " correct" : flashColor === "red" ? " wrong" : ""}`}
+                style={{ flex: 1 }}
               />
               <button
                 onClick={handleSubmit}
-                disabled={!userInput.trim()}
-                className={`p-5 rounded-2xl transition-all ${
-                  userInput.trim()
-                    ? `bg-gradient-to-r ${config?.gradient || "from-primary to-primary"} text-white shadow-lg hover:shadow-xl hover:scale-105`
-                    : "bg-secondary text-muted-foreground cursor-not-allowed"
-                }`}
+                className="bm-skip-btn"
+                style={{ all: "unset", width: 52, height: 52, borderRadius: 14, background: "var(--bm-surf2)", border: "1px solid var(--bm-bdr2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 22, color: "var(--bm-muted)", transition: "all .2s ease", flexShrink: 0, boxSizing: "border-box" } as React.CSSProperties}
+                onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "rgba(249,115,22,.08)"; b.style.borderColor = "rgba(249,115,22,.3)"; b.style.color = "var(--bm-burst2)"; }}
+                onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "var(--bm-surf2)"; b.style.borderColor = "var(--bm-bdr2)"; b.style.color = "var(--bm-muted)"; }}
+                onMouseDown={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = "scale(.92)"; }}
+                onMouseUp={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = ""; }}
               >
-                <ChevronRight className="w-8 h-8" />
+                ›
               </button>
             </div>
           </div>
@@ -927,131 +1028,139 @@ export default function BurstMode() {
     })();
 
     return (
-      <div className="min-h-screen bg-background pt-24 pb-20 px-4 sm:px-6">
-        <div className="max-w-2xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 mb-4 shadow-xl">
-              <Trophy className="w-10 h-10 text-white" />
+      <div style={{ minHeight: "100vh", background: "var(--bm-bg)", position: "relative" }}>
+        {/* Background glow */}
+        <div style={{ position: "fixed", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 60% 50% at 50% 15%, rgba(249,115,22,.06) 0%, rgba(123,92,229,.04) 50%, transparent 70%)" }} />
+
+        <div style={{ maxWidth: 700, margin: "0 auto", padding: "40px 24px 60px", position: "relative", zIndex: 1 }}>
+          {/* Completion header */}
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <div className="bm-scale-in" style={{ width: 68, height: 68, borderRadius: 20, margin: "0 auto 20px", background: "linear-gradient(135deg, var(--bm-burst), #C2410C)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 12px 40px rgba(249,115,22,.35), 0 0 0 1px rgba(249,115,22,.2)" }}>
+              <Trophy style={{ width: 32, height: 32, color: "white" }} />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-foreground mb-1">Burst Complete!</h1>
-            <p className="text-muted-foreground">
-              {config?.label} • {BURST_OPERATIONS[selectedOp!]?.options.find(o => o.value === selectedOption)?.label}
+            <h1 style={{ fontFamily: "var(--bm-fd)", fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, letterSpacing: "-.03em", color: "var(--bm-white)", margin: "0 0 6px" }}>Burst Complete!</h1>
+            <p style={{ fontFamily: "var(--bm-fm)", fontSize: 13, color: "var(--bm-muted)", letterSpacing: ".04em", margin: 0 }}>
+              <span style={{ color: "var(--bm-burst2)" }}>{config?.label}</span>
+              <span style={{ color: "var(--bm-muted)" }}> · </span>
+              <span style={{ color: "var(--bm-white2)" }}>{BURST_OPERATIONS[selectedOp!]?.options.find(o => o.value === selectedOption)?.label}</span>
             </p>
           </div>
 
-          {/* Stats cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-            <div className="bg-card border-2 border-border rounded-2xl p-4 text-center">
-              <div className="text-3xl font-black text-foreground">{results.length}</div>
-              <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Attempted</div>
+          {/* Primary stats grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 14 }}>
+            {[
+              { value: results.length, label: "Attempted", bg: "rgba(123,92,229,.08)", border: "rgba(123,92,229,.2)", color: "var(--bm-white)", delay: 0 },
+              { value: correctCount, label: "Correct", bg: "rgba(16,185,129,.08)", border: "rgba(16,185,129,.2)", color: "var(--bm-green)", delay: 0.07 },
+              { value: wrongCount, label: "Wrong", bg: "rgba(239,68,68,.08)", border: "rgba(239,68,68,.2)", color: "var(--bm-red)", delay: 0.14 },
+              { value: `${accuracy}%`, label: "Accuracy", bg: "rgba(249,115,22,.08)", border: "rgba(249,115,22,.22)", color: "var(--bm-burst2)", delay: 0.21 },
+            ].map(({ value, label, bg, border, color, delay }) => (
+              <div key={label} className="bm-count-up" style={{ borderRadius: 18, padding: "22px 12px", textAlign: "center", background: bg, border: `1px solid ${border}`, animationDelay: `${delay}s` }}>
+                <div style={{ fontFamily: "var(--bm-fm)", fontSize: "clamp(26px,3vw,36px)", fontWeight: 800, color }}>{value}</div>
+                <div style={{ fontFamily: "var(--bm-fm)", fontSize: 10, fontWeight: 600, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--bm-muted)", marginTop: 8 }}>{label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Secondary stats */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
+            <div style={{ background: "var(--bm-surf)", border: "1px solid var(--bm-bdr)", borderRadius: 16, padding: "18px 22px", display: "flex", alignItems: "center", gap: 14 }}>
+              <div style={{ width: 38, height: 38, borderRadius: 11, background: "rgba(123,92,229,.12)", border: "1px solid rgba(123,92,229,.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <Clock style={{ width: 18, height: 18, color: "var(--bm-purple2)" }} />
+              </div>
+              <div>
+                <div style={{ fontFamily: "var(--bm-fm)", fontSize: 22, fontWeight: 800, color: "var(--bm-white)" }}>{avgTime.toFixed(1)}s</div>
+                <div style={{ fontFamily: "var(--bm-fb)", fontSize: 12, color: "var(--bm-muted)", marginTop: 2 }}>Avg. per question</div>
+              </div>
             </div>
-            <div className="bg-card border-2 border-emerald-500/20 rounded-2xl p-4 text-center">
-              <div className="text-3xl font-black text-emerald-500">{correctCount}</div>
-              <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Correct</div>
-            </div>
-            <div className="bg-card border-2 border-red-500/20 rounded-2xl p-4 text-center">
-              <div className="text-3xl font-black text-red-400">{wrongCount}</div>
-              <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Wrong</div>
-            </div>
-            <div className="bg-card border-2 border-primary/20 rounded-2xl p-4 text-center">
-              <div className="text-3xl font-black text-primary">{accuracy}%</div>
-              <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Accuracy</div>
+            <div style={{ background: "var(--bm-surf)", border: "1px solid var(--bm-bdr)", borderRadius: 16, padding: "18px 22px", display: "flex", alignItems: "center", gap: 14 }}>
+              <div style={{ width: 38, height: 38, borderRadius: 11, background: "rgba(245,158,11,.12)", border: "1px solid rgba(245,158,11,.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <Flame style={{ width: 18, height: 18, color: "var(--bm-gold)" }} />
+              </div>
+              <div>
+                <div style={{ fontFamily: "var(--bm-fm)", fontSize: 22, fontWeight: 800, color: "var(--bm-white)" }}>{bestStreak}</div>
+                <div style={{ fontFamily: "var(--bm-fb)", fontSize: 12, color: "var(--bm-muted)", marginTop: 2 }}>Best streak</div>
+              </div>
             </div>
           </div>
 
-          {/* Extra stats */}
-          <div className="grid grid-cols-2 gap-3 mb-8">
-            <div className="bg-card border border-border rounded-2xl p-4 flex items-center gap-3">
-              <Clock className="w-8 h-8 text-muted-foreground" />
-              <div>
-                <div className="text-lg font-black text-foreground">{avgTime.toFixed(1)}s</div>
-                <div className="text-[11px] text-muted-foreground font-medium">Avg. per question</div>
-              </div>
+          {/* Accuracy bar */}
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+              <span style={{ fontFamily: "var(--bm-fm)", fontSize: 10, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--bm-muted)" }}>ACCURACY</span>
+              <span style={{ fontFamily: "var(--bm-fm)", fontSize: 13, fontWeight: 700, color: "var(--bm-white2)" }}>{accuracy}%</span>
             </div>
-            <div className="bg-card border border-border rounded-2xl p-4 flex items-center gap-3">
-              <Flame className="w-8 h-8 text-orange-500" />
-              <div>
-                <div className="text-lg font-black text-foreground">{bestStreak}</div>
-                <div className="text-[11px] text-muted-foreground font-medium">Best streak</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Saving indicator */}
-          {saving && (
-            <div className="text-center text-sm text-muted-foreground mb-4 animate-pulse">
-              Saving your session...
-            </div>
-          )}
-
-          {/* Question review */}
-          <div className="bg-card border-2 border-border rounded-3xl overflow-hidden mb-8">
-            <div className="p-5 border-b border-border">
-              <h3 className="font-bold text-card-foreground">Question Review</h3>
-            </div>
-            <div className="max-h-[400px] overflow-y-auto">
-              {results.map((r, i) => (
-                <div
-                  key={i}
-                  className={`flex items-center justify-between px-5 py-3 border-b border-border/50 last:border-0 ${
-                    r.isCorrect ? "bg-emerald-500/5" : "bg-red-500/5"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    {r.isCorrect ? (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                    ) : (
-                      <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-                    )}
-                    <span className="font-mono text-sm font-bold text-card-foreground">{r.question.text}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm">
-                    {!r.isCorrect && (
-                      <span className="text-red-400 line-through">{r.userAnswer ?? "—"}</span>
-                    )}
-                    <span className={r.isCorrect ? "text-emerald-600 font-bold" : "text-muted-foreground font-medium"}>
-                      {r.question.answer}
-                    </span>
-                    <span className="text-muted-foreground text-xs">{r.timeTaken.toFixed(1)}s</span>
-                  </div>
-                </div>
-              ))}
-              {results.length === 0 && (
-                <div className="p-8 text-center text-muted-foreground">No questions attempted</div>
-              )}
+            <div style={{ height: 6, borderRadius: 3, background: "var(--bm-bdr2)", overflow: "hidden" }}>
+              <div style={{ borderRadius: 3, height: "100%", background: "linear-gradient(90deg, var(--bm-red) 0%, var(--bm-gold) 45%, var(--bm-green) 100%)", width: `${accuracy}%`, transition: "width 1.4s cubic-bezier(.4,0,.2,1) .4s", boxShadow: accuracy > 70 ? "0 0 12px rgba(16,185,129,.2)" : undefined }} />
             </div>
           </div>
 
           {/* Action buttons */}
-          <div className="flex gap-3">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 24 }}>
             <button
-              onClick={() => {
-                setResults([]);
-                setTimeLeft(BURST_DURATION);
-                setSessionSaved(false);
-                startCountdown();
-              }}
-              className={`flex-1 py-4 rounded-2xl font-bold text-white bg-gradient-to-r ${config?.gradient || "from-primary to-primary"} hover:opacity-90 transition-opacity flex items-center justify-center gap-2`}
+              onClick={() => { setResults([]); setTimeLeft(BURST_DURATION); setSessionSaved(false); startCountdown(); }}
+              style={{ background: "linear-gradient(135deg, var(--bm-burst), #C2410C)", border: "none", borderRadius: 12, padding: "14px 10px", color: "white", fontFamily: "var(--bm-fd)", fontSize: 14, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 6px 20px rgba(249,115,22,.22)", cursor: "pointer", transition: "all .25s ease" }}
+              onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = "translateY(-2px)"; b.style.boxShadow = "0 12px 36px rgba(249,115,22,.35)"; }}
+              onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = ""; b.style.boxShadow = "0 6px 20px rgba(249,115,22,.22)"; }}
             >
-              <RotateCcw className="w-5 h-5" />
-              Try Again
+              <RotateCcw style={{ width: 15, height: 15 }} />Burst Again
+            </button>
+            <button
+              onClick={() => { /* navigate to dashboard */ window.location.href = "/dashboard"; }}
+              style={{ background: "linear-gradient(135deg, var(--bm-purple), #5535C0)", border: "none", borderRadius: 12, padding: "14px 10px", color: "white", fontFamily: "var(--bm-fd)", fontSize: 14, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 6px 20px rgba(123,92,229,.2)", cursor: "pointer", transition: "all .25s ease" }}
+              onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = "translateY(-2px)"; b.style.boxShadow = "0 12px 32px rgba(123,92,229,.32)"; }}
+              onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = ""; b.style.boxShadow = "0 6px 20px rgba(123,92,229,.2)"; }}
+            >
+              <Trophy style={{ width: 15, height: 15 }} />Dashboard
             </button>
             <button
               onClick={resetToSelect}
-              className="flex-1 py-4 rounded-2xl font-bold border-2 border-border text-card-foreground hover:bg-secondary transition-colors flex items-center justify-center gap-2"
+              style={{ background: "var(--bm-surf2)", border: "1px solid var(--bm-bdr2)", borderRadius: 12, padding: "14px 10px", color: "var(--bm-white2)", fontFamily: "var(--bm-fb)", fontSize: 14, fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer", transition: "all .2s" }}
+              onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor = "rgba(249,115,22,.3)"; b.style.color = "var(--bm-white)"; }}
+              onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor = "var(--bm-bdr2)"; b.style.color = "var(--bm-white2)"; }}
             >
-              <Zap className="w-5 h-5" />
-              New Operation
+              <Zap style={{ width: 15, height: 15 }} />New Mode
             </button>
           </div>
 
-          <div className="text-center mt-6">
-            <Link href="/dashboard">
-              <span className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer">
-                Go to Dashboard
-              </span>
-            </Link>
+          {/* Saving indicator */}
+          {saving && (
+            <div style={{ textAlign: "center", fontFamily: "var(--bm-fb)", fontSize: 13, color: "var(--bm-muted)", marginBottom: 16, animation: "bm-bg-breathe 1s ease infinite" }}>
+              Saving your session…
+            </div>
+          )}
+
+          {/* Question review */}
+          <div style={{ background: "var(--bm-surf)", border: "1px solid var(--bm-bdr)", borderRadius: 20, overflow: "hidden" }}>
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--bm-bdr)" }}>
+              <span style={{ fontFamily: "var(--bm-fd)", fontSize: 17, fontWeight: 700, color: "var(--bm-white)" }}>Question Review</span>
+            </div>
+            <div style={{ maxHeight: 400, overflowY: "auto" }}>
+              {results.map((r, i) => (
+                <div
+                  key={i}
+                  className="bm-fade-up"
+                  style={{ display: "grid", gridTemplateColumns: "1fr auto auto auto", gap: 12, alignItems: "center", padding: "14px 20px", borderBottom: i < results.length - 1 ? "1px solid var(--bm-bdr)" : undefined, transition: "background .15s ease", borderLeft: r.isCorrect ? "2px solid rgba(16,185,129,.15)" : "2px solid rgba(239,68,68,.2)", paddingLeft: 18, animationDelay: `${i * 0.04}s` }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,.02)"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = ""; }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    {r.isCorrect
+                      ? <CheckCircle2 style={{ width: 16, height: 16, color: "var(--bm-green)", flexShrink: 0 }} />
+                      : <XCircle style={{ width: 16, height: 16, color: "var(--bm-red)", flexShrink: 0 }} />
+                    }
+                    <span style={{ fontFamily: "var(--bm-fm)", fontSize: 14, fontWeight: 600, color: "var(--bm-white)" }}>{r.question.text}</span>
+                  </div>
+                  {!r.isCorrect && (
+                    <span style={{ fontFamily: "var(--bm-fm)", fontSize: 13, fontWeight: 600, color: "var(--bm-red)", textDecoration: "line-through" }}>{r.userAnswer ?? "—"}</span>
+                  )}
+                  <span style={{ fontFamily: "var(--bm-fm)", fontSize: 13, fontWeight: 700, color: r.isCorrect ? "var(--bm-green)" : "var(--bm-muted)" }}>{r.question.answer}</span>
+                  <span style={{ fontFamily: "var(--bm-fm)", fontSize: 11, color: "var(--bm-muted)", whiteSpace: "nowrap" }}>{r.timeTaken.toFixed(1)}s</span>
+                </div>
+              ))}
+              {results.length === 0 && (
+                <div style={{ padding: 40, textAlign: "center", fontFamily: "var(--bm-fb)", color: "var(--bm-muted)" }}>No questions attempted</div>
+              )}
+            </div>
           </div>
         </div>
       </div>

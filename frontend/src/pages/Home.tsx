@@ -4,8 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import {
   ArrowRight, Trophy, Zap, BarChart3, Flame, FileText,
   Target, Brain, Medal, Globe, Calendar, Heart,
-  Calculator, BookOpen, PenTool, Rocket, Phone,
-  MapPin
+  Calculator, BookOpen, PenTool, Rocket, Phone
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -787,89 +786,6 @@ function CTABanner() {
 
 // ─────────────────────────────────────────────────────────────
 // FOOTER
-// ─────────────────────────────────────────────────────────────
-function Footer() {
-  return (
-    <footer style={{ background: "var(--th-bg2)", borderTop: "1px solid var(--th-border)", padding: "60px 24px 28px" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 48, marginBottom: 44 }}>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-              <div style={{ width: 32, height: 32, borderRadius: 10, background: "linear-gradient(135deg, var(--th-purple), #5b21b6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 5h8M8 5v6M5 11h6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </div>
-              <div>
-                <div style={{ fontFamily: "var(--th-font-display)", fontWeight: 700, fontSize: 15, color: "var(--th-white)" }}>Talent Hub</div>
-                <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 9, letterSpacing: "0.12em", color: "var(--th-muted)", textTransform: "uppercase" }}>Excellence Lab</div>
-              </div>
-            </div>
-            <p style={{ fontSize: 14, color: "var(--th-muted)", lineHeight: 1.7, maxWidth: 270, marginBottom: 16 }}>
-              Transforming how children learn and think through proven, structured, and genuinely engaging programs since 2006.
-            </p>
-            <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, color: "var(--th-muted2)", letterSpacing: "0.05em" }}>18+ Years · 900+ Students · 3 Branches</div>
-          </div>
-
-          <div>
-            <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--th-muted)", marginBottom: 18 }}>Programs</div>
-            {[["Abacus", "/courses/abacus"], ["Vedic Maths", "/courses/vedic-maths"], ["Handwriting", "/courses/handwriting"], ["STEM", "/courses/stem"]].map(([p, path]) => (
-              <div key={p} style={{ marginBottom: 10 }}>
-                <Link href={path as string}>
-                  <a style={{ fontSize: 14, color: "var(--th-white2)", textDecoration: "none", transition: "color 0.2s" }}
-                    onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = "white"}
-                    onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = "var(--th-white2)"}
-                  >{p}</a>
-                </Link>
-              </div>
-            ))}
-          </div>
-
-          <div>
-            <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--th-muted)", marginBottom: 18 }}>Tools</div>
-            {[["Mental Math", "/mental"], ["Create Papers", "/create"], ["Burst Mode", "/burst"], ["Dashboard", "/dashboard"], ["Leaderboard", "/leaderboard"]].map(([t, path]) => (
-              <div key={t} style={{ marginBottom: 10 }}>
-                <Link href={path as string}>
-                  <a style={{ fontSize: 14, color: "var(--th-white2)", textDecoration: "none", transition: "color 0.2s" }}
-                    onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = "white"}
-                    onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = "var(--th-white2)"}
-                  >{t}</a>
-                </Link>
-              </div>
-            ))}
-          </div>
-
-          <div>
-            <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--th-muted)", marginBottom: 18 }}>Branches</div>
-            {[{ name: "Rohini Sector 16", city: "New Delhi" }, { name: "Rohini Sector 11", city: "New Delhi" }, { name: "Gurgaon", city: "Haryana" }].map((b) => (
-              <div key={b.name} style={{ marginBottom: 14, display: "flex", gap: 7 }}>
-                <MapPin size={13} style={{ color: "var(--th-purple2)", marginTop: 2, flexShrink: 0 }} />
-                <div>
-                  <div style={{ fontSize: 14, color: "var(--th-white2)" }}>{b.name}</div>
-                  <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, color: "var(--th-muted)" }}>{b.city}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="th-glow-line" style={{ marginBottom: 22 }} />
-
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
-          <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 12, color: "var(--th-muted)" }}>
-            © {new Date().getFullYear()} Talent Hub Excellence Lab. All rights reserved.
-          </div>
-          <div style={{ display: "flex", gap: 18 }}>
-            {["Privacy Policy", "Terms of Service", "Contact"].map((link) => (
-              <a key={link} href="#" style={{ fontFamily: "var(--th-font-mono)", fontSize: 12, color: "var(--th-muted)", textDecoration: "none", transition: "color 0.2s" }}
-                onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = "var(--th-white2)"}
-                onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = "var(--th-muted)"}
-              >{link}</a>
-            ))}
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────
 // MAIN HOME COMPONENT
@@ -877,11 +793,9 @@ function Footer() {
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
-  const scrollY = useScrollY();
   const [loaded, setLoaded] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [shuffledImages, setShuffledImages] = useState<string[]>([]);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const carouselImages = useMemo(() => [
     "1.jpg","4.jpg","6.jpg","7.jpg","8.jpg","9.jpg","10.jpg","11.jpg","12.jpg","13.jpg","14.jpg",
@@ -917,92 +831,10 @@ export default function Home() {
 
   if (!shuffledImages.length) return null;
 
-  const scrolled = scrollY > 40;
-
-  const NAV_LINKS = [
-    { label: "Courses", path: "/#courses" },
-    { label: "Papers", path: "/create" },
-    { label: "Mental Math", path: "/mental" },
-    { label: "Burst", path: "/burst", badge: "NEW" },
-  ];
-
   return (
     <div style={{ background: "var(--th-bg)", color: "var(--th-white)", fontFamily: "var(--th-font-body)", overflowX: "hidden" }}>
       <GlobalStyles />
       <div className="th-noise" />
-
-      {/* ── NAVIGATION ─────────────────────────────────────────── */}
-      <nav style={{
-        position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, padding: "0 24px",
-        borderBottom: scrolled ? "1px solid var(--th-border)" : "1px solid transparent",
-        backdropFilter: scrolled ? "blur(22px)" : "none",
-        background: scrolled ? "rgba(7,8,15,0.88)" : "transparent",
-        transition: "all 0.3s ease",
-      }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", height: 66, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <button onClick={() => setLocation("/")} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 9 }}>
-            <div style={{ width: 30, height: 30, borderRadius: 9, background: "linear-gradient(135deg, var(--th-purple), #5b21b6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M4 5h8M8 5v6M5 11h6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            </div>
-            <div>
-              <div style={{ fontFamily: "var(--th-font-display)", fontWeight: 700, fontSize: 15, letterSpacing: "-0.02em", color: "var(--th-white)", lineHeight: 1 }}>Talent Hub</div>
-              <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 8, letterSpacing: "0.14em", color: "var(--th-muted)", textTransform: "uppercase" }}>Excellence Lab</div>
-            </div>
-          </button>
-
-          <div className="th-hide-mobile" style={{ display: "flex", alignItems: "center", gap: 2 }}>
-            {NAV_LINKS.map((item) => (
-              <button key={item.label} onClick={() => setLocation(item.path)} style={{ background: "none", border: "none", color: "var(--th-white2)", fontFamily: "var(--th-font-body)", fontSize: 14, fontWeight: 500, cursor: "pointer", padding: "7px 13px", borderRadius: 8, display: "flex", alignItems: "center", gap: 5, transition: "color 0.2s, background 0.2s" }}
-                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "white"; (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.05)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--th-white2)"; (e.currentTarget as HTMLButtonElement).style.background = "none"; }}
-              >
-                {item.label}
-                {item.badge && <span style={{ background: "var(--th-orange)", color: "white", fontSize: 9, fontWeight: 700, padding: "2px 5px", borderRadius: 4, letterSpacing: "0.05em" }}>{item.badge}</span>}
-              </button>
-            ))}
-          </div>
-
-          <div className="th-hide-mobile" style={{ display: "flex", alignItems: "center", gap: 9 }}>
-            <button className="th-btn-secondary" onClick={() => setLocation("/login")} style={{ padding: "8px 17px", fontSize: 14, borderRadius: 10 }}>Sign In</button>
-            <button className="th-btn-primary" onClick={() => setLocation(isAuthenticated ? "/dashboard" : "/login")} style={{ padding: "8px 17px", fontSize: 14, borderRadius: 10 }}>
-              Get Started <ArrowRight size={14} />
-            </button>
-          </div>
-
-          <button className="th-hide-desktop" onClick={() => setMobileMenuOpen(true)} style={{ background: "none", border: "none", color: "white", cursor: "pointer", padding: 4 }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-          </button>
-        </div>
-      </nav>
-
-      {/* Mobile menu overlay */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
-            style={{ position: "fixed", inset: 0, zIndex: 2000, background: "var(--th-bg2)", display: "flex", flexDirection: "column", padding: 24 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 36 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg, var(--th-purple), #5b21b6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 5h8M8 5v6M5 11h6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </div>
-                <span style={{ fontFamily: "var(--th-font-display)", fontWeight: 700, fontSize: 15, color: "var(--th-white)" }}>Talent Hub</span>
-              </div>
-              <button onClick={() => setMobileMenuOpen(false)} style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </div>
-            {NAV_LINKS.map((item) => (
-              <button key={item.label} onClick={() => { setLocation(item.path); setMobileMenuOpen(false); }} style={{ background: "none", border: "none", color: "var(--th-white2)", fontFamily: "var(--th-font-body)", fontSize: 20, fontWeight: 600, cursor: "pointer", padding: "14px 0", textAlign: "left", borderBottom: "1px solid var(--th-border)" }}>
-                {item.label}
-              </button>
-            ))}
-            <div style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 10 }}>
-              <button className="th-btn-secondary" onClick={() => { setLocation("/login"); setMobileMenuOpen(false); }} style={{ width: "100%", justifyContent: "center" }}>Sign In</button>
-              <button className="th-btn-primary" onClick={() => { setLocation(isAuthenticated ? "/dashboard" : "/login"); setMobileMenuOpen(false); }} style={{ width: "100%", justifyContent: "center" }}>Get Started <ArrowRight size={14} /></button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* ── HERO SECTION ──────────────────────────────────────────── */}
       <section style={{ position: "relative", minHeight: "100vh", display: "flex", alignItems: "center", overflow: "hidden", paddingTop: 80 }}>
@@ -1106,7 +938,6 @@ export default function Home() {
       <AchievementsSection />
       <Testimonials />
       <CTABanner />
-      <Footer />
     </div>
   );
 }

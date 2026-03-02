@@ -1709,14 +1709,74 @@ export default function Mental() {
 
   // ALL HOOKS MUST BE ABOVE THIS LINE - NO EARLY RETURNS BEFORE ALL HOOKS
 
+  // ── Design-system CSS injection ──────────────────────────────────────────
+  useEffect(() => {
+    const id = "mm-design-tokens";
+    if (document.getElementById(id)) return;
+    const s = document.createElement("style");
+    s.id = id;
+    s.textContent = `
+      @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+      :root{--mm-bg:#06070F;--mm-bg2:#0B0D1A;--mm-surf:#0F1120;--mm-surf2:#141729;--mm-surf3:#1C2040;--mm-bdr:rgba(255,255,255,0.06);--mm-bdr2:rgba(255,255,255,0.10);--mm-pur:#7B5CE5;--mm-pur2:#9D7FF0;--mm-pur3:#C4ADFF;--mm-pglow:rgba(123,92,229,0.22);--mm-pdim:rgba(123,92,229,0.10);--mm-grn:#10B981;--mm-rdim:rgba(239,68,68,0.12);--mm-red:#EF4444;--mm-gld:#F59E0B;--mm-whi:#F0F2FF;--mm-whi2:#B8BDD8;--mm-muted:#525870;--mm-fd:'Syne',sans-serif;--mm-fb:'DM Sans',sans-serif;--mm-fm:'JetBrains Mono',monospace;}
+      @keyframes mm-fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+      @keyframes mm-fade-in{from{opacity:0}to{opacity:1}}
+      @keyframes mm-scale-in{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+      @keyframes mm-scale-pop{0%{transform:scale(1)}40%{transform:scale(1.06)}100%{transform:scale(1)}}
+      @keyframes mm-number-slam{0%{opacity:0;transform:scale(.6) translateY(24px)}60%{transform:scale(1.08) translateY(-4px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+      @keyframes mm-pulse-ring{0%{box-shadow:0 0 0 0 rgba(123,92,229,0.22)}70%{box-shadow:0 0 0 12px transparent}100%{box-shadow:0 0 0 0 transparent}}
+      @keyframes mm-timer-urgent{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.75;transform:scale(1.05)}}
+      @keyframes mm-countdown-in{0%{opacity:0;transform:scale(2.5)}30%{opacity:1;transform:scale(1)}80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.8)}}
+      @keyframes mm-row-reveal{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+      @keyframes mm-count-up{from{opacity:0;transform:translateY(10px) scale(.85)}to{opacity:1;transform:none}}
+      @keyframes mm-glow-border{0%,100%{border-color:rgba(123,92,229,.3)}50%{border-color:rgba(123,92,229,.7)}}
+      @keyframes mm-correct-flash{0%{background:rgba(16,185,129,.25)}100%{background:transparent}}
+      @keyframes mm-wrong-flash{0%{background:rgba(239,68,68,.25)}100%{background:transparent}}
+      @keyframes mm-progress-drain{from{width:100%}to{width:0%}}
+      .mm-countdown-num{animation:mm-countdown-in 1s cubic-bezier(.4,0,.2,1) both}
+      .mm-pulse-ring{animation:mm-pulse-ring 2s ease infinite}
+      .mm-number-slam{animation:mm-number-slam .4s cubic-bezier(.34,1.56,.64,1) both}
+      .mm-row-reveal{animation:mm-row-reveal .25s ease both}
+      .mm-scale-in{animation:mm-scale-in .3s cubic-bezier(.4,0,.2,1) both}
+      .mm-results-in{animation:mm-scale-in .4s cubic-bezier(.4,0,.2,1) both}
+      .mm-count-up{animation:mm-count-up .4s ease both}
+      .mm-timer-urgent{animation:mm-timer-urgent .6s ease infinite}
+      .mm-drain{animation:mm-progress-drain linear both}
+      .mm-answer-input:focus{border-color:rgba(123,92,229,.6)!important;box-shadow:0 0 0 4px rgba(123,92,229,.08)!important;animation:mm-glow-border 2s ease infinite!important}
+      .mm-fade-up{animation:mm-fade-up .35s ease both}
+      .mm-preset-pop{animation:mm-scale-pop .25s ease}
+      .mm-form-input{background:var(--mm-surf2)!important;border:1px solid var(--mm-bdr2)!important;border-radius:12px!important;padding:13px 16px!important;color:var(--mm-whi)!important;font-family:var(--mm-fm)!important;font-size:16px!important;font-weight:500!important;width:100%!important;transition:border-color .2s,box-shadow .2s!important;outline:none!important;}
+      .mm-form-input:focus{border-color:rgba(123,92,229,.5)!important;box-shadow:0 0 0 3px rgba(123,92,229,.07)!important;}
+      .mm-form-input::placeholder{color:rgba(255,255,255,.2)!important;font-weight:400!important;font-size:14px!important;}
+      .mm-form-select{background:#141729!important;appearance:none;padding-right:36px!important;background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239D7FF0' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>")!important;background-repeat:no-repeat!important;background-position:right 14px center!important;}
+    `;
+    document.head.appendChild(s);
+    return () => { document.getElementById(id)?.remove(); };
+  }, []);
+
   if (countdown > 0) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4 transition-colors duration-300">
-        <div className="text-center">
-          <div className="text-9xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 animate-pulse">
+      <div style={{minHeight:"100vh",background:"var(--mm-bg)",display:"flex",alignItems:"center",justifyContent:"center",position:"relative",overflow:"hidden"}}>
+        {/* Background glow */}
+        <div style={{position:"absolute",width:400,height:400,borderRadius:"50%",background:"radial-gradient(circle, rgba(123,92,229,.15) 0%, transparent 70%)",pointerEvents:"none"}} />
+        <div className="mm-pulse-ring" style={{position:"absolute",width:300,height:300,borderRadius:"50%",border:"1px solid rgba(123,92,229,.12)",pointerEvents:"none"}} />
+        <div style={{textAlign:"center",position:"relative",zIndex:1}}>
+          <div key={countdown} className="mm-countdown-num"
+            style={{fontFamily:"var(--mm-fm)",fontSize:"clamp(120px,20vw,200px)",fontWeight:800,lineHeight:1,
+              background:"linear-gradient(135deg, var(--mm-pur2) 0%, #C084FC 40%, var(--mm-pur) 100%)",
+              WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>
             {countdown}
           </div>
-          <p className="text-2xl font-semibold text-gray-700 dark:text-white mt-4">Get Ready!</p>
+          <p style={{fontFamily:"var(--mm-fd)",fontSize:20,fontWeight:700,color:"var(--mm-whi2)",marginTop:24,
+            opacity:.7,letterSpacing:"-.01em",animation:"mm-fade-in .5s ease .2s both"}}>
+            Get Ready!
+          </p>
+          <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"var(--mm-surf)",
+            border:"1px solid var(--mm-bdr2)",borderRadius:100,padding:"7px 16px",marginTop:16,
+            animation:"mm-fade-in .5s ease .4s both"}}>
+            <span style={{fontFamily:"var(--mm-fm)",fontSize:12,color:"var(--mm-muted)"}}>
+              {numQuestions} questions · {operationType.replace(/_/g," ")} · {operationType === "add_sub" ? `${addSubRowTime.toFixed(1)}s/row` : `${timeLimit}s each`}
+            </span>
+          </div>
         </div>
       </div>
     );
@@ -1772,94 +1832,110 @@ export default function Mental() {
     };
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-4 relative">
-        {/* Fixed Session Timer - Top Right, Shows Final Time */}
-        <div className="fixed top-24 right-4 z-40">
-          <div className="flex items-center gap-2 px-5 py-2.5 premium-gradient rounded-xl shadow-2xl border-2 border-white/20 backdrop-blur-md">
-            <Clock className="w-4 h-4 text-white" />
-            <span className="text-base font-bold text-white tracking-wide">
+      <div style={{minHeight:"100vh",background:"var(--mm-bg)",position:"relative",overflowX:"hidden"}}>
+        {/* Background glow */}
+        <div style={{position:"fixed",inset:0,background:"radial-gradient(ellipse 60% 50% at 50% 20%, rgba(16,185,129,.06), transparent 70%)",pointerEvents:"none"}} />
+
+        {/* Fixed Session Timer */}
+        <div style={{position:"fixed",top:88,right:16,zIndex:40}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 16px",background:"var(--mm-surf)",border:"1px solid var(--mm-bdr2)",borderRadius:14,backdropFilter:"blur(12px)"}}>
+            <Clock style={{width:14,height:14,color:"var(--mm-pur2)"}} />
+            <span style={{fontFamily:"var(--mm-fm)",fontSize:13,fontWeight:600,color:"var(--mm-whi)",letterSpacing:"-.01em"}}>
               {Math.floor(sessionElapsedTime / 60)}m {String(sessionElapsedTime % 60).padStart(2, '0')}s
             </span>
           </div>
         </div>
 
-        <div className="container mx-auto max-w-4xl">
-          <div className="bg-slate-800 dark:bg-slate-800 rounded-2xl shadow-xl dark:shadow-2xl p-8 mb-6 border border-slate-700 dark:border-slate-700 transition-all duration-300">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-20 h-20 gradient-green rounded-full mb-4">
-                <Trophy className="w-10 h-10 text-white" />
-              </div>
-              <h1 className="text-4xl font-bold text-white mb-2">Practice Completed!</h1>
-              <p className="text-slate-300">Mental Math Practice</p>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-              <div className="bg-blue-900/30 dark:bg-blue-900/30 border border-blue-700 dark:border-blue-700 rounded-xl p-4 text-center transition-all duration-300">
-                <div className="text-3xl font-bold text-blue-400 dark:text-blue-400">{score}</div>
-                <div className="text-sm text-slate-300 dark:text-slate-300 mt-1">Correct</div>
-              </div>
-              <div className="bg-red-900/30 dark:bg-red-900/30 border border-red-700 dark:border-red-700 rounded-xl p-4 text-center transition-all duration-300">
-                <div className="text-3xl font-bold text-red-400 dark:text-red-400">{results.filter(r => !r.isCorrect).length}</div>
-                <div className="text-sm text-slate-300 dark:text-slate-300 mt-1">Wrong</div>
-              </div>
-              <div className="bg-yellow-900/30 dark:bg-yellow-900/30 border border-yellow-700 dark:border-yellow-700 rounded-xl p-4 text-center transition-all duration-300">
-                <div className="text-3xl font-bold text-yellow-400 dark:text-yellow-400">
-                  {numQuestions - results.length}
+        <div style={{maxWidth:700,margin:"0 auto",padding:"80px 20px 60px"}}>
+          {/* Main results card */}
+          <div className="mm-results-in" style={{background:"var(--mm-surf)",border:"1px solid var(--mm-bdr2)",borderRadius:28,overflow:"hidden",marginBottom:24}}>
+            {/* Top accent bar */}
+            <div style={{height:3,background:"linear-gradient(90deg, var(--mm-pur), var(--mm-grn), transparent)"}} />
+            <div style={{padding:"36px 36px 32px"}}>
+              {/* Trophy + title */}
+              <div style={{textAlign:"center",marginBottom:32}}>
+                <div className="mm-count-up" style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:64,height:64,borderRadius:20,background:"linear-gradient(135deg, var(--mm-grn), #059669)",marginBottom:16}}>
+                  <Trophy style={{width:28,height:28,color:"#fff"}} />
                 </div>
-                <div className="text-sm text-slate-300 dark:text-slate-300 mt-1">Unattempted</div>
+                <h1 style={{fontFamily:"var(--mm-fd)",fontSize:"clamp(24px,3.5vw,36px)",fontWeight:800,color:"var(--mm-whi)",margin:"0 0 6px",letterSpacing:"-.02em"}}>
+                  Practice Completed!
+                </h1>
+                <p style={{fontFamily:"var(--mm-fb)",fontSize:14,color:"var(--mm-muted)",margin:0}}>{getPerformanceMessage()}</p>
               </div>
-              <div className="bg-purple-900/30 dark:bg-purple-900/30 border border-purple-700 dark:border-purple-700 rounded-xl p-4 text-center transition-all duration-300">
-                <div className="text-3xl font-bold text-purple-400 dark:text-purple-400">{percentage.toFixed(1)}%</div>
-                <div className="text-sm text-slate-300 dark:text-slate-300 mt-1">Accuracy</div>
-              </div>
-              <div className="bg-emerald-900/30 dark:bg-emerald-900/30 border border-emerald-700 dark:border-emerald-700 rounded-xl p-4 text-center transition-all duration-300">
-                <div className="text-3xl font-bold text-emerald-400 dark:text-emerald-400">{pointsEarned || 0}</div>
-                <div className="text-sm text-slate-300 dark:text-slate-300 mt-1">Points</div>
-              </div>
-            </div>
 
-            <div className="bg-slate-700/50 dark:bg-slate-700/50 border border-slate-600 dark:border-slate-600 rounded-xl p-6 mb-6 transition-all duration-300">
-              <div className="grid grid-cols-2 gap-4 text-center">
-                <div>
-                  <div className="text-sm text-slate-300 dark:text-slate-300">Time Taken</div>
-                  <div className="text-2xl font-bold text-white dark:text-white">
+              {/* Stats grid */}
+              <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:10,marginBottom:24}}>
+                {[
+                  {label:"CORRECT",value:score,color:"var(--mm-grn)",bg:"rgba(16,185,129,.08)",bdr:"rgba(16,185,129,.2)",delay:".05s"},
+                  {label:"WRONG",value:results.filter(r=>!r.isCorrect).length,color:"var(--mm-red)",bg:"rgba(239,68,68,.08)",bdr:"rgba(239,68,68,.2)",delay:".1s"},
+                  {label:"MISSED",value:numQuestions-results.length,color:"var(--mm-gld)",bg:"rgba(245,158,11,.08)",bdr:"rgba(245,158,11,.2)",delay:".15s"},
+                  {label:"ACCURACY",value:`${percentage.toFixed(1)}%`,color:"var(--mm-pur2)",bg:"rgba(123,92,229,.08)",bdr:"rgba(123,92,229,.2)",delay:".2s"},
+                  {label:"POINTS",value:pointsEarned||0,color:"var(--mm-grn)",bg:"rgba(16,185,129,.08)",bdr:"rgba(16,185,129,.2)",delay:".25s"},
+                ].map(({label,value,color,bg,bdr,delay})=>(
+                  <div key={label} className="mm-count-up" style={{background:bg,border:`1px solid ${bdr}`,borderRadius:14,padding:"14px 8px",textAlign:"center",animationDelay:delay}}>
+                    <div style={{fontFamily:"var(--mm-fm)",fontSize:"clamp(18px,2.5vw,26px)",fontWeight:700,color,lineHeight:1}}>{value}</div>
+                    <div style={{fontFamily:"var(--mm-fm)",fontSize:9,fontWeight:600,letterSpacing:".1em",color:"var(--mm-muted)",marginTop:5,textTransform:"uppercase"}}>{label}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Accuracy bar */}
+              <div style={{marginBottom:24}}>
+                <div style={{height:6,background:"var(--mm-surf2)",borderRadius:99,overflow:"hidden"}}>
+                  <div style={{height:"100%",background:"linear-gradient(90deg, var(--mm-red) 0%, var(--mm-gld) 40%, var(--mm-grn) 100%)",width:`${percentage}%`,borderRadius:99,transition:"width 1.2s cubic-bezier(.4,0,.2,1) .5s"}} />
+                </div>
+              </div>
+
+              {/* Time / Score row */}
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1px 1fr",background:"var(--mm-surf2)",borderRadius:16,overflow:"hidden",marginBottom:28}}>
+                <div style={{padding:"18px 20px",textAlign:"center"}}>
+                  <div style={{fontFamily:"var(--mm-fb)",fontSize:11,fontWeight:600,letterSpacing:".1em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:6}}>Time Taken</div>
+                  <div style={{fontFamily:"var(--mm-fm)",fontSize:22,fontWeight:700,color:"var(--mm-whi)"}}>
                     {sessionElapsedTime ? formatTime(Math.floor(sessionElapsedTime)) : "—"}
                   </div>
                 </div>
-                <div>
-                  <div className="text-sm text-slate-300 dark:text-slate-300">Score</div>
-                  <div className="text-2xl font-bold text-white dark:text-white">
-                    {score} / {numQuestions}
-                  </div>
+                <div style={{background:"var(--mm-bdr)"}} />
+                <div style={{padding:"18px 20px",textAlign:"center"}}>
+                  <div style={{fontFamily:"var(--mm-fb)",fontSize:11,fontWeight:600,letterSpacing:".1em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:6}}>Score</div>
+                  <div style={{fontFamily:"var(--mm-fm)",fontSize:22,fontWeight:700,color:"var(--mm-whi)"}}>{score} / {numQuestions}</div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button
-                onClick={resetGame}
-                className="w-full sm:flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                <RotateCcw className="w-5 h-5" />
-                Try Again
-              </button>
-              <Link href="/dashboard" className="w-full sm:flex-1">
-                <button className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all">
-                  View Dashboard
+              {/* Action buttons */}
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
+                <button
+                  onClick={resetGame}
+                  style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"14px 10px",background:"linear-gradient(135deg, var(--mm-pur), #5535C0)",border:"none",borderRadius:14,fontFamily:"var(--mm-fd)",fontSize:14,fontWeight:800,color:"#fff",cursor:"pointer",letterSpacing:"-.01em",transition:"transform .2s, box-shadow .2s",boxShadow:"0 6px 24px rgba(123,92,229,.25)"}}
+                  onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.transform="translateY(-2px)";(e.currentTarget as HTMLButtonElement).style.boxShadow="0 12px 36px rgba(123,92,229,.4)"}}
+                  onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.transform="";(e.currentTarget as HTMLButtonElement).style.boxShadow="0 6px 24px rgba(123,92,229,.25)"}}
+                >
+                  <RotateCcw style={{width:16,height:16}} />
+                  Try Again
                 </button>
-              </Link>
-              <Link href="/" className="w-full sm:flex-1">
-                <button className="w-full px-6 py-3 bg-slate-700 dark:bg-slate-700 border-2 border-slate-600 dark:border-slate-600 text-white dark:text-white rounded-lg font-semibold hover:bg-slate-600 dark:hover:bg-slate-600 transition-all">
-                  Go Home
-                </button>
-              </Link>
+                <Link href="/dashboard" style={{textDecoration:"none"}}>
+                  <button style={{width:"100%",padding:"14px 10px",background:"linear-gradient(135deg, var(--mm-grn), #059669)",border:"none",borderRadius:14,fontFamily:"var(--mm-fd)",fontSize:14,fontWeight:800,color:"#fff",cursor:"pointer",letterSpacing:"-.01em",transition:"transform .2s, box-shadow .2s",boxShadow:"0 6px 24px rgba(16,185,129,.2)"}}
+                    onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.transform="translateY(-2px)";(e.currentTarget as HTMLButtonElement).style.boxShadow="0 12px 36px rgba(16,185,129,.35)"}}
+                    onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.transform="";(e.currentTarget as HTMLButtonElement).style.boxShadow="0 6px 24px rgba(16,185,129,.2)"}}>
+                    View Dashboard
+                  </button>
+                </Link>
+                <Link href="/" style={{textDecoration:"none"}}>
+                  <button style={{width:"100%",padding:"14px 10px",background:"var(--mm-surf2)",border:"1px solid var(--mm-bdr2)",borderRadius:14,fontFamily:"var(--mm-fd)",fontSize:14,fontWeight:700,color:"var(--mm-whi2)",cursor:"pointer",letterSpacing:"-.01em",transition:"background .2s"}}
+                    onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.background="var(--mm-surf3)"}}
+                    onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.background="var(--mm-surf2)"}}>
+                    Go Home
+                  </button>
+                </Link>
+              </div>
             </div>
           </div>
 
           {/* Question Review */}
           {(results.length > 0 || (questionsRef.current.length > 0 && questionsRef.current.length > results.length)) && (
-            <div className="bg-slate-800 dark:bg-slate-800 rounded-2xl shadow-xl dark:shadow-2xl p-8 border border-slate-700 dark:border-slate-700 transition-all duration-300 mt-6">
-              <h2 className="text-2xl font-bold text-white mb-6">Question Review</h2>
+            <div style={{background:"var(--mm-surf)",border:"1px solid var(--mm-bdr2)",borderRadius:24,overflow:"hidden"}}>
+              <div style={{height:2,background:"linear-gradient(90deg, var(--mm-pur), transparent)"}} />
+              <div style={{padding:"28px 32px"}}>
+                <h2 style={{fontFamily:"var(--mm-fd)",fontSize:18,fontWeight:800,color:"var(--mm-whi)",margin:"0 0 24px",letterSpacing:"-.01em"}}>Question Review</h2>
               
               {/* Separate questions into categories */}
               {(() => {
@@ -1933,42 +2009,32 @@ export default function Mental() {
                 };
 
                 return (
-                  <div className="space-y-8 max-h-96 overflow-y-auto scrollbar-premium">
-                    {/* Correct Questions */}
-                    {correctQuestions.length > 0 && (
+                  <div style={{maxHeight:480,overflowY:"auto",display:"flex",flexDirection:"column",gap:28}}>
+                    {/* Wrong Questions first (most useful) */}
+                    {wrongQuestions.length > 0 && (
                       <div>
-                        <h3 className="text-xl font-bold text-green-400 dark:text-green-400 mb-4 flex items-center gap-2">
-                          <CheckCircle2 className="w-6 h-6" />
-                          Correct Answers ({correctQuestions.length})
-                        </h3>
-                        <div className="space-y-3">
-                          {correctQuestions.map((result, index) => {
+                        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
+                          <XCircle style={{width:18,height:18,color:"var(--mm-red)"}} />
+                          <span style={{fontFamily:"var(--mm-fd)",fontSize:14,fontWeight:800,color:"var(--mm-red)",letterSpacing:"-.01em"}}>Wrong Answers ({wrongQuestions.length})</span>
+                        </div>
+                        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                          {wrongQuestions.map((result, index) => {
                             const questionText = formatQuestionText(result.question, index);
                             return (
-                              <div
-                                key={index}
-                                className="p-4 rounded-lg border-2 bg-green-900/30 dark:bg-green-900/30 border-green-700 dark:border-green-700 transition-all duration-300"
-                              >
-                                <div className="flex items-start justify-between mb-2">
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-3 mb-2">
-                                      <span className="font-semibold text-white dark:text-white">Q{index + 1}:</span>
-                                      <span className="text-lg font-semibold text-white dark:text-white">
-                                        {questionText}
-                                      </span>
+                              <div key={index} className="mm-fade-up"
+                                style={{padding:"14px 16px",background:"rgba(239,68,68,.05)",border:"1px solid rgba(239,68,68,.14)",borderRadius:12,animationDelay:`${index*.04}s`}}>
+                                <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+                                  <div style={{flex:1}}>
+                                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+                                      <span style={{fontFamily:"var(--mm-fm)",fontSize:11,fontWeight:600,color:"var(--mm-muted)"}}>Q{index+1}</span>
+                                      <span style={{fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)"}}>{questionText}</span>
                                     </div>
-                                    <div className="flex items-center gap-4 text-sm">
-                                      <span className="text-green-400 dark:text-green-400">
-                                        Your answer: <span className="font-semibold">{result.userAnswer}</span>
-                                      </span>
-                                      <span className="text-slate-300 dark:text-slate-300">
-                                        Correct: <span className="font-semibold">{result.question.answer}</span>
-                                      </span>
+                                    <div style={{display:"flex",gap:16,fontSize:12}}>
+                                      <span style={{fontFamily:"var(--mm-fb)",color:"var(--mm-red)"}}>Your answer: <b>{result.userAnswer !== null && result.userAnswer !== undefined ? result.userAnswer : "—"}</b></span>
+                                      <span style={{fontFamily:"var(--mm-fb)",color:"var(--mm-muted)"}}>Correct: <b style={{color:"var(--mm-whi2)"}}>{result.question.answer}</b></span>
                                     </div>
                                   </div>
-                                  <div className="ml-4">
-                                    <CheckCircle2 className="w-6 h-6 text-green-400 dark:text-green-400" />
-                                  </div>
+                                  <XCircle style={{width:16,height:16,color:"var(--mm-red)",flexShrink:0,marginTop:2}} />
                                 </div>
                               </div>
                             );
@@ -1977,43 +2043,31 @@ export default function Mental() {
                       </div>
                     )}
 
-                    {/* Wrong Questions */}
-                    {wrongQuestions.length > 0 && (
+                    {/* Correct Questions */}
+                    {correctQuestions.length > 0 && (
                       <div>
-                        <h3 className="text-xl font-bold text-red-400 dark:text-red-400 mb-4 flex items-center gap-2">
-                          <XCircle className="w-6 h-6" />
-                          Wrong Answers ({wrongQuestions.length})
-                        </h3>
-                        <div className="space-y-3">
-                          {wrongQuestions.map((result, index) => {
+                        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
+                          <CheckCircle2 style={{width:18,height:18,color:"var(--mm-grn)"}} />
+                          <span style={{fontFamily:"var(--mm-fd)",fontSize:14,fontWeight:800,color:"var(--mm-grn)",letterSpacing:"-.01em"}}>Correct Answers ({correctQuestions.length})</span>
+                        </div>
+                        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                          {correctQuestions.map((result, index) => {
                             const questionText = formatQuestionText(result.question, index);
                             return (
-                              <div
-                                key={index}
-                                className="p-4 rounded-lg border-2 bg-red-900/30 dark:bg-red-900/30 border-red-700 dark:border-red-700 transition-all duration-300"
-                              >
-                                <div className="flex items-start justify-between mb-2">
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-3 mb-2">
-                                      <span className="font-semibold text-white dark:text-white">Q{index + 1}:</span>
-                                      <span className="text-lg font-semibold text-white dark:text-white">
-                                        {questionText}
-                                      </span>
+                              <div key={index} className="mm-fade-up"
+                                style={{padding:"14px 16px",background:"rgba(16,185,129,.05)",border:"1px solid rgba(16,185,129,.14)",borderRadius:12,animationDelay:`${index*.04}s`}}>
+                                <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+                                  <div style={{flex:1}}>
+                                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+                                      <span style={{fontFamily:"var(--mm-fm)",fontSize:11,fontWeight:600,color:"var(--mm-muted)"}}>Q{index+1}</span>
+                                      <span style={{fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)"}}>{questionText}</span>
                                     </div>
-                                    <div className="flex items-center gap-4 text-sm">
-                                      <span className="text-red-400 dark:text-red-400">
-                                        Your answer: <span className="font-semibold">
-                                          {result.userAnswer !== null && result.userAnswer !== undefined ? result.userAnswer : "—"}
-                                        </span>
-                                      </span>
-                                      <span className="text-slate-300 dark:text-slate-300">
-                                        Correct: <span className="font-semibold">{result.question.answer}</span>
-                                      </span>
+                                    <div style={{display:"flex",gap:16,fontSize:12}}>
+                                      <span style={{fontFamily:"var(--mm-fb)",color:"var(--mm-grn)"}}>Your answer: <b>{result.userAnswer}</b></span>
+                                      <span style={{fontFamily:"var(--mm-fb)",color:"var(--mm-muted)"}}>Correct: <b style={{color:"var(--mm-whi2)"}}>{result.question.answer}</b></span>
                                     </div>
                                   </div>
-                                  <div className="ml-4">
-                                    <XCircle className="w-6 h-6 text-red-400 dark:text-red-400" />
-                                  </div>
+                                  <CheckCircle2 style={{width:16,height:16,color:"var(--mm-grn)",flexShrink:0,marginTop:2}} />
                                 </div>
                               </div>
                             );
@@ -2025,38 +2079,28 @@ export default function Mental() {
                     {/* Unattempted Questions */}
                     {unattemptedQuestions.length > 0 && (
                       <div>
-                        <h3 className="text-xl font-bold text-yellow-400 dark:text-yellow-400 mb-4 flex items-center gap-2">
-                          <Square className="w-6 h-6" />
-                          Unattempted Questions ({unattemptedQuestions.length})
-                        </h3>
-                        <div className="space-y-3">
+                        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
+                          <Square style={{width:18,height:18,color:"var(--mm-gld)"}} />
+                          <span style={{fontFamily:"var(--mm-fd)",fontSize:14,fontWeight:800,color:"var(--mm-gld)",letterSpacing:"-.01em"}}>Unattempted ({unattemptedQuestions.length})</span>
+                        </div>
+                        <div style={{display:"flex",flexDirection:"column",gap:8}}>
                           {unattemptedQuestions.map(({ question, originalIndex }) => {
                             const questionText = formatQuestionText(question, originalIndex);
                             return (
-                              <div
-                                key={originalIndex}
-                                className="p-4 rounded-lg border-2 bg-yellow-900/30 dark:bg-yellow-900/30 border-yellow-700 dark:border-yellow-700 transition-all duration-300"
-                              >
-                                <div className="flex items-start justify-between mb-2">
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-3 mb-2">
-                                      <span className="font-semibold text-white dark:text-white">Q{originalIndex + 1}:</span>
-                                      <span className="text-lg font-semibold text-white dark:text-white">
-                                        {questionText}
-                                      </span>
+                              <div key={originalIndex} className="mm-fade-up"
+                                style={{padding:"14px 16px",background:"rgba(245,158,11,.05)",border:"1px solid rgba(245,158,11,.14)",borderRadius:12,animationDelay:`${originalIndex*.04}s`}}>
+                                <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+                                  <div style={{flex:1}}>
+                                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+                                      <span style={{fontFamily:"var(--mm-fm)",fontSize:11,fontWeight:600,color:"var(--mm-muted)"}}>Q{originalIndex+1}</span>
+                                      <span style={{fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)"}}>{questionText}</span>
                                     </div>
-                                    <div className="flex items-center gap-4 text-sm">
-                                      <span className="text-yellow-400 dark:text-yellow-400">
-                                        Your answer: <span className="font-semibold">—</span>
-                                      </span>
-                                      <span className="text-slate-300 dark:text-slate-300">
-                                        Correct: <span className="font-semibold">{question.answer}</span>
-                                      </span>
+                                    <div style={{display:"flex",gap:16,fontSize:12}}>
+                                      <span style={{fontFamily:"var(--mm-fb)",color:"var(--mm-gld)"}}>Your answer: <b>—</b></span>
+                                      <span style={{fontFamily:"var(--mm-fb)",color:"var(--mm-muted)"}}>Correct: <b style={{color:"var(--mm-whi2)"}}>{question.answer}</b></span>
                                     </div>
                                   </div>
-                                  <div className="ml-4">
-                                    <Square className="w-6 h-6 text-yellow-400 dark:text-yellow-400" />
-                                  </div>
+                                  <Square style={{width:16,height:16,color:"var(--mm-gld)",flexShrink:0,marginTop:2}} />
                                 </div>
                               </div>
                             );
@@ -2067,6 +2111,7 @@ export default function Mental() {
                   </div>
                 );
               })()}
+              </div>
             </div>
           )}
         </div>
@@ -2075,128 +2120,137 @@ export default function Mental() {
   }
 
   if (isStarted && currentQuestion) {
+    // Shared session timer widget
+    const sessionTimerWidget = (
+      <div style={{position:"fixed",top:88,right:16,zIndex:40}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,padding:"7px 14px",background:"var(--mm-surf)",border:"1px solid var(--mm-bdr2)",borderRadius:12}}>
+          <Clock style={{width:13,height:13,color:"var(--mm-pur2)"}} />
+          <span style={{fontFamily:"var(--mm-fm)",fontSize:12,fontWeight:600,color:"var(--mm-whi)",letterSpacing:"-.01em"}}>
+            {Math.floor(sessionElapsedTime / 60)}m {String(sessionElapsedTime % 60).padStart(2, '0')}s
+          </span>
+        </div>
+      </div>
+    );
+
+    // Shared card header
+    const cardHeader = (
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <span style={{fontFamily:"var(--mm-fm)",fontSize:11,fontWeight:600,color:"var(--mm-muted)",letterSpacing:".08em"}}>
+            Q {currentQuestionIndex + 1} / {numQuestions}
+          </span>
+          <span style={{fontFamily:"var(--mm-fm)",fontSize:11,fontWeight:600,color:"var(--mm-pur2)"}}>
+            {score} pts
+          </span>
+        </div>
+        <button
+          onClick={exitPractice}
+          title="Exit Practice"
+          style={{padding:"6px 8px",background:"transparent",border:"1px solid transparent",borderRadius:8,color:"var(--mm-muted)",cursor:"pointer",transition:"color .2s, background .2s, border-color .2s"}}
+          onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.color="var(--mm-red)";(e.currentTarget as HTMLButtonElement).style.background="rgba(239,68,68,.08)";(e.currentTarget as HTMLButtonElement).style.borderColor="rgba(239,68,68,.2)"}}
+          onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.color="var(--mm-muted)";(e.currentTarget as HTMLButtonElement).style.background="transparent";(e.currentTarget as HTMLButtonElement).style.borderColor="transparent"}}
+        >
+          <X style={{width:16,height:16}} />
+        </button>
+      </div>
+    );
+
+    // Shared progress bar
+    const progressBar = (
+      <div style={{height:4,background:"var(--mm-surf2)",borderRadius:99,overflow:"hidden",marginBottom:28}}>
+        <div style={{height:"100%",background:"linear-gradient(90deg, var(--mm-pur), var(--mm-pur2))",width:`${((currentQuestionIndex+1)/numQuestions)*100}%`,borderRadius:99,transition:"width .4s cubic-bezier(.4,0,.2,1)"}} />
+      </div>
+    );
+
     // Handle Add/Sub question display (row by row)
     if ((currentQuestion.type === "add_sub" || currentQuestion.type === "integer_add_sub") && !isShowingAnswerTime) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-4 relative">
-          {/* Fixed Session Timer - Top Right, Below Navbar */}
-          <div className="fixed top-24 right-4 z-40">
-            <div className="flex items-center gap-2 px-5 py-2.5 premium-gradient rounded-xl shadow-2xl border-2 border-white/20 backdrop-blur-md">
-              <Clock className="w-4 h-4 text-white animate-pulse" />
-              <span className="text-base font-bold text-white tracking-wide">
-                {Math.floor(sessionElapsedTime / 60)}m {String(sessionElapsedTime % 60).padStart(2, '0')}s
-              </span>
-            </div>
-          </div>
+        <div style={{minHeight:"100vh",background:"var(--mm-bg)",position:"relative"}}>
+          <div style={{position:"fixed",inset:0,background:"radial-gradient(ellipse 50% 40% at 50% 20%, rgba(123,92,229,.05), transparent 70%)",pointerEvents:"none"}} />
+          {sessionTimerWidget}
 
-          <div className="container mx-auto max-w-5xl">
-          <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-md rounded-3xl shadow-xl dark:shadow-2xl p-6 md:p-10 lg:p-12 mt-8 relative border border-slate-200/60 dark:border-slate-700/60 transition-all duration-300">
-            {/* Exit Button */}
-            <button
-              onClick={exitPractice}
-              className="absolute top-4 right-4 p-2 text-gray-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 z-10"
-              title="Exit Practice"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            
-            {/* Progress Bar */}
-            <div className="mb-8">
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-xs md:text-sm font-medium text-gray-600 dark:text-slate-400 tracking-wide">
-                  Question {currentQuestionIndex + 1} of {numQuestions}
-                </span>
-                <span className="text-xs md:text-sm font-medium text-gray-600 dark:text-slate-400 tracking-wide">
-                  Score: {score}/{results.length > 0 ? results.length : currentQuestionIndex}
-                </span>
-              </div>
-              <div className="w-full bg-gray-100 dark:bg-slate-700/50 rounded-full h-2 overflow-hidden">
-                <div
-                  className="bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 h-2 rounded-full transition-all duration-500 ease-out shadow-sm"
-                  style={{ width: `${((currentQuestionIndex + 1) / numQuestions) * 100}%` }}
-                />
-              </div>
-            </div>
+          <div style={{maxWidth:720,margin:"0 auto",padding:"80px 20px 60px"}}>
+            <div className="mm-scale-in" style={{background:"var(--mm-surf)",border:"1px solid var(--mm-bdr2)",borderRadius:24,overflow:"hidden"}}>
+              <div style={{height:2,background:"linear-gradient(90deg, var(--mm-pur), var(--mm-pur2), transparent)"}} />
+              <div style={{padding:"24px 28px"}}>
+                {cardHeader}
+                {progressBar}
 
-            {/* Question Display (Sequential - One by One) */}
-            <div className="mb-8 relative min-h-[500px] max-h-[600px] flex flex-col items-center justify-center">
-              <div className="flex items-center justify-center w-full relative px-4">
-                {/* Current Item - Big Text (Centered, Double Size) */}
-                {addSubCurrentItem && (
-                  <div className="text-[210px] md:text-[240px] lg:text-[270px] font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 transition-all duration-500 ease-out text-center leading-none tracking-tight">
-                    {addSubCurrentItem}
-                  </div>
-                )}
-                
-                {/* Previous Items - Left Column (First 10 rows) and Right Column (If more than 10) */}
-                {addSubDisplayedItems.length > 0 && (() => {
-                  const leftItems = addSubDisplayedItems.slice(0, 10);
-                  const rightItems = addSubDisplayedItems.slice(10);
-                  
-                  return (
-                    <>
-                      {/* Left Column - First 10 items starting from top-left */}
-                      <div 
-                        className="absolute left-0 top-0 flex flex-col gap-1.5 h-[400px] overflow-hidden pl-3"
+                {/* Question Display (Sequential - One by One) */}
+                <div style={{position:"relative",minHeight:500,maxHeight:600,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",marginBottom:16}}>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"center",width:"100%",position:"relative",padding:"0 56px"}}>
+                    {/* Current Item - Big Text (Centered) */}
+                    {addSubCurrentItem && (
+                      <div
+                        key={addSubCurrentItem}
+                        className="mm-number-slam"
+                        style={{fontSize:"clamp(80px,14vw,160px)",fontFamily:"var(--mm-fm)",fontWeight:800,background:"linear-gradient(135deg, var(--mm-pur2), #EC4899, var(--mm-pur))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",lineHeight:1,textAlign:"center",letterSpacing:"-.04em"}}
                       >
-                        {leftItems.map((item, idx) => {
-                          // Calculate opacity based on position (newer items more visible)
-                          const totalItems = addSubDisplayedItems.length;
-                          const positionFromEnd = totalItems - idx;
-                          const opacity = positionFromEnd <= 8 ? 1 : Math.max(0.3, 1 - (positionFromEnd - 8) * 0.1);
-                          
-                          return (
-                            <span 
-                              key={idx} 
-                              className="whitespace-nowrap text-xl md:text-2xl font-medium text-gray-500 dark:text-slate-400 transition-all duration-300"
-                              style={{ opacity }}
-                            >
-                              {item}
-                            </span>
-                          );
-                        })}
+                        {addSubCurrentItem}
                       </div>
+                    )}
+                    
+                    {/* Previous Items - Left Column (First 10 rows) and Right Column (If more than 10) */}
+                    {addSubDisplayedItems.length > 0 && (() => {
+                      const leftItems = addSubDisplayedItems.slice(0, 10);
+                      const rightItems = addSubDisplayedItems.slice(10);
                       
-                      {/* Right Column - Items beyond 10, only shown if there are more than 10 items */}
-                      {rightItems.length > 0 && (
-                        <div 
-                          className="absolute right-0 top-0 flex flex-col gap-1.5 h-[400px] overflow-y-auto overflow-x-hidden pr-3 scrollbar-premium"
-                        >
-                          {rightItems.map((item, idx) => {
-                            // Calculate opacity based on position (newer items more visible)
-                            const totalItems = addSubDisplayedItems.length;
-                            const actualIdx = 10 + idx; // Actual index in the full array
-                            const positionFromEnd = totalItems - actualIdx;
-                            const opacity = positionFromEnd <= 8 ? 1 : Math.max(0.3, 1 - (positionFromEnd - 8) * 0.1);
-                            
-                            return (
-                              <span 
-                                key={actualIdx} 
-                                className="whitespace-nowrap text-xl md:text-2xl font-medium text-gray-500 dark:text-slate-400 transition-all duration-300"
-                                style={{ opacity }}
-                              >
-                                {item}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </>
-                  );
-                })()}
+                      return (
+                        <>
+                          {/* Left Column - First 10 items starting from top-left */}
+                          <div style={{position:"absolute",left:0,top:0,display:"flex",flexDirection:"column",gap:6,height:400,overflow:"hidden",paddingLeft:4}}>
+                            {leftItems.map((item, idx) => {
+                              const totalItems = addSubDisplayedItems.length;
+                              const positionFromEnd = totalItems - idx;
+                              const opacity = positionFromEnd <= 8 ? 1 : Math.max(0.3, 1 - (positionFromEnd - 8) * 0.1);
+                              return (
+                                <span
+                                  key={idx}
+                                  className="mm-row-reveal"
+                                  style={{whiteSpace:"nowrap",fontFamily:"var(--mm-fm)",fontSize:18,fontWeight:500,color:"var(--mm-whi2)",opacity,transition:"opacity .3s",animationDelay:`${idx*.03}s`}}
+                                >
+                                  {item}
+                                </span>
+                              );
+                            })}
+                          </div>
+                          
+                          {/* Right Column - Items beyond 10 */}
+                          {rightItems.length > 0 && (
+                            <div style={{position:"absolute",right:0,top:0,display:"flex",flexDirection:"column",gap:6,height:400,overflowY:"auto",overflowX:"hidden",paddingRight:4}}>
+                              {rightItems.map((item, idx) => {
+                                const totalItems = addSubDisplayedItems.length;
+                                const actualIdx = 10 + idx;
+                                const positionFromEnd = totalItems - actualIdx;
+                                const opacity = positionFromEnd <= 8 ? 1 : Math.max(0.3, 1 - (positionFromEnd - 8) * 0.1);
+                                return (
+                                  <span
+                                    key={actualIdx}
+                                    style={{whiteSpace:"nowrap",fontFamily:"var(--mm-fm)",fontSize:18,fontWeight:500,color:"var(--mm-whi2)",opacity,transition:"opacity .3s"}}
+                                  >
+                                    {item}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
+                  
+                  {/* Row counter */}
+                  <p style={{fontFamily:"var(--mm-fm)",fontSize:13,color:"var(--mm-muted)",marginTop:48,textAlign:"center"}}>
+                    {(() => {
+                      if (currentQuestion.type === "add_sub" || currentQuestion.type === "integer_add_sub") {
+                        const addSubQ = currentQuestion as AddSubQuestion | IntegerAddSubQuestion;
+                        return `${addSubDisplayIndex + 1} / ${addSubQ.numbers.length}`;
+                      }
+                      return `${addSubDisplayIndex + 1}`;
+                    })()}
+                  </p>
+                </div>
               </div>
-              
-              {/* Showing item text - Below in center */}
-              <p className="text-sm md:text-base text-gray-400 dark:text-slate-500 mt-12 text-center font-medium tracking-wide">
-                {(() => {
-                  if (currentQuestion.type === "add_sub" || currentQuestion.type === "integer_add_sub") {
-                    const addSubQ = currentQuestion as AddSubQuestion | IntegerAddSubQuestion;
-                    return `${addSubDisplayIndex + 1} / ${addSubQ.numbers.length}`;
-                  }
-                  return `${addSubDisplayIndex + 1}`;
-                })()}
-              </p>
-            </div>
             </div>
           </div>
         </div>
@@ -2232,105 +2286,113 @@ export default function Mental() {
       questionDisplay = `${currentQuestion.percentage}% of ${currentQuestion.number}`;
     }
 
+    const effectiveLimit = (isShowingAnswerTime || (currentQuestion.type !== "add_sub" && currentQuestion.type !== "integer_add_sub")) ? timeLimit : addSubAnswerTime;
+    const timerRatio = timeRemaining / effectiveLimit;
+    const timerColor = timerRatio > 0.5 ? "var(--mm-grn)" : timerRatio > 0.25 ? "var(--mm-gld)" : "var(--mm-red)";
+    const timerBg = timerRatio > 0.5 ? "rgba(16,185,129,.15)" : timerRatio > 0.25 ? "rgba(245,158,11,.15)" : "rgba(239,68,68,.15)";
+    const timerBdr = timerRatio > 0.5 ? "rgba(16,185,129,.3)" : timerRatio > 0.25 ? "rgba(245,158,11,.3)" : "rgba(239,68,68,.3)";
+
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-4 relative">
-        {/* Fixed Session Timer - Top Right, Below Navbar */}
-        <div className="fixed top-24 right-4 z-40">
-          <div className="flex items-center gap-2 px-5 py-2.5 premium-gradient rounded-xl shadow-2xl border-2 border-white/20 backdrop-blur-md">
-            <Clock className="w-4 h-4 text-white animate-pulse" />
-            <span className="text-base font-bold text-white tracking-wide">
-              {Math.floor(sessionElapsedTime / 60)}m {String(sessionElapsedTime % 60).padStart(2, '0')}s
-            </span>
-          </div>
-        </div>
+      <div style={{minHeight:"100vh",background:"var(--mm-bg)",position:"relative"}}>
+        <div style={{position:"fixed",inset:0,background:"radial-gradient(ellipse 50% 40% at 50% 20%, rgba(123,92,229,.05), transparent 70%)",pointerEvents:"none"}} />
+        {sessionTimerWidget}
 
-        <div className="container mx-auto max-w-4xl">
-          <div className="bg-white/90 dark:bg-slate-800 backdrop-blur-sm rounded-3xl shadow-2xl dark:shadow-2xl p-8 md:p-12 mt-8 relative border border-slate-200/50 dark:border-slate-700/50 transition-all duration-300">
-            {/* Exit Button */}
-            <button
-              onClick={exitPractice}
-              className="absolute top-4 right-4 p-2 text-gray-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full transition-colors z-10"
-              title="Exit Practice"
-            >
-              <X className="w-6 h-6" />
-            </button>
-            
-            {/* Progress Bar */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-semibold text-gray-700 dark:text-white">
-                  Question {currentQuestionIndex + 1} of {numQuestions}
-                </span>
-                <span className="text-sm font-semibold text-gray-700 dark:text-white">
-                  Score: {score}/{results.length > 0 ? results.length : currentQuestionIndex}
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-3">
+        <div style={{maxWidth:640,margin:"0 auto",padding:"80px 20px 60px"}}>
+          <div className="mm-scale-in" style={{background:"var(--mm-surf)",border:"1px solid var(--mm-bdr2)",borderRadius:24,overflow:"hidden"}}>
+            <div style={{height:2,background:"linear-gradient(90deg, var(--mm-pur), var(--mm-pur2), transparent)",position:"relative"}}>
+              {/* Timer drain overlay */}
+              {(isShowingAnswerTime || (currentQuestion.type !== "add_sub" && currentQuestion.type !== "integer_add_sub")) && (
                 <div
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 h-3 rounded-full transition-all duration-300"
-                  style={{ width: `${((currentQuestionIndex + 1) / numQuestions) * 100}%` }}
+                  key={`drain-${currentQuestionIndex}`}
+                  className="mm-drain"
+                  style={{position:"absolute",top:0,right:0,height:"100%",background:"var(--mm-bg)",animationDuration:`${effectiveLimit}s`,animationFillMode:"forwards"}}
                 />
-              </div>
+              )}
             </div>
+            <div style={{padding:"24px 28px"}}>
+              {cardHeader}
+              {progressBar}
 
-            {/* Question Timer (Time Remaining) */}
-            {isShowingAnswerTime || (currentQuestion.type !== "add_sub" && currentQuestion.type !== "integer_add_sub") ? (
-              <div className="flex justify-center mb-8">
-                <div className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-orange-400 to-red-500 rounded-full shadow-lg">
-                  <Clock className="w-6 h-6 text-white" />
-                  <span className="text-3xl font-bold text-white">{timeRemaining}s</span>
+              {/* Timer pill */}
+              {(isShowingAnswerTime || (currentQuestion.type !== "add_sub" && currentQuestion.type !== "integer_add_sub")) && (
+                <div style={{display:"flex",justifyContent:"center",marginBottom:28}}>
+                  <div
+                    className={timerRatio < 0.25 ? "mm-timer-urgent" : ""}
+                    style={{display:"flex",alignItems:"center",gap:8,padding:"8px 20px",background:timerBg,border:`1px solid ${timerBdr}`,borderRadius:99,transition:"background .5s ease, border-color .5s ease, color .5s ease"}}
+                  >
+                    <Clock style={{width:14,height:14,color:timerColor}} />
+                    <span style={{fontFamily:"var(--mm-fm)",fontSize:22,fontWeight:700,color:timerColor,letterSpacing:"-.02em"}}>{timeRemaining}s</span>
+                  </div>
                 </div>
-              </div>
-            ) : null}
+              )}
 
-            {/* Question */}
-            <div className="text-center mb-8">
-              <div className="text-7xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 mb-4">
-                {questionDisplay}
+              {/* Question */}
+              <div style={{textAlign:"center",marginBottom:28}}>
+                <div
+                  key={currentQuestionIndex}
+                  className="mm-number-slam"
+                  style={{display:"flex",alignItems:"center",justifyContent:"center",flexWrap:"wrap",gap:"0.3em",fontSize:"clamp(40px,8vw,72px)",fontFamily:"var(--mm-fm)",fontWeight:800,lineHeight:1.1,marginBottom:12}}
+                >
+                  {questionDisplay.split(" ").map((token, i) => {
+                    const isAdd = token === "+";
+                    const isSub = token === "−" || token === "-";
+                    const isMul = token === "×";
+                    const isDiv = token === "÷";
+                    const isParen = token.startsWith("(") || token.endsWith(")") || token === "of";
+                    if (isAdd) return <span key={i} style={{color:"var(--mm-grn)"}}>{token}</span>;
+                    if (isSub) return <span key={i} style={{color:"var(--mm-red)"}}>{token}</span>;
+                    if (isMul || isDiv) return <span key={i} style={{color:"var(--mm-pur2)"}}>{token}</span>;
+                    if (isParen) return <span key={i} style={{color:"var(--mm-muted)"}}>{token}</span>;
+                    return <span key={i} style={{background:"linear-gradient(135deg, var(--mm-whi), var(--mm-whi2))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>{token}</span>;
+                  })}
+                </div>
+                <span style={{fontFamily:"var(--mm-fm)",fontSize:24,fontWeight:600,color:"var(--mm-muted)"}}>= ?</span>
               </div>
-              <p className="text-2xl text-gray-600 dark:text-slate-300">= ?</p>
-            </div>
 
-            {/* Answer Input */}
-            <div className="max-w-md mx-auto">
-              <input
-                type="text"
-                inputMode="decimal"
-                value={currentAnswer}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  // Allow empty, integers, decimals, and negative numbers, max 20 characters
-                  if (val === "" || (/^-?\d*\.?\d*$/.test(val) && val.length <= 20)) {
-                    setCurrentAnswer(val);
-                    currentAnswerRef.current = val; // Update ref immediately for timer access
-                  }
-                }}
-                maxLength={20}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    handleSubmitAnswer();
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-                    e.preventDefault();
-                  }
-                }}
-                placeholder="Enter your answer"
-                className="w-full px-6 py-4 text-3xl font-bold text-center border-4 border-purple-300 dark:border-purple-600 rounded-xl focus:border-purple-500 dark:focus:border-purple-400 focus:ring-4 focus:ring-purple-200 dark:focus:ring-purple-900/30 outline-none transition-all bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
-                autoFocus={!((currentQuestion.type === "add_sub" || currentQuestion.type === "integer_add_sub") && !isShowingAnswerTime)}
-                disabled={(currentQuestion.type === "add_sub" || currentQuestion.type === "integer_add_sub") && !isShowingAnswerTime}
-                ref={(input) => {
-                  answerInputRef.current = input;
-                }}
-              />
-              <button
-                onClick={handleSubmitAnswer}
-                disabled={currentAnswer === "" || ((currentQuestion.type === "add_sub" || currentQuestion.type === "integer_add_sub") && !isShowingAnswerTime)}
-                className="w-full mt-4 px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                Submit Answer
-              </button>
+              {/* Answer Input */}
+              <div style={{maxWidth:360,margin:"0 auto"}}>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={currentAnswer}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty, integers, decimals, and negative numbers, max 20 characters
+                    if (val === "" || (/^-?\d*\.?\d*$/.test(val) && val.length <= 20)) {
+                      setCurrentAnswer(val);
+                      currentAnswerRef.current = val; // Update ref immediately for timer access
+                    }
+                  }}
+                  maxLength={20}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      handleSubmitAnswer();
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                      e.preventDefault();
+                    }
+                  }}
+                  placeholder="Enter your answer"
+                  className="mm-answer-input"
+                  style={{width:"100%",padding:"14px 20px",fontSize:22,fontFamily:"var(--mm-fm)",fontWeight:700,textAlign:"center",background:"var(--mm-surf2)",border:"1.5px solid rgba(123,92,229,.3)",borderRadius:14,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box",caretColor:"var(--mm-pur2)"}}
+                  autoFocus={!((currentQuestion.type === "add_sub" || currentQuestion.type === "integer_add_sub") && !isShowingAnswerTime)}
+                  disabled={(currentQuestion.type === "add_sub" || currentQuestion.type === "integer_add_sub") && !isShowingAnswerTime}
+                  ref={(input) => {
+                    answerInputRef.current = input;
+                  }}
+                />
+                <button
+                  onClick={handleSubmitAnswer}
+                  disabled={currentAnswer === "" || ((currentQuestion.type === "add_sub" || currentQuestion.type === "integer_add_sub") && !isShowingAnswerTime)}
+                  style={{width:"100%",marginTop:12,padding:"14px",background:"linear-gradient(135deg, var(--mm-grn), #059669)",border:"none",borderRadius:14,fontFamily:"var(--mm-fd)",fontSize:15,fontWeight:800,color:"#fff",cursor:"pointer",letterSpacing:"-.01em",transition:"transform .2s, opacity .2s",opacity:currentAnswer===""||((currentQuestion.type==="add_sub"||currentQuestion.type==="integer_add_sub")&&!isShowingAnswerTime)?0.45:1}}
+                  onMouseEnter={e=>{if(!(currentAnswer===""||((currentQuestion.type==="add_sub"||currentQuestion.type==="integer_add_sub")&&!isShowingAnswerTime)))(e.currentTarget as HTMLButtonElement).style.transform="translateY(-2px)"}}
+                  onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.transform=""}}
+                >
+                  Submit Answer
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2339,52 +2401,34 @@ export default function Mental() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-32 pb-20 px-6 transition-colors duration-300">
-      <div className="container mx-auto">
-        {/* Page Header */}
-        <header className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <Link href="/">
-              <button className="group flex items-center gap-2 px-6 py-3 bg-background border border-border rounded-xl hover:border-primary hover:bg-primary/5 transition-all">
-                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform text-primary" />
-                <span className="font-bold uppercase tracking-widest text-muted-foreground">Back to Home</span>
-              </button>
-            </Link>
-            <h1 className="text-5xl font-black tracking-tighter uppercase italic text-foreground flex items-center gap-3">
-              <Sparkles className="w-10 h-10 text-primary" />
-              Mental Math Practice
-            </h1>
-            <div className="w-32"></div>
-          </div>
-        </header>
+    <div style={{minHeight:"100vh",background:"var(--mm-bg)"}}>
 
-        <div className="bg-card border border-border rounded-[2.5rem] shadow-xl overflow-hidden">
-          {/* Premium Header */}
-          <div className="relative bg-gradient-to-r from-primary via-primary/80 to-primary/60 px-8 md:px-16 py-14 text-center overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/50 to-primary/30"></div>
-            <div className="relative z-10">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-md rounded-2xl mb-6 shadow-xl border border-white/30 transform hover:scale-105 transition-transform duration-300">
-                <Sparkles className="w-10 h-10 text-white drop-shadow-lg" />
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-3 drop-shadow-lg uppercase italic tracking-tighter">
-                Mental Math Practice
-              </h2>
-              <p className="text-white/95 text-lg md:text-xl font-medium">
-                Challenge yourself with timed math questions
-              </p>
-            </div>
+      {/* Hero banner */}
+      <div style={{position:"relative",overflow:"hidden",borderRadius:"0 0 28px 28px",padding:"52px 32px 56px",background:"linear-gradient(145deg,#12103A 0%,#1A1050 40%,#0E0B28 100%)",borderBottom:"1px solid rgba(123,92,229,.2)"}}>
+        {/* Grid pattern layer */}
+        <div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(123,92,229,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(123,92,229,.05) 1px, transparent 1px)",backgroundSize:"48px 48px",WebkitMaskImage:"radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)"}} />
+        {/* Bottom fade */}
+        <div style={{position:"absolute",bottom:0,left:0,right:0,height:40,background:"linear-gradient(to bottom, transparent, var(--mm-bg))"}} />
+        <div style={{position:"relative",zIndex:1,textAlign:"center"}}>
+          <div style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:60,height:60,borderRadius:18,background:"rgba(123,92,229,.2)",marginBottom:20}}>
+            <Sparkles style={{width:28,height:28,color:"var(--mm-pur2)"}} />
           </div>
+          <h1 style={{fontFamily:"var(--mm-fd)",fontSize:"clamp(28px,4vw,44px)",fontWeight:800,color:"var(--mm-whi)",margin:"0 0 10px",letterSpacing:"-.03em"}}>Mental Math Practice</h1>
+          <p style={{fontFamily:"var(--mm-fb)",fontSize:16,fontWeight:300,color:"rgba(255,255,255,.5)",margin:0}}>Challenge yourself with timed questions</p>
+        </div>
+      </div>
 
-          {/* Form Content - Horizontal Layout */}
-          <div className="p-8 md:p-12 lg:p-16">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-              {/* Left Column */}
-              <div className="space-y-6 bg-background/50 rounded-2xl p-6 border border-border shadow-sm transition-all duration-300">
+      {/* Form content */}
+      <div style={{maxWidth:900,margin:"0 auto",padding:"32px 20px 60px"}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:24}}>
+          {/* Left Column */}
+          <div className="mm-fade-up" style={{background:"var(--mm-surf)",border:"1px solid var(--mm-bdr)",borderRadius:20,padding:28,display:"flex",flexDirection:"column",gap:20,animationDelay:".1s"}}>
+
                 {/* Student Name */}
-                <div className="group">
-                  <label className="block text-sm font-bold uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-2">
-                    <span className="w-2 h-2 bg-primary rounded-full"></span>
-                    Your Name <span className="text-red-500">*</span>
+                <div>
+                  <label style={{display:"flex",alignItems:"center",gap:6,fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>
+                    <span style={{width:5,height:5,borderRadius:"50%",background:"var(--mm-red)",flexShrink:0}} />
+                    Your Name
                   </label>
                   <input
                     type="text"
@@ -2403,30 +2447,25 @@ export default function Mental() {
                       }
                 }}
                 placeholder="Enter your name"
-                    className={`w-full px-5 py-4 border-2 dark:border-slate-600 rounded-xl focus:ring-4 transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-400 font-semibold shadow-sm hover:shadow-md ${
-                  studentNameError
-                    ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                        : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-200"
-                }`}
+                    className="mm-form-input"
+                    style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:`1.5px solid ${studentNameError ? "var(--mm-red)" : "var(--mm-bdr2)"}`,borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
               />
               {studentNameError && (
-                    <p className="mt-2 text-sm font-medium text-red-600 flex items-center gap-2">
-                      <XCircle className="w-4 h-4" />
+                    <p style={{marginTop:6,fontFamily:"var(--mm-fb)",fontSize:12,color:"var(--mm-red)",display:"flex",alignItems:"center",gap:4}}>
+                      <XCircle style={{width:12,height:12}} />
                       {studentNameError}
                     </p>
                   )}
                 </div>
 
                 {/* Operation Type */}
-                <div className="group">
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                    <span className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></span>
-                    Operation Type
-                  </label>
+                <div>
+                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Operation Type</label>
                   <select
                     value={operationType}
                     onChange={(e) => setOperationType(e.target.value as OperationType)}
-                    className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-sm hover:shadow-md cursor-pointer"
+                    className="mm-form-input mm-form-select"
+                    style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",cursor:"pointer",boxSizing:"border-box" as const}}
                   >
                 <optgroup label="Basic Operations">
                   <option value="add_sub">Add/Subtract</option>
@@ -2447,97 +2486,85 @@ export default function Mental() {
             </div>
 
             {/* Number of Questions */}
-                <div className="group">
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                    <span className="w-2 h-2 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full"></span>
-                    Number of Questions <span className="text-slate-500 dark:text-slate-400 font-normal text-xs">(Min: 1, Max: 50)</span>
-              </label>
+                <div>
+                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Number of Questions <span style={{fontWeight:400,opacity:.6}}>(1–50)</span></label>
               <NumericInput
                 value={numQuestions}
                 onChange={setNumQuestions}
                 min={1}
                 max={50}
-                    className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-sm hover:shadow-md"
+                    className="mm-form-input"
+                    style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
               />
                 </div>
-            </div>
+          </div>
 
-              {/* Right Column - White Background */}
-              <div className="space-y-6 bg-white dark:bg-slate-800/50 rounded-2xl p-6 border border-slate-200/50 dark:border-slate-700/50 shadow-sm transition-all duration-300">
+          {/* Right Column */}
+          <div className="mm-fade-up" style={{background:"var(--mm-surf)",border:"1px solid var(--mm-bdr)",borderRadius:20,padding:28,display:"flex",flexDirection:"column",gap:20,animationDelay:".2s"}}>
 
             {/* Multiplication/Division specific inputs */}
             {(operationType === "multiplication" || operationType === "division") && (
               <>
                 {operationType === "multiplication" ? (
                   <>
-                    <div className="group">
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                        <span className="w-2 h-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"></span>
-                        Multiplicand Digits <span className="text-slate-500 dark:text-slate-400 font-normal text-xs">(Min: 2, Max: 10)</span>
-                      </label>
+                    <div>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Multiplicand Digits <span style={{fontWeight:400,opacity:.6}}>(2–10)</span></label>
                       <NumericInput
                         value={multiplicandDigits}
                         onChange={setMultiplicandDigits}
                         min={2}
                         max={10}
-                        className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-sm hover:shadow-md"
+                        className="mm-form-input"
+                        style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                       />
                     </div>
-                    <div className="group">
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                        <span className="w-2 h-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"></span>
-                        Multiplier Digits <span className="text-slate-500 dark:text-slate-400 font-normal text-xs">(Min: 1, Max: 10)</span>
-                      </label>
+                    <div>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Multiplier Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
                       <NumericInput
                         value={multiplierDigits}
                         onChange={setMultiplierDigits}
                         min={1}
                         max={10}
-                        className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-sm hover:shadow-md"
+                        className="mm-form-input"
+                        style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                       />
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="group">
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                        <span className="w-2 h-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"></span>
-                        Dividend Digits <span className="text-slate-500 dark:text-slate-400 font-normal text-xs">(Min: 2, Max: 10)</span>
-                      </label>
+                    <div>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Dividend Digits <span style={{fontWeight:400,opacity:.6}}>(2–10)</span></label>
                       <NumericInput
                         value={dividendDigits}
                         onChange={setDividendDigits}
                         min={2}
                         max={10}
-                        className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-sm hover:shadow-md"
+                        className="mm-form-input"
+                        style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                       />
                     </div>
-                    <div className="group">
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                        <span className="w-2 h-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"></span>
-                        Divisor Digits <span className="text-slate-500 dark:text-slate-400 font-normal text-xs">(Min: 1, Max: 10)</span>
-                      </label>
+                    <div>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Divisor Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
                       <NumericInput
                         value={divisorDigits}
                         onChange={setDivisorDigits}
                         min={1}
                         max={10}
-                        className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-semibold shadow-sm hover:shadow-md"
+                        className="mm-form-input"
+                        style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                       />
                     </div>
                   </>
                 )}
                 {/* Time Limit for Multiplication/Division */}
-                <div className="group">
-                  <div className="bg-gradient-to-br from-white to-indigo-50/30 dark:from-slate-800 dark:to-indigo-900/20 p-6 rounded-2xl border-2 border-indigo-200/50 dark:border-indigo-700/50 shadow-xl">
-                    <TimeLimitSlider
-                      value={timeLimit}
-                      onChange={setTimeLimit}
-                      operationType={operationType}
-                      difficultyMode={difficultyMode}
-                      onDifficultyChange={setDifficultyMode}
-                    />
-                  </div>
+                <div style={{background:"var(--mm-surf2)",border:"1px solid var(--mm-bdr)",borderRadius:16,padding:20}}>
+                  <TimeLimitSlider
+                    value={timeLimit}
+                    onChange={setTimeLimit}
+                    operationType={operationType}
+                    difficultyMode={difficultyMode}
+                    onDifficultyChange={setDifficultyMode}
+                  />
                 </div>
               </>
             )}
@@ -2546,30 +2573,28 @@ export default function Mental() {
             {operationType === "decimal_multiplication" && (
               <>
                 <div>
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                    Multiplicand Digits <span className="text-gray-500 dark:text-slate-400 font-normal text-xs">(Min: 2, Max: 20)</span>
-                  </label>
+                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Multiplicand Digits <span style={{fontWeight:400,opacity:.6}}>(2–20)</span></label>
                     <NumericInput
                       value={decimalMultMultiplicandDigits}
                       onChange={setDecimalMultMultiplicandDigits}
                       min={2}
                       max={20}
-                      className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 font-semibold shadow-sm hover:shadow-md transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                      className="mm-form-input"
+                      style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                     />
                 </div>
                 <div>
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                    Multiplier Digits <span className="text-gray-500 dark:text-slate-400 font-normal text-xs">(Min: 0, Max: 20, 0 = whole number)</span>
-                  </label>
+                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Multiplier Digits <span style={{fontWeight:400,opacity:.6}}>(0–20, 0 = whole)</span></label>
                     <NumericInput
                       value={decimalMultMultiplierDigits}
                       onChange={setDecimalMultMultiplierDigits}
                       min={0}
                       max={20}
-                      className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 font-semibold shadow-sm hover:shadow-md transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                      className="mm-form-input"
+                      style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                     />
                 </div>
-                <div className="bg-gradient-to-br from-white to-indigo-50/30 dark:from-slate-800 dark:to-indigo-900/20 p-6 rounded-2xl border-2 border-indigo-200/50 dark:border-indigo-700/50 shadow-xl">
+                <div style={{background:"var(--mm-surf2)",border:"1px solid var(--mm-bdr)",borderRadius:16,padding:20}}>
                   <TimeLimitSlider
                     value={timeLimit}
                     onChange={setTimeLimit}
@@ -2585,30 +2610,28 @@ export default function Mental() {
             {operationType === "decimal_division" && (
               <>
                 <div>
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                    Dividend Digits <span className="text-gray-500 dark:text-slate-400 font-normal text-xs">(Min: 2, Max: 20)</span>
-                  </label>
+                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Dividend Digits <span style={{fontWeight:400,opacity:.6}}>(2–20)</span></label>
                     <NumericInput
                       value={decimalDivDividendDigits}
                       onChange={setDecimalDivDividendDigits}
                       min={2}
                       max={20}
-                      className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 font-semibold shadow-sm hover:shadow-md transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                      className="mm-form-input"
+                      style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                     />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                        Divisor Digits <span className="text-gray-500 dark:text-slate-400 font-normal text-xs">(Min: 1, Max: 20)</span>
-                      </label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Divisor Digits <span style={{fontWeight:400,opacity:.6}}>(1–20)</span></label>
                       <NumericInput
                         value={decimalDivDivisorDigits}
                         onChange={setDecimalDivDivisorDigits}
                         min={1}
                         max={20}
-                        className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 font-semibold shadow-sm hover:shadow-md transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                        className="mm-form-input"
+                        style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                     />
                 </div>
-                <div className="bg-gradient-to-br from-white to-indigo-50/30 dark:from-slate-800 dark:to-indigo-900/20 p-6 rounded-2xl border-2 border-indigo-200/50 dark:border-indigo-700/50 shadow-xl">
+                <div style={{background:"var(--mm-surf2)",border:"1px solid var(--mm-bdr)",borderRadius:16,padding:20}}>
                   <TimeLimitSlider
                     value={timeLimit}
                     onChange={setTimeLimit}
@@ -2624,31 +2647,29 @@ export default function Mental() {
             {operationType === "integer_add_sub" && (
               <>
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                        Number of Digits <span className="text-gray-500 dark:text-slate-400 font-normal text-xs">(Min: 1, Max: 10)</span>
-                      </label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Number of Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
                     <NumericInput
                       value={integerAddSubDigits}
                       onChange={setIntegerAddSubDigits}
                       min={1}
                       max={10}
-                      className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 font-semibold shadow-sm hover:shadow-md transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                      className="mm-form-input"
+                      style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                     />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                        Number of Rows <span className="text-gray-500 dark:text-slate-400 font-normal text-xs">(Min: 3, Max: 20)</span>
-                      </label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Number of Rows <span style={{fontWeight:400,opacity:.6}}>(3–20)</span></label>
                       <NumericInput
                         value={integerAddSubRows}
                         onChange={setIntegerAddSubRows}
                         min={3}
                         max={20}
-                        className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 font-semibold shadow-sm hover:shadow-md transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                        className="mm-form-input"
+                        style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                     />
                     </div>
                     {/* Time Limit Slider for Integer Add/Sub - controls addSubRowTime */}
-                    <div className="bg-gradient-to-br from-white to-indigo-50/30 dark:from-slate-800 dark:to-indigo-900/20 p-6 rounded-2xl border-2 border-indigo-200/50 dark:border-indigo-700/50 shadow-xl">
+                    <div style={{background:"var(--mm-surf2)",border:"1px solid var(--mm-bdr)",borderRadius:16,padding:20}}>
                       <TimeLimitSlider
                         value={addSubRowTime}
                         onChange={setAddSubRowTime}
@@ -2664,30 +2685,28 @@ export default function Mental() {
             {(operationType === "lcm" || operationType === "gcd") && (
               <>
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                        First Number Digits <span className="text-gray-500 dark:text-slate-400 font-normal text-xs">(Min: 1, Max: 10)</span>
-                      </label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>First Number Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
                     <NumericInput
                       value={lcmGcdFirstDigits}
                       onChange={setLcmGcdFirstDigits}
                       min={1}
                       max={10}
-                      className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 font-semibold shadow-sm hover:shadow-md transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                      className="mm-form-input"
+                      style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                     />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                        Second Number Digits <span className="text-gray-500 dark:text-slate-400 font-normal text-xs">(Min: 1, Max: 10)</span>
-                      </label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Second Number Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
                       <NumericInput
                         value={lcmGcdSecondDigits}
                         onChange={setLcmGcdSecondDigits}
                         min={1}
                         max={10}
-                        className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 font-semibold shadow-sm hover:shadow-md transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                        className="mm-form-input"
+                        style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                     />
                 </div>
-                <div className="bg-gradient-to-br from-white to-indigo-50/30 dark:from-slate-800 dark:to-indigo-900/20 p-6 rounded-2xl border-2 border-indigo-200/50 dark:border-indigo-700/50 shadow-xl">
+                <div style={{background:"var(--mm-surf2)",border:"1px solid var(--mm-bdr)",borderRadius:16,padding:20}}>
                   <TimeLimitSlider
                     value={timeLimit}
                     onChange={setTimeLimit}
@@ -2703,18 +2722,17 @@ export default function Mental() {
             {(operationType === "square_root" || operationType === "cube_root") && (
               <>
                 <div>
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                    Root Digits <span className="text-gray-500 dark:text-slate-400 font-normal text-xs">(Min: 2, Max: 30)</span>
-                  </label>
+                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Root Digits <span style={{fontWeight:400,opacity:.6}}>(2–30)</span></label>
                     <NumericInput
                       value={rootDigits}
                       onChange={setRootDigits}
                       min={2}
                       max={30}
-                      className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 font-semibold shadow-sm hover:shadow-md transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                      className="mm-form-input"
+                      style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                     />
                 </div>
-                <div className="bg-gradient-to-br from-white to-indigo-50/30 dark:from-slate-800 dark:to-indigo-900/20 p-6 rounded-2xl border-2 border-indigo-200/50 dark:border-indigo-700/50 shadow-xl">
+                <div style={{background:"var(--mm-surf2)",border:"1px solid var(--mm-bdr)",borderRadius:16,padding:20}}>
                   <TimeLimitSlider
                     value={timeLimit}
                     onChange={setTimeLimit}
@@ -2730,42 +2748,39 @@ export default function Mental() {
             {operationType === "percentage" && (
               <>
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                        Percentage Min <span className="text-gray-500 dark:text-slate-400 font-normal text-xs">(Min: 1, Max: 100)</span>
-                      </label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Percentage Min <span style={{fontWeight:400,opacity:.6}}>(1–100)</span></label>
                     <NumericInput
                       value={percentageMin}
                       onChange={setPercentageMin}
                       min={1}
                       max={100}
-                      className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 font-semibold shadow-sm hover:shadow-md transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                      className="mm-form-input"
+                      style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                     />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                        Percentage Max <span className="text-gray-500 dark:text-slate-400 font-normal text-xs">(Min: 1, Max: 100)</span>
-                      </label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Percentage Max <span style={{fontWeight:400,opacity:.6}}>(1–100)</span></label>
                       <NumericInput
                         value={percentageMax}
                         onChange={setPercentageMax}
                         min={1}
                         max={100}
-                        className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 font-semibold shadow-sm hover:shadow-md transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                        className="mm-form-input"
+                        style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                     />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                        Number Digits <span className="text-gray-500 dark:text-slate-400 font-normal text-xs">(Min: 2, Max: 10)</span>
-                      </label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Number Digits <span style={{fontWeight:400,opacity:.6}}>(2–10)</span></label>
                       <NumericInput
                         value={percentageNumberDigits}
                         onChange={setPercentageNumberDigits}
                         min={2}
                         max={10}
-                        className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 font-semibold shadow-sm hover:shadow-md transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                        className="mm-form-input"
+                        style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                     />
                 </div>
-                <div className="bg-gradient-to-br from-white to-indigo-50/30 dark:from-slate-800 dark:to-indigo-900/20 p-6 rounded-2xl border-2 border-indigo-200/50 dark:border-indigo-700/50 shadow-xl">
+                <div style={{background:"var(--mm-surf2)",border:"1px solid var(--mm-bdr)",borderRadius:16,padding:20}}>
                   <TimeLimitSlider
                     value={timeLimit}
                     onChange={setTimeLimit}
@@ -2781,31 +2796,29 @@ export default function Mental() {
             {operationType === "add_sub" && (
               <>
                 <div>
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                    Number of Digits <span className="text-gray-500 dark:text-slate-400 font-normal text-xs">(Min: 1, Max: 10)</span>
-                  </label>
+                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Number of Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
                     <NumericInput
                       value={addSubDigits}
                       onChange={setAddSubDigits}
                       min={1}
                       max={10}
-                      className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 font-semibold shadow-sm hover:shadow-md transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                      className="mm-form-input"
+                      style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                     />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 dark:text-white mb-3 flex items-center gap-2">
-                        Number of Rows <span className="text-gray-500 dark:text-slate-400 font-normal text-xs">(Min: 3, Max: 20)</span>
-                      </label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Number of Rows <span style={{fontWeight:400,opacity:.6}}>(3–20)</span></label>
                       <NumericInput
                         value={addSubRows}
                         onChange={setAddSubRows}
                         min={3}
                         max={20}
-                        className="w-full px-5 py-4 border-2 border-slate-200 dark:border-slate-600 rounded-xl focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30 font-semibold shadow-sm hover:shadow-md transition-all duration-300 outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                        className="mm-form-input"
+                        style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
                     />
                     </div>
                     {/* Time Limit Slider for Add/Sub - controls addSubRowTime */}
-                    <div className="bg-gradient-to-br from-white to-indigo-50/30 dark:from-slate-800 dark:to-indigo-900/20 p-6 rounded-2xl border-2 border-indigo-200/50 dark:border-indigo-700/50 shadow-xl">
+                    <div style={{background:"var(--mm-surf2)",border:"1px solid var(--mm-bdr)",borderRadius:16,padding:20}}>
                       <TimeLimitSlider
                         value={addSubRowTime}
                         onChange={setAddSubRowTime}
@@ -2816,24 +2829,21 @@ export default function Mental() {
                     </div>
               </>
             )}
-            </div>
-            </div>
-
-            {/* Start Button */}
-            <div className="col-span-1 lg:col-span-2 pt-6 border-t-2 border-slate-200 dark:border-slate-700">
-              <div>
-              <button
-                onClick={startCountdown}
-                  className="group w-full px-10 py-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden"
-              >
-                  <span className="absolute inset-0 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                  <Play className="w-6 h-6 relative z-10 group-hover:scale-110 transition-transform" />
-                <span className="relative z-10">Start Practice</span>
-                  <Sparkles className="w-5 h-5 relative z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </button>
-            </div>
-            </div>
           </div>
+        </div>
+
+        {/* Start Button — sticky footer */}
+        <div style={{position:"sticky",bottom:0,background:"linear-gradient(to top, var(--mm-bg) 65%, transparent)",padding:"16px 20px 24px",maxWidth:900,margin:"0 auto"}}>
+          <button
+            onClick={startCountdown}
+            style={{width:"100%",padding:"18px",background:"linear-gradient(135deg, var(--mm-pur) 0%, #5535C0 50%, #4428A8 100%)",border:"none",borderRadius:16,fontFamily:"var(--mm-fd)",fontSize:17,fontWeight:800,color:"#fff",cursor:"pointer",letterSpacing:"-.01em",display:"flex",alignItems:"center",justifyContent:"center",gap:10,boxShadow:"0 8px 32px rgba(123,92,229,.3), inset 0 1px 0 rgba(255,255,255,.1)",transition:"transform .2s, box-shadow .2s"}}
+            onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.transform="translateY(-3px)";(e.currentTarget as HTMLButtonElement).style.boxShadow="0 16px 48px rgba(123,92,229,.45), inset 0 1px 0 rgba(255,255,255,.1)"}}
+            onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.transform="";(e.currentTarget as HTMLButtonElement).style.boxShadow="0 8px 32px rgba(123,92,229,.3), inset 0 1px 0 rgba(255,255,255,.1)"}}
+          >
+            <Play style={{width:20,height:20}} />
+            Start Practice
+            <span style={{fontFamily:"var(--mm-fm)",fontSize:12,fontWeight:400,opacity:.55,marginLeft:4}}>{numQuestions} questions · {operationType==="add_sub"||operationType==="integer_add_sub" ? `${addSubRowTime.toFixed(1)}s/row` : `${timeLimit}s each`}</span>
+          </button>
         </div>
       </div>
     </div>

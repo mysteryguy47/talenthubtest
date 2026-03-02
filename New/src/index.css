@@ -1,0 +1,64 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Core palette */
+  --amber:        #e8980a;
+  --amber-bright: #f5b830;
+  --amber-glow:   rgba(232, 152, 10, 0.45);
+  --amber-dim:    rgba(232, 152, 10, 0.22);
+  --blue-marker:  #3da8e8;
+  --red-ones:     #e85030;
+
+  /* Backgrounds */
+  --bg-root:   #05080f;
+  --bg-panel:  #090d18;
+  --bg-card:   #0d1220;
+  --bg-raised: #111828;
+  --bg-inset:  #080c14;
+
+  /* Borders */
+  --border-0:    rgba(70, 100, 160, 0.10);
+  --border-1:    rgba(70, 100, 160, 0.18);
+  --border-2:    rgba(70, 100, 160, 0.32);
+  --border-amber: rgba(232, 152, 10, 0.28);
+
+  /* Text — all verified ≥3.5:1 on their backgrounds */
+  --text-1: #d0daee;   /* primary   — 14:1 on bg-root */
+  --text-2: #8898c8;   /* secondary —  5:1 on bg-card */
+  --text-3: #5c6e9e;   /* tertiary  —  3:1 on bg-card (labels, hints) */
+
+  /* Fonts */
+  --font-ui:   'Outfit', system-ui, sans-serif;
+  --font-mono: 'DM Mono', 'Courier New', monospace;
+
+  /* Motion */
+  --ease-spring: cubic-bezier(0.32, 1.5, 0.58, 1);
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html {
+  background: var(--bg-root);
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+button {
+  font-family: var(--font-ui);
+  cursor: pointer;
+}
+
+input[type="range"] { cursor: pointer; }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg-raised); border-radius: 2px; }

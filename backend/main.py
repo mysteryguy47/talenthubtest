@@ -62,6 +62,30 @@ except Exception as e:
     logger.exception("[IMPORT] attendance_routes failed: %s", str(e))
     logger.debug(traceback.format_exc())
 
+subscription_router = None
+try:
+    from subscription_routes import router as subscription_router
+    logger.info("[IMPORT] subscription_routes loaded")
+except Exception as e:
+    import traceback
+    logger.exception("[IMPORT] subscription_routes failed: %s", str(e))
+
+payment_router = None
+try:
+    from payment_routes import router as payment_router
+    logger.info("[IMPORT] payment_routes loaded")
+except Exception as e:
+    import traceback
+    logger.exception("[IMPORT] payment_routes failed: %s", str(e))
+
+admin_access_router = None
+try:
+    from admin_access_routes import router as admin_access_router
+    logger.info("[IMPORT] admin_access_routes loaded")
+except Exception as e:
+    import traceback
+    logger.exception("[IMPORT] admin_access_routes failed: %s", str(e))
+
 app = FastAPI(title="Abacus Paper Generator", version="3.0.0")
 app_start_time = time.monotonic()
 
@@ -190,14 +214,47 @@ if attendance_router:
 else:
     logger.warning("[STARTUP] attendance_router not available")
 
+for _name, _rtr in [
+    ("subscription_router", subscription_router),
+    ("payment_router", payment_router),
+    ("admin_access_router", admin_access_router),
+]:
+    if _rtr:
+        try:
+            app.include_router(_rtr)
+            logger.info("[STARTUP] %s included", _name)
+        except Exception as _e:
+            logger.exception("[STARTUP] %s include failed: %s", _name, str(_e))
+    else:
+        logger.warning("[STARTUP] %s not available", _name)
+
 # Initialize database on startup
 @app.on_event("startup")
 async def startup_event() -> None:
     try:
         logger.info("[STARTUP] initializing database")
+        # Register subscription models with Base.metadata
+        import subscription_models  # noqa: F401  — ensures tables are created
         init_db()
         logger.info("[STARTUP] database initialized")
-        
+
+        # Seed default subscription plans (idempotent)
+        try:
+            from subscription_service import seed_default_plans
+            _seed_db = next(get_db())
+            seed_default_plans(_seed_db)
+            _seed_db.close()
+            logger.info("[STARTUP] subscription plans seeded")
+        except Exception as _seed_err:
+            logger.warning("[STARTUP] plan seeding failed: %s", _seed_err)
+
+        # Start daily subscription expiry checker
+        try:
+            from subscription_scheduler import start_expiry_scheduler
+            start_expiry_scheduler()
+        except Exception as _sched_err:
+            logger.warning("[STARTUP] expiry scheduler failed to start: %s", _sched_err)
+
         # Clean up stale incomplete attempts on startup
         try:
             db = next(get_db())

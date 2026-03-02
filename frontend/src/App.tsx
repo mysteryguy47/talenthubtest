@@ -1,9 +1,11 @@
 import { Switch, Route } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { SubscriptionProvider } from "./contexts/SubscriptionContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import GraceBanner from "./components/GraceBanner";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Home from "./pages/Home";
 import PaperCreate from "./pages/PaperCreate";
@@ -23,6 +25,10 @@ import AbacusCourse from "./pages/AbacusCourse";
 import VedicMathsCourse from "./pages/VedicMathsCourse";
 import HandwritingCourse from "./pages/HandwritingCourse";
 import STEMCourse from "./pages/STEMCourse";
+import GridMaster from "./pages/GridMaster";
+import SorobanAbacus from "./pages/SorobanAbacus";
+import Pricing from "./pages/Pricing";
+import AdminAccessControl from "./pages/AdminAccessControl";
 import { ReactNode } from "react";
 import { useScrollRestoration } from "./hooks/useScrollRestoration";
 import { useInactivityDetection } from "./hooks/useInactivityDetection";
@@ -101,8 +107,7 @@ function AppContent() {
         onDismiss={dismissWarning} 
       />
       <div className="flex flex-col min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
-        <Header />
-        <main className="flex-grow">
+        <Header />        <GraceBanner />        <main className="flex-grow">
           <ErrorBoundary>
             <Switch>
               <Route path="/login" component={Login} />
@@ -171,6 +176,14 @@ function AppContent() {
               <Route path="/courses/vedic-maths" component={VedicMathsCourse} />
               <Route path="/courses/handwriting" component={HandwritingCourse} />
               <Route path="/courses/stem" component={STEMCourse} />
+              <Route path="/tools/gridmaster" component={GridMaster} />
+              <Route path="/tools/soroban" component={SorobanAbacus} />
+              <Route path="/pricing" component={Pricing} />
+              <Route path="/admin/access-control">
+                <AdminRoute>
+                  <AdminAccessControl />
+                </AdminRoute>
+              </Route>
               <Route component={NotFound} />
             </Switch>
           </ErrorBoundary>
@@ -186,8 +199,10 @@ function App() {
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <AppContent />
-          <SpeedInsights />
+          <SubscriptionProvider>
+            <AppContent />
+            <SpeedInsights />
+          </SubscriptionProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>

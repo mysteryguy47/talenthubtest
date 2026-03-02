@@ -1,0 +1,61 @@
+/* ─────────────────────────────────────────────
+   GRIDMASTER — Global Styles
+───────────────────────────────────────────── */
+:root {
+  --bg: #090910;
+  --surface: #111119;
+  --surface2: #18181f;
+  --surface3: #20202a;
+  --border: #252530;
+  --border2: #363648;
+  --gold: #e8c97e;
+  --gold2: #f5e0a8;
+  --gold-dim: rgba(232,201,126,0.12);
+  --teal: #4ecdc4;
+  --teal-dim: rgba(78,205,196,0.1);
+  --coral: #ff6b6b;
+  --coral-dim: rgba(255,107,107,0.1);
+  --purple: #9b8cff;
+  --purple-dim: rgba(155,140,255,0.1);
+  --text: #eeedf8;
+  --text2: #9896b0;
+  --text3: #4e4c66;
+  --success: #56cf8e;
+  --success-dim: rgba(86,207,142,0.1);
+  --r: 12px;
+  --r-sm: 8px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Ambient background glow */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 40% at 15% 5%, rgba(78,205,196,0.055) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 85% 85%, rgba(155,140,255,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 25% at 50% 50%, rgba(232,201,126,0.025) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#root { position: relative; z-index: 1; min-height: 100vh; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }

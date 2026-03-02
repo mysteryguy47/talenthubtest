@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
 import { getStudentDashboardData, getPracticeSessionDetail, StudentStats, PracticeSessionDetail, getPointsLogs, PointsSummaryResponse, PointsLogEntry, StudentDashboardData, getOverallLeaderboard, getWeeklyLeaderboard, LeaderboardEntry, getMyCertificates, CertificateRecord } from "../lib/userApi";
 import { PaperAttempt, getPaperAttempt, PaperAttemptDetail, getPaperAttemptCount } from "../lib/api";
-import { Trophy, Target, Zap, CheckCircle2, XCircle, BarChart3, History, X, Eye, ChevronDown, ChevronUp, RotateCcw, Clock, Loader2, RefreshCw, Award } from "lucide-react";
+import { Trophy, Target, Zap, CheckCircle2, XCircle, BarChart3, History, X, Eye, ChevronDown, ChevronUp, RotateCcw, Clock, Loader2, RefreshCw, Award, Calendar } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { formatDateToIST } from "../lib/timezoneUtils";
 import MathQuestion from "../components/MathQuestion";
@@ -461,6 +461,13 @@ export default function StudentDashboard() {
           <p className="text-muted-foreground text-lg font-medium">
             Track your progress and compete with others
           </p>
+          <div className="mt-4">
+            <Link href="/attendance">
+              <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary bg-primary/10 hover:bg-primary/20 px-4 py-2 rounded-full transition-colors cursor-pointer border border-primary/20">
+                <Calendar className="w-4 h-4" />📅 My Attendance
+              </span>
+            </Link>
+          </div>
         </header>
 
         {/* Stats Grid */}
