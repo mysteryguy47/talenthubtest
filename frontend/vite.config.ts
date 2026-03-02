@@ -10,6 +10,14 @@ export default defineConfig({
     },
   },
 
+  build: {
+    rollupOptions: {
+      // Cashfree JS SDK is loaded from their CDN at runtime — never bundle it.
+      // Pricing.tsx already has a .catch() fallback for when it's unavailable.
+      external: ["@cashfreepayments/cashfree-js"],
+    },
+  },
+
   server: {
     host: "localhost",
     port: 5173,

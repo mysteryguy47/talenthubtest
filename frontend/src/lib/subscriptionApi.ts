@@ -37,7 +37,7 @@ export const initiatePayment = (
 ): Promise<PaymentInitiation> =>
   apiClient.post<PaymentInitiation>("/api/subscriptions/initiate", { plan_id, gateway });
 
-export async function verifyPayment(params: {
+export const verifyPayment = async (params: {
   gateway_order_id: string;
   gateway_payment_id: string;
   gateway_signature: string;
