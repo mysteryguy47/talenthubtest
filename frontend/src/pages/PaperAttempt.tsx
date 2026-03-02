@@ -667,11 +667,12 @@ export default function PaperAttempt() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <div className="text-xl text-slate-300 dark:text-slate-300">Loading paper...</div>
-          <div className="text-sm text-slate-400 dark:text-slate-400 mt-2">Please wait</div>
+      <div style={{minHeight:'100vh',background:'#06070F',display:'flex',alignItems:'center',justifyContent:'center'}}>
+        <style>{`@keyframes pa-spin{to{transform:rotate(360deg)}}@keyframes pa-fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}`}</style>
+        <div style={{textAlign:'center',animation:'pa-fade-up 0.5s ease'}}>
+          <div style={{width:48,height:48,border:'3px solid #7B5CE5',borderTopColor:'transparent',borderRadius:'50%',animation:'pa-spin 0.9s linear infinite',margin:'0 auto 24px'}}></div>
+          <div style={{fontSize:18,color:'#B8BDD8',fontFamily:'DM Sans, sans-serif',fontWeight:500}}>Loading paper...</div>
+          <div style={{fontSize:12,color:'#525870',marginTop:8,fontFamily:'JetBrains Mono, monospace',letterSpacing:'0.08em'}}>PLEASE WAIT</div>
         </div>
       </div>
     );
@@ -679,11 +680,14 @@ export default function PaperAttempt() {
 
   if (error && !paperConfig) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-xl text-red-400 dark:text-red-400 mb-4">{error}</div>
+      <div style={{minHeight:'100vh',background:'#06070F',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
+        <div style={{textAlign:'center',maxWidth:420}}>
+          <div style={{width:64,height:64,background:'rgba(239,68,68,0.12)',border:'1px solid rgba(239,68,68,0.3)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 20px'}}>
+            <XCircle style={{width:32,height:32,color:'#EF4444'}} />
+          </div>
+          <div style={{color:'#EF4444',marginBottom:16,fontFamily:'DM Sans, sans-serif',fontSize:17,fontWeight:500}}>{error}</div>
           <Link href="/create">
-            <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button style={{padding:'12px 28px',background:'linear-gradient(135deg,#7B5CE5,#9D7FF0)',color:'white',borderRadius:12,border:'none',cursor:'pointer',fontFamily:'DM Sans, sans-serif',fontWeight:600,fontSize:14,boxShadow:'0 4px 20px rgba(123,92,229,0.25)'}}>
               Go to Paper Creation
             </button>
           </Link>
@@ -693,92 +697,101 @@ export default function PaperAttempt() {
   }
 
   if (isSubmitted && result) {
+    const accuracy = result.accuracy || 0;
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-8 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-        <div className="container mx-auto px-4 max-w-4xl">
+      <div style={{minHeight:'100vh',background:'#06070F',paddingTop:40,paddingBottom:60}}>
+        <style>{`
+          @keyframes pa-scale-in{from{opacity:0;transform:scale(0.94)}to{opacity:1;transform:scale(1)}}
+          @keyframes pa-fade-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+          @keyframes pa-trophy{0%{transform:scale(0) rotate(-20deg)}60%{transform:scale(1.15) rotate(5deg)}100%{transform:scale(1) rotate(0deg)}}
+          @keyframes pa-progress{from{width:0}to{width:var(--acc)}}
+          .pa-stat-tile{transition:transform 0.2s,box-shadow 0.2s}
+          .pa-stat-tile:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.4)!important}
+          .pa-action-btn{transition:all 0.2s;cursor:pointer;border:none}
+          .pa-action-btn:hover{filter:brightness(1.15);transform:translateY(-2px)}
+          .pa-review-card{transition:all 0.2s}
+          .pa-review-card:hover{border-color:rgba(255,255,255,0.15)!important}
+        `}</style>
+        <div style={{maxWidth:760,margin:'0 auto',padding:'0 16px'}}>
           <Link href="/dashboard">
-            <button className="mb-6 flex items-center gap-2 px-4 py-2 bg-slate-800 dark:bg-slate-800 text-white rounded-lg shadow-lg hover:bg-slate-700 dark:hover:bg-slate-700 transition-all">
-              <ArrowLeft className="w-4 h-4" />
+            <button style={{marginBottom:20,display:'flex',alignItems:'center',gap:8,padding:'10px 18px',background:'#0F1120',border:'1px solid rgba(255,255,255,0.08)',color:'#B8BDD8',borderRadius:12,cursor:'pointer',fontFamily:'DM Sans, sans-serif',fontWeight:500,fontSize:14}}>
+              <ArrowLeft style={{width:16,height:16}} />
               Back to Dashboard
             </button>
           </Link>
 
-          <div className="bg-slate-800 dark:bg-slate-800 rounded-2xl shadow-xl dark:shadow-2xl p-8 mb-6 border border-slate-700 dark:border-slate-700 transition-all duration-300">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full mb-4">
-                <Trophy className="w-10 h-10 text-white" />
+          <div style={{background:'#0F1120',borderRadius:20,padding:'40px 36px',marginBottom:20,border:'1px solid rgba(255,255,255,0.07)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',animation:'pa-scale-in 0.4s cubic-bezier(0.34,1.2,0.64,1)',overflow:'hidden',position:'relative'}}>
+            <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:'linear-gradient(90deg,#7B5CE5,#10B981)'}} />
+            <div style={{textAlign:'center',marginBottom:32}}>
+              <div style={{width:72,height:72,borderRadius:'50%',background:'linear-gradient(135deg,#10B981,#059669)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px',boxShadow:'0 8px 32px rgba(16,185,129,0.4)',animation:'pa-trophy 0.6s cubic-bezier(0.34,1.56,0.64,1)'}}>
+                <Trophy style={{width:36,height:36,color:'white'}} />
               </div>
-              <h1 className="text-4xl font-bold text-white mb-2">Paper Completed!</h1>
-              <p className="text-slate-300">{paperConfig?.title}</p>
+              <h1 style={{fontSize:32,fontWeight:800,color:'#F0F2FF',fontFamily:'Syne, sans-serif',margin:'0 0 8px'}}>Paper Completed!</h1>
+              <p style={{color:'#525870',fontFamily:'DM Sans, sans-serif',fontSize:15,margin:0}}>{paperConfig?.title}</p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-              <div className="bg-blue-900/30 dark:bg-blue-900/30 border border-blue-700 dark:border-blue-700 rounded-xl p-4 text-center transition-all duration-300">
-                <div className="text-3xl font-bold text-blue-400 dark:text-blue-400">{result.correct_answers}</div>
-                <div className="text-sm text-slate-300 dark:text-slate-300 mt-1">Correct</div>
-              </div>
-              <div className="bg-red-900/30 dark:bg-red-900/30 border border-red-700 dark:border-red-700 rounded-xl p-4 text-center transition-all duration-300">
-                <div className="text-3xl font-bold text-red-400 dark:text-red-400">{result.wrong_answers}</div>
-                <div className="text-sm text-slate-300 dark:text-slate-300 mt-1">Wrong</div>
-              </div>
-              <div className="bg-yellow-900/30 dark:bg-yellow-900/30 border border-yellow-700 dark:border-yellow-700 rounded-xl p-4 text-center transition-all duration-300">
-                <div className="text-3xl font-bold text-yellow-400 dark:text-yellow-400">
-                  {result.total_questions - result.correct_answers - result.wrong_answers}
+            <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:12,marginBottom:24}}>
+              {[{val:result.correct_answers,label:'Correct',color:'#10B981',bg:'rgba(16,185,129,0.1)',border:'rgba(16,185,129,0.25)'},{val:result.wrong_answers,label:'Wrong',color:'#EF4444',bg:'rgba(239,68,68,0.1)',border:'rgba(239,68,68,0.25)'},{val:result.total_questions-result.correct_answers-result.wrong_answers,label:'Unattempted',color:'#F59E0B',bg:'rgba(245,158,11,0.1)',border:'rgba(245,158,11,0.25)'},{val:result.accuracy.toFixed(1)+'%',label:'Accuracy',color:'#9D7FF0',bg:'rgba(123,92,229,0.1)',border:'rgba(123,92,229,0.25)'},{val:result.points_earned,label:'Points',color:'#10B981',bg:'rgba(16,185,129,0.08)',border:'rgba(16,185,129,0.2)'}].map(({val,label,color,bg,border})=>(
+                <div key={label} className="pa-stat-tile" style={{background:bg,border:`1px solid ${border}`,borderRadius:14,padding:'18px 8px',textAlign:'center',boxShadow:'0 4px 16px rgba(0,0,0,0.2)'}}>
+                  <div style={{fontSize:28,fontWeight:800,color,fontFamily:'JetBrains Mono, monospace',lineHeight:1}}>{val}</div>
+                  <div style={{fontSize:12,color:'#B8BDD8',fontFamily:'DM Sans, sans-serif',marginTop:6,fontWeight:500}}>{label}</div>
                 </div>
-                <div className="text-sm text-slate-300 dark:text-slate-300 mt-1">Unattempted</div>
+              ))}
+            </div>
+            {/* Accuracy bar */}
+            <div style={{marginBottom:24}}>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+                <span style={{fontSize:12,color:'#525870',fontFamily:'DM Sans, sans-serif',fontWeight:500}}>ACCURACY</span>
+                <span style={{fontSize:12,color:'#9D7FF0',fontFamily:'JetBrains Mono, monospace',fontWeight:600}}>{result.accuracy.toFixed(1)}%</span>
               </div>
-              <div className="bg-purple-900/30 dark:bg-purple-900/30 border border-purple-700 dark:border-purple-700 rounded-xl p-4 text-center transition-all duration-300">
-                <div className="text-3xl font-bold text-purple-400 dark:text-purple-400">{result.accuracy.toFixed(1)}%</div>
-                <div className="text-sm text-slate-300 dark:text-slate-300 mt-1">Accuracy</div>
-              </div>
-              <div className="bg-emerald-900/30 dark:bg-emerald-900/30 border border-emerald-700 dark:border-emerald-700 rounded-xl p-4 text-center transition-all duration-300">
-                <div className="text-3xl font-bold text-emerald-400 dark:text-emerald-400">{result.points_earned}</div>
-                <div className="text-sm text-slate-300 dark:text-slate-300 mt-1">Points</div>
+              <div style={{height:6,background:'rgba(255,255,255,0.06)',borderRadius:99,overflow:'hidden'}}>
+                <div style={{height:'100%',background:'linear-gradient(90deg,#7B5CE5,#10B981)',borderRadius:99,width:`${result.accuracy}%`,transition:'width 1s ease'}} />
               </div>
             </div>
 
-            <div className="bg-slate-700/50 dark:bg-slate-700/50 border border-slate-600 dark:border-slate-600 rounded-xl p-6 mb-6 transition-all duration-300">
-              <div className="grid grid-cols-2 gap-4 text-center">
+            <div style={{background:'#141729',border:'1px solid rgba(255,255,255,0.06)',borderRadius:14,padding:'20px 24px',marginBottom:24}}>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,textAlign:'center'}}>
                 <div>
-                  <div className="text-sm text-slate-300 dark:text-slate-300">Time Taken</div>
-                  <div className="text-2xl font-bold text-white dark:text-white">
-                    {result.time_taken ? formatTime(Math.floor(result.time_taken)) : "—"}
+                  <div style={{fontSize:12,color:'#525870',fontFamily:'DM Sans, sans-serif',fontWeight:500,marginBottom:4}}>TIME TAKEN</div>
+                  <div style={{fontSize:24,fontWeight:700,color:'#F0F2FF',fontFamily:'JetBrains Mono, monospace'}}>
+                    {result.time_taken ? formatTime(Math.floor(result.time_taken)) : '—'}
                   </div>
                 </div>
                 <div>
-                  <div className="text-sm text-slate-300 dark:text-slate-300">Score</div>
-                  <div className="text-2xl font-bold text-white dark:text-white">
+                  <div style={{fontSize:12,color:'#525870',fontFamily:'DM Sans, sans-serif',fontWeight:500,marginBottom:4}}>SCORE</div>
+                  <div style={{fontSize:24,fontWeight:700,color:'#F0F2FF',fontFamily:'JetBrains Mono, monospace'}}>
                     {result.score} / {result.total_questions}
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12}}>
               <button
                 onClick={handleReAttempt}
                 disabled={reAttempting || !paperConfig || !generatedBlocks || seed === null}
-                className="w-full sm:flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="pa-action-btn"
+                style={{padding:'14px 20px',background:'linear-gradient(135deg,#7B5CE5,#9D7FF0)',color:'white',borderRadius:12,fontWeight:700,fontFamily:'DM Sans, sans-serif',fontSize:14,boxShadow:'0 4px 20px rgba(123,92,229,0.3)',display:'flex',alignItems:'center',justifyContent:'center',gap:8,opacity:reAttempting||!paperConfig||!generatedBlocks||seed===null?0.5:1}}
               >
-                <RotateCcw className={`w-5 h-5 ${reAttempting ? "animate-spin" : ""}`} />
-                {reAttempting ? "Starting..." : "Re-attempt Paper"}
+                <RotateCcw style={{width:16,height:16,animation:reAttempting?'pa-spin 0.8s linear infinite':undefined}} />
+                {reAttempting ? 'Starting...' : 'Re-attempt'}
               </button>
-              <Link href="/dashboard" className="w-full sm:flex-1">
-                <button className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all">
-                  View Dashboard
+              <Link href="/dashboard" style={{textDecoration:'none'}}>
+                <button className="pa-action-btn" style={{width:'100%',padding:'14px 20px',background:'linear-gradient(135deg,#10B981,#059669)',color:'white',borderRadius:12,fontWeight:700,fontFamily:'DM Sans, sans-serif',fontSize:14,boxShadow:'0 4px 20px rgba(16,185,129,0.3)'}}>
+                  Dashboard
                 </button>
               </Link>
-              <Link href="/create" className="w-full sm:flex-1">
-                <button className="w-full px-6 py-3 bg-slate-700 dark:bg-slate-700 border-2 border-slate-600 dark:border-slate-600 text-white dark:text-white rounded-lg font-semibold hover:bg-slate-600 dark:hover:bg-slate-600 transition-all">
-                  Create New Paper
+              <Link href="/create" style={{textDecoration:'none'}}>
+                <button className="pa-action-btn" style={{width:'100%',padding:'14px 20px',background:'#141729',border:'1px solid rgba(255,255,255,0.1)',color:'#B8BDD8',borderRadius:12,fontWeight:600,fontFamily:'DM Sans, sans-serif',fontSize:14}}>
+                  Create New
                 </button>
               </Link>
             </div>
           </div>
 
           {/* Results breakdown */}
-          <div className="bg-slate-800 dark:bg-slate-800 rounded-2xl shadow-xl dark:shadow-2xl p-8 border border-slate-700 dark:border-slate-700 transition-all duration-300">
-            <h2 className="text-2xl font-bold text-white mb-6">Question Review</h2>
+          <div style={{background:'#0F1120',borderRadius:20,padding:'32px 36px',border:'1px solid rgba(255,255,255,0.07)',boxShadow:'0 24px 60px rgba(0,0,0,0.4)',animation:'pa-fade-up 0.5s ease 0.2s both'}}>
+            <h2 style={{fontSize:22,fontWeight:700,color:'#F0F2FF',fontFamily:'Syne, sans-serif',marginBottom:24}}>Question Review</h2>
             
             {/* Separate questions into categories */}
             {(() => {
@@ -833,42 +846,36 @@ export default function PaperAttempt() {
 
               return (
                 <div className="space-y-8">
-                  {/* Correct Questions */}
                   {correctQuestions.length > 0 && (
                     <div>
-                      <h3 className="text-xl font-bold text-green-400 dark:text-green-400 mb-4 flex items-center gap-2">
-                        <CheckCircle2 className="w-6 h-6" />
+                      <h3 style={{fontSize:18,fontWeight:700,color:'#10B981',fontFamily:'Syne, sans-serif',marginBottom:16,display:'flex',alignItems:'center',gap:8}}>
+                        <CheckCircle2 style={{width:20,height:20}} />
                         Correct Answers ({correctQuestions.length})
                       </h3>
-                      <div className="space-y-3">
+                      <div style={{display:'flex',flexDirection:'column',gap:8}}>
                         {correctQuestions.map(({ question, blockTitle }) => {
                           const userAnswerStr = answers[question.id] || "";
                           return (
                             <div
                               key={question.id}
-                              className="p-4 rounded-lg border-2 bg-green-900/30 dark:bg-green-900/30 border-green-700 dark:border-green-700 transition-all duration-300"
+                              className="pa-review-card"
+                              style={{padding:'14px 16px',borderRadius:12,border:'1px solid rgba(16,185,129,0.25)',background:'rgba(16,185,129,0.07)'}}
                             >
-                              <div className="flex items-start justify-between mb-2">
-                                <div className="flex-1">
+                              <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
+                                <div style={{flex:1}}>
                                   {blockTitle && (
-                                    <p className="text-xs text-green-300 dark:text-green-300 mb-1">{blockTitle}</p>
+                                    <p style={{fontSize:11,color:'rgba(16,185,129,0.7)',marginBottom:4,fontFamily:'JetBrains Mono, monospace',letterSpacing:'0.06em',textTransform:'uppercase'}}>{blockTitle}</p>
                                   )}
-                                  <div className="flex items-center gap-3 mb-2">
-                                    <span className="font-semibold text-white dark:text-white">Q{question.id}:</span>
+                                  <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
+                                    <span style={{fontWeight:600,color:'#F0F2FF',fontFamily:'DM Sans, sans-serif'}}>Q{question.id}:</span>
                                     <MathQuestion question={question} showAnswer={false} largeFont={true} />
                                   </div>
-                                  <div className="flex items-center gap-4 text-sm">
-                                    <span className="text-green-400 dark:text-green-400">
-                                      Your answer: <span className="font-semibold">{userAnswerStr}</span>
-                                    </span>
-                                    <span className="text-slate-300 dark:text-slate-300">
-                                      Correct: <span className="font-semibold">{question.answer}</span>
-                                    </span>
+                                  <div style={{display:'flex',alignItems:'center',gap:16,fontSize:13}}>
+                                    <span style={{color:'#10B981',fontFamily:'DM Sans, sans-serif'}}>Your answer: <span style={{fontWeight:600}}>{userAnswerStr}</span></span>
+                                    <span style={{color:'#525870',fontFamily:'DM Sans, sans-serif'}}>Correct: <span style={{fontWeight:600,color:'#B8BDD8'}}>{question.answer}</span></span>
                                   </div>
                                 </div>
-                                <div className="ml-4">
-                                  <CheckCircle2 className="w-6 h-6 text-green-400 dark:text-green-400" />
-                                </div>
+                                <CheckCircle2 style={{width:20,height:20,color:'#10B981',flexShrink:0,marginLeft:12}} />
                               </div>
                             </div>
                           );
@@ -877,42 +884,30 @@ export default function PaperAttempt() {
                     </div>
                   )}
 
-                  {/* Wrong Questions */}
                   {wrongQuestions.length > 0 && (
                     <div>
-                      <h3 className="text-xl font-bold text-red-400 dark:text-red-400 mb-4 flex items-center gap-2">
-                        <XCircle className="w-6 h-6" />
+                      <h3 style={{fontSize:18,fontWeight:700,color:'#EF4444',fontFamily:'Syne, sans-serif',marginBottom:16,display:'flex',alignItems:'center',gap:8}}>
+                        <XCircle style={{width:20,height:20}} />
                         Wrong Answers ({wrongQuestions.length})
                       </h3>
-                      <div className="space-y-3">
+                      <div style={{display:'flex',flexDirection:'column',gap:8}}>
                         {wrongQuestions.map(({ question, blockTitle }) => {
                           const userAnswerStr = answers[question.id] || "";
                           return (
-                            <div
-                              key={question.id}
-                              className="p-4 rounded-lg border-2 bg-red-900/30 dark:bg-red-900/30 border-red-700 dark:border-red-700 transition-all duration-300"
-                            >
-                              <div className="flex items-start justify-between mb-2">
-                                <div className="flex-1">
-                                  {blockTitle && (
-                                    <p className="text-xs text-red-300 dark:text-red-300 mb-1">{blockTitle}</p>
-                                  )}
-                                  <div className="flex items-center gap-3 mb-2">
-                                    <span className="font-semibold text-white dark:text-white">Q{question.id}:</span>
+                            <div key={question.id} className="pa-review-card" style={{padding:'14px 16px',borderRadius:12,border:'1px solid rgba(239,68,68,0.25)',background:'rgba(239,68,68,0.07)'}}>
+                              <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
+                                <div style={{flex:1}}>
+                                  {blockTitle && (<p style={{fontSize:11,color:'rgba(239,68,68,0.7)',marginBottom:4,fontFamily:'JetBrains Mono, monospace',letterSpacing:'0.06em',textTransform:'uppercase'}}>{blockTitle}</p>)}
+                                  <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
+                                    <span style={{fontWeight:600,color:'#F0F2FF',fontFamily:'DM Sans, sans-serif'}}>Q{question.id}:</span>
                                     <MathQuestion question={question} showAnswer={false} largeFont={true} />
                                   </div>
-                                  <div className="flex items-center gap-4 text-sm">
-                                    <span className="text-red-400 dark:text-red-400">
-                                      Your answer: <span className="font-semibold">{userAnswerStr}</span>
-                                    </span>
-                                    <span className="text-slate-300 dark:text-slate-300">
-                                      Correct: <span className="font-semibold">{question.answer}</span>
-                                    </span>
+                                  <div style={{display:'flex',alignItems:'center',gap:16,fontSize:13}}>
+                                    <span style={{color:'#EF4444',fontFamily:'DM Sans, sans-serif'}}>Your answer: <span style={{fontWeight:600}}>{userAnswerStr}</span></span>
+                                    <span style={{color:'#525870',fontFamily:'DM Sans, sans-serif'}}>Correct: <span style={{fontWeight:600,color:'#B8BDD8'}}>{question.answer}</span></span>
                                   </div>
                                 </div>
-                                <div className="ml-4">
-                                  <XCircle className="w-6 h-6 text-red-400 dark:text-red-400" />
-                                </div>
+                                <XCircle style={{width:20,height:20,color:'#EF4444',flexShrink:0,marginLeft:12}} />
                               </div>
                             </div>
                           );
@@ -921,40 +916,28 @@ export default function PaperAttempt() {
                     </div>
                   )}
 
-                  {/* Unattempted Questions */}
                   {unattemptedQuestions.length > 0 && (
                     <div>
-                      <h3 className="text-xl font-bold text-yellow-400 dark:text-yellow-400 mb-4 flex items-center gap-2">
-                        <Square className="w-6 h-6" />
-                        Unattempted Questions ({unattemptedQuestions.length})
+                      <h3 style={{fontSize:18,fontWeight:700,color:'#F59E0B',fontFamily:'Syne, sans-serif',marginBottom:16,display:'flex',alignItems:'center',gap:8}}>
+                        <Square style={{width:20,height:20}} />
+                        Unattempted ({unattemptedQuestions.length})
                       </h3>
-                      <div className="space-y-3">
+                      <div style={{display:'flex',flexDirection:'column',gap:8}}>
                         {unattemptedQuestions.map(({ question, blockTitle }) => (
-                          <div
-                            key={question.id}
-                            className="p-4 rounded-lg border-2 bg-yellow-900/30 dark:bg-yellow-900/30 border-yellow-700 dark:border-yellow-700 transition-all duration-300"
-                          >
-                            <div className="flex items-start justify-between mb-2">
-                              <div className="flex-1">
-                                {blockTitle && (
-                                  <p className="text-xs text-yellow-300 dark:text-yellow-300 mb-1">{blockTitle}</p>
-                                )}
-                                <div className="flex items-center gap-3 mb-2">
-                                  <span className="font-semibold text-white dark:text-white">Q{question.id}:</span>
+                          <div key={question.id} className="pa-review-card" style={{padding:'14px 16px',borderRadius:12,border:'1px solid rgba(245,158,11,0.25)',background:'rgba(245,158,11,0.07)'}}>
+                            <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
+                              <div style={{flex:1}}>
+                                {blockTitle && (<p style={{fontSize:11,color:'rgba(245,158,11,0.7)',marginBottom:4,fontFamily:'JetBrains Mono, monospace',letterSpacing:'0.06em',textTransform:'uppercase'}}>{blockTitle}</p>)}
+                                <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
+                                  <span style={{fontWeight:600,color:'#F0F2FF',fontFamily:'DM Sans, sans-serif'}}>Q{question.id}:</span>
                                   <MathQuestion question={question} showAnswer={false} largeFont={true} />
                                 </div>
-                                <div className="flex items-center gap-4 text-sm">
-                                  <span className="text-yellow-400 dark:text-yellow-400">
-                                    Your answer: <span className="font-semibold">—</span>
-                                  </span>
-                                  <span className="text-slate-300 dark:text-slate-300">
-                                    Correct: <span className="font-semibold">{question.answer}</span>
-                                  </span>
+                                <div style={{display:'flex',alignItems:'center',gap:16,fontSize:13}}>
+                                  <span style={{color:'#F59E0B',fontFamily:'DM Sans, sans-serif'}}>Your answer: <span style={{fontWeight:600}}>—</span></span>
+                                  <span style={{color:'#525870',fontFamily:'DM Sans, sans-serif'}}>Correct: <span style={{fontWeight:600,color:'#B8BDD8'}}>{question.answer}</span></span>
                                 </div>
                               </div>
-                              <div className="ml-4">
-                                <Square className="w-6 h-6 text-yellow-400 dark:text-yellow-400" />
-                              </div>
+                              <Square style={{width:20,height:20,color:'#F59E0B',flexShrink:0,marginLeft:12}} />
                             </div>
                           </div>
                         ))}
@@ -974,11 +957,11 @@ export default function PaperAttempt() {
   if (!paperConfig || !generatedBlocks || generatedBlocks.length === 0) {
     if (error) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-xl text-red-400 dark:text-red-400 mb-4">{error}</div>
+        <div style={{minHeight:'100vh',background:'#06070F',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
+          <div style={{textAlign:'center'}}>
+            <div style={{color:'#EF4444',marginBottom:16,fontFamily:'DM Sans, sans-serif',fontSize:17}}>{error}</div>
             <Link href="/create">
-              <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <button style={{padding:'12px 28px',background:'linear-gradient(135deg,#7B5CE5,#9D7FF0)',color:'white',borderRadius:12,border:'none',cursor:'pointer',fontFamily:'DM Sans, sans-serif',fontWeight:600,fontSize:14}}>
                 Go to Paper Creation
               </button>
             </Link>
@@ -988,10 +971,10 @@ export default function PaperAttempt() {
     }
     // Still loading or no data
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <div className="text-xl text-slate-300 dark:text-slate-300">Loading paper...</div>
+      <div style={{minHeight:'100vh',background:'#06070F',display:'flex',alignItems:'center',justifyContent:'center'}}>
+        <div style={{textAlign:'center'}}>
+          <div style={{width:48,height:48,border:'3px solid #7B5CE5',borderTopColor:'transparent',borderRadius:'50%',animation:'pa-spin 0.9s linear infinite',margin:'0 auto 24px'}}></div>
+          <div style={{fontSize:18,color:'#B8BDD8',fontFamily:'DM Sans, sans-serif'}}>Loading paper...</div>
         </div>
       </div>
     );
@@ -1003,47 +986,51 @@ export default function PaperAttempt() {
       sum + (block.questions?.length || 0), 0);
     
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-        <div className="bg-slate-800 dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-2xl p-8 max-w-md w-full mx-4 relative border border-slate-700 dark:border-slate-700 transition-all duration-300">
+      <div style={{position:'fixed',inset:0,zIndex:50,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(0,0,0,0.75)',backdropFilter:'blur(16px)'}}>
+        <style>{`@keyframes pa-scale-in{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}`}</style>
+        <div style={{background:'#0F1120',borderRadius:20,padding:'36px 32px',maxWidth:460,width:'calc(100% - 32px)',position:'relative',border:'1px solid rgba(255,255,255,0.08)',boxShadow:'0 32px 80px rgba(0,0,0,0.7)',overflow:'hidden',animation:'pa-scale-in 0.3s cubic-bezier(0.34,1.56,0.64,1)'}}>
+          <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:'linear-gradient(90deg,#7B5CE5,#9D7FF0)'}} />
           <button
             onClick={() => setShowStartScreen(false)}
-            className="absolute top-4 right-4 text-slate-400 dark:text-slate-400 hover:text-white dark:hover:text-white transition-colors"
+            style={{position:'absolute',top:16,right:16,color:'#525870',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:8,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',padding:6,transition:'all 0.2s'}}
             title="Close"
           >
-            <X className="w-6 h-6" />
+            <X style={{width:16,height:16}} />
           </button>
-          <div className="text-center mb-6">
-            <h2 className="text-3xl font-bold text-white dark:text-white mb-2">{paperConfig.title}</h2>
-            <p className="text-slate-300 dark:text-slate-300">{paperConfig.level}</p>
+          <div style={{textAlign:'center',marginBottom:28,marginTop:8}}>
+            <div style={{width:56,height:56,borderRadius:'50%',background:'linear-gradient(135deg,rgba(123,92,229,0.2),rgba(157,127,240,0.1))',border:'1px solid rgba(123,92,229,0.3)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px'}}>
+              <Target style={{width:26,height:26,color:'#9D7FF0'}} />
+            </div>
+            <h2 style={{fontSize:26,fontWeight:800,color:'#F0F2FF',fontFamily:'Syne, sans-serif',margin:'0 0 6px'}}>{paperConfig.title}</h2>
+            <p style={{color:'#525870',fontFamily:'JetBrains Mono, monospace',fontSize:12,letterSpacing:'0.1em',textTransform:'uppercase',margin:0}}>{paperConfig.level}</p>
           </div>
           
-          <div className="space-y-4 mb-6">
-            <div className="flex items-center justify-between p-3 bg-slate-700/50 dark:bg-slate-700/50 border border-slate-600 dark:border-slate-600 rounded-lg transition-all duration-300">
-              <span className="text-slate-300 dark:text-slate-300 font-medium">Total Questions:</span>
-              <span className="text-white dark:text-white font-bold text-lg">{totalQuestions}</span>
+          <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:20}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',background:'#141729',border:'1px solid rgba(255,255,255,0.06)',borderRadius:10}}>
+              <span style={{color:'#B8BDD8',fontFamily:'DM Sans, sans-serif',fontWeight:500,fontSize:14}}>Total Questions:</span>
+              <span style={{color:'#F0F2FF',fontFamily:'JetBrains Mono, monospace',fontWeight:700,fontSize:20}}>{totalQuestions}</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-slate-700/50 dark:bg-slate-700/50 border border-slate-600 dark:border-slate-600 rounded-lg transition-all duration-300">
-              <span className="text-slate-300 dark:text-slate-300 font-medium">Blocks:</span>
-              <span className="text-white dark:text-white font-bold text-lg">{generatedBlocks.length}</span>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',background:'#141729',border:'1px solid rgba(255,255,255,0.06)',borderRadius:10}}>
+              <span style={{color:'#B8BDD8',fontFamily:'DM Sans, sans-serif',fontWeight:500,fontSize:14}}>Blocks:</span>
+              <span style={{color:'#F0F2FF',fontFamily:'JetBrains Mono, monospace',fontWeight:700,fontSize:20}}>{generatedBlocks.length}</span>
             </div>
           </div>
 
-          <div className="bg-blue-900/30 dark:bg-blue-900/30 border border-blue-700 dark:border-blue-700 rounded-lg p-4 mb-6 transition-all duration-300">
-            <p className="text-sm text-blue-300 dark:text-blue-300">
-              <strong>Note:</strong> The timer will start as soon as you click "Start Paper". 
-              Make sure you're ready before proceeding.
+          <div style={{background:'rgba(245,158,11,0.08)',border:'1px solid rgba(245,158,11,0.2)',borderRadius:10,padding:'12px 16px',marginBottom:24}}>
+            <p style={{fontSize:13,color:'#F59E0B',fontFamily:'DM Sans, sans-serif',margin:0,lineHeight:1.6}}>
+              <strong>Note:</strong> The timer will start as soon as you click "Start Paper". Make sure you're ready before proceeding.
             </p>
           </div>
 
-          <div className="flex gap-3">
-            <Link href="/create" className="flex-1">
-              <button className="w-full px-6 py-3 bg-slate-700 dark:bg-slate-700 text-white dark:text-white rounded-lg font-semibold hover:bg-slate-600 dark:hover:bg-slate-600 transition-all">
+          <div style={{display:'flex',gap:12}}>
+            <Link href="/create" style={{flex:1}}>
+              <button style={{width:'100%',padding:'14px 24px',background:'#141729',border:'1px solid rgba(255,255,255,0.08)',color:'#B8BDD8',borderRadius:12,fontWeight:600,fontFamily:'DM Sans, sans-serif',cursor:'pointer',fontSize:14}}>
                 Cancel
               </button>
             </Link>
             <button
               onClick={handleStartPaper}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
+              style={{flex:1,padding:'14px 24px',background:'linear-gradient(135deg,#10B981,#059669)',color:'white',border:'none',borderRadius:12,fontWeight:700,fontFamily:'DM Sans, sans-serif',cursor:'pointer',fontSize:14,boxShadow:'0 4px 20px rgba(16,185,129,0.3)'}}
             >
               Start Paper
             </button>
@@ -1054,88 +1041,100 @@ export default function PaperAttempt() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-32 pb-20 px-6 transition-colors duration-300">
-      <div className="container mx-auto">
-        {/* Page Header */}
-        <header className="mb-12">
-          <div className="flex items-center justify-between mb-6">
+    <div style={{minHeight:'100vh',background:'#06070F',paddingBottom:120}}>
+      <style>{`
+        @keyframes pa-spin{to{transform:rotate(360deg)}}
+        @keyframes pa-fade-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pa-timer-tick{0%,100%{opacity:1}50%{opacity:0.7}}
+        .pa-qcard{background:#141729;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:8px;transition:all 0.2s}
+        .pa-qcard:hover{border-color:rgba(123,92,229,0.35);box-shadow:0 4px 20px rgba(123,92,229,0.1)}
+        .pa-answer-input{background:#0F1120;border:none;border-bottom:1.5px solid rgba(255,255,255,0.15);border-radius:0;color:#F0F2FF;font-family:'JetBrains Mono',monospace;font-weight:600;text-align:center;transition:all 0.2s;outline:none}
+        .pa-answer-input:focus{border-bottom-color:#7B5CE5;box-shadow:none;background:rgba(123,92,229,0.05)}
+        .pa-answer-input.answered{border-bottom-color:#10B981;color:#10B981}
+        .pa-block-card{border-radius:16px;padding:24px;border:1px solid rgba(255,255,255,0.06);transition:all 0.3s;animation:pa-fade-up 0.4s ease both}
+      `}</style>
+
+      {/* Sticky Header */}
+      <header style={{position:'sticky',top:0,zIndex:40,height:68,background:'rgba(6,7,15,0.85)',backdropFilter:'blur(20px)',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',alignItems:'center',padding:'0 24px'}}>
+        <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',alignItems:'center',width:'100%',maxWidth:1100,margin:'0 auto',gap:16}}>
+          {/* Left: Exit */}
+          <div>
             <button
               onClick={() => setShowExitConfirm(true)}
-              className="group flex items-center gap-2 px-6 py-3 bg-background border border-border rounded-xl hover:border-primary hover:bg-primary/5 transition-all"
+              style={{display:'flex',alignItems:'center',gap:8,padding:'8px 16px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:10,color:'#B8BDD8',cursor:'pointer',fontFamily:'DM Sans, sans-serif',fontWeight:500,fontSize:13}}
             >
-              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform text-primary" />
-              <span className="font-bold uppercase tracking-widest text-muted-foreground">Exit Paper</span>
+              <ArrowLeft style={{width:15,height:15}} />
+              Exit Paper
             </button>
-            <h1 className="text-5xl font-black tracking-tighter uppercase italic text-foreground flex items-center gap-3">
-              <Target className="w-10 h-10 text-primary" />
-              {paperConfig.title}
-            </h1>
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-xl">
-                <Clock className="w-5 h-5 text-primary" />
-                <span className="text-lg font-bold text-card-foreground">{formatTime(currentTime)}</span>
-              </div>
-              <div className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
-                {answeredCount} / {totalQuestions} answered
-              </div>
+          </div>
+          {/* Center: Title */}
+          <div style={{display:'flex',alignItems:'center',gap:10}}>
+            <Target style={{width:18,height:18,color:'#7B5CE5',flexShrink:0}} />
+            <h1 style={{fontSize:17,fontWeight:800,color:'#F0F2FF',fontFamily:'Syne, sans-serif',margin:0,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:360}}>{paperConfig.title}</h1>
+          </div>
+          {/* Right: Timer + Progress */}
+          <div style={{display:'flex',alignItems:'center',gap:16,justifyContent:'flex-end'}}>
+            <div style={{display:'flex',alignItems:'center',gap:8,padding:'6px 14px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:10}}>
+              <Clock style={{width:14,height:14,color:'#7B5CE5'}} />
+              <span style={{fontSize:16,fontWeight:700,color:'#F0F2FF',fontFamily:'JetBrains Mono, monospace',animation:'pa-timer-tick 1s ease-in-out infinite'}}>{formatTime(currentTime)}</span>
+            </div>
+            <div style={{fontSize:12,fontWeight:700,color:'#525870',fontFamily:'JetBrains Mono, monospace',letterSpacing:'0.06em'}}>{answeredCount}/{totalQuestions}</div>
+          </div>
+        </div>
+      </header>
+
+      {/* Exit Confirmation Modal */}
+      {showExitConfirm && (
+        <div style={{position:'fixed',inset:0,zIndex:50,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(0,0,0,0.75)',backdropFilter:'blur(12px)'}}>
+          <div style={{background:'#0F1120',borderRadius:16,padding:'28px 32px',maxWidth:420,width:'calc(100% - 32px)',border:'1px solid rgba(255,255,255,0.08)',boxShadow:'0 24px 60px rgba(0,0,0,0.6)'}}>
+            <h3 style={{fontSize:20,fontWeight:700,color:'#F0F2FF',fontFamily:'Syne, sans-serif',marginBottom:8}}>Exit Paper?</h3>
+            <p style={{color:'#B8BDD8',fontFamily:'DM Sans, sans-serif',fontSize:14,marginBottom:24,lineHeight:1.6}}>
+              Your progress will be saved, but the timer will stop. Are you sure you want to exit?
+            </p>
+            <div style={{display:'flex',gap:12}}>
+              <button
+                onClick={() => { setShowExitConfirm(false); }}
+                style={{flex:1,padding:'12px 20px',background:'#141729',border:'1px solid rgba(255,255,255,0.08)',color:'#B8BDD8',borderRadius:10,fontWeight:600,fontFamily:'DM Sans, sans-serif',cursor:'pointer',fontSize:14}}
+              >
+                Continue
+              </button>
+              <button
+                onClick={() => {
+                  if (paperReady && !isSubmitted && attemptId) {
+                    setSessionState("aborted");
+                    savePaperSessionState();
+                  }
+                  window.location.href = '/create';
+                }}
+                style={{flex:1,padding:'12px 20px',background:'rgba(239,68,68,0.15)',border:'1px solid rgba(239,68,68,0.3)',color:'#EF4444',borderRadius:10,fontWeight:600,fontFamily:'DM Sans, sans-serif',cursor:'pointer',fontSize:14}}
+              >
+                Exit Paper
+              </button>
             </div>
           </div>
-        </header>
+        </div>
+      )}
 
-        {/* Exit Confirmation Modal */}
-        {showExitConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="bg-slate-800 dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-2xl p-6 max-w-md w-full mx-4 border border-slate-700 dark:border-slate-700 transition-all duration-300">
-              <h3 className="text-xl font-bold text-white dark:text-white mb-2">Exit Paper?</h3>
-              <p className="text-slate-300 dark:text-slate-300 mb-6">
-                Your progress will be saved, but the timer will stop. Are you sure you want to exit?
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => {
-                    setShowExitConfirm(false);
-                  }}
-                  className="flex-1 px-6 py-3 bg-slate-700 dark:bg-slate-700 text-white dark:text-white rounded-lg font-semibold hover:bg-slate-600 dark:hover:bg-slate-600 transition-all"
-                >
-                  Continue
-                </button>
-                <button
-                  onClick={() => {
-                    // Mark session as aborted and save state before exiting
-                    if (paperReady && !isSubmitted && attemptId) {
-                      setSessionState("aborted");
-                      savePaperSessionState();
-                    }
-                    window.location.href = '/create';
-                  }}
-                  className="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-all"
-                >
-                  Exit Paper
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Questions */}
-        <div className="space-y-6 mb-6">
+      {/* Questions */}
+      <div style={{maxWidth:1100,margin:'0 auto',padding:'28px 20px 0'}}>
+        <div style={{display:'flex',flexDirection:'column',gap:20,marginBottom:24}}>
           {generatedBlocks.map((block, blockIdx) => {
             if (!block || !block.questions || block.questions.length === 0) {
               return null;
             }
             return (
-            <div key={blockIdx} className="bg-slate-800/90 dark:bg-slate-800/90 rounded-2xl shadow-xl dark:shadow-2xl p-6 border border-slate-700/50 dark:border-slate-700/50 transition-all duration-300">
+            <div key={blockIdx} className="pa-block-card" style={{background:'#0F1120',animationDelay:`${blockIdx*0.07}s`}}>
               {block.config?.title && (
-                <h2 className="text-xl font-bold text-white dark:text-white mb-4">{block.config.title}</h2>
+                <h2 style={{fontSize:15,fontWeight:700,color:'#9D7FF0',fontFamily:'JetBrains Mono, monospace',marginBottom:16,letterSpacing:'0.08em',textTransform:'uppercase'}}>{block.config.title}</h2>
               )}
               
               {block.questions.some(q => q?.isVertical) ? (
                 // Vertical questions
                 <div className="grid grid-cols-10 gap-2">
                   {block.questions.map((question) => (
-                    <div key={question.id} className="border border-slate-600 dark:border-slate-600 rounded-xl p-2 bg-slate-700/50 dark:bg-slate-700/50 shadow-sm hover:shadow-md hover:border-slate-500 dark:hover:border-slate-500 transition-all">
-                      <div className="text-center mb-1.5">
-                        <span className="font-semibold text-blue-400 dark:text-blue-400 text-sm">{question.id}.</span>
+                    <div key={question.id} className="pa-qcard" style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
+                      <div style={{textAlign:'center',marginBottom:4}}>
+                        <span style={{fontWeight:700,color:'#9D7FF0',fontFamily:'JetBrains Mono, monospace',fontSize:11}}>{question.id}.</span>
                       </div>
                       <MathQuestion question={question} showAnswer={false} hideSerialNumber={true} largeFont={true} />
                       <input
@@ -1144,13 +1143,13 @@ export default function PaperAttempt() {
                         value={answers[question.id] ?? ""}
                         onChange={(e) => {
                           const val = e.target.value;
-                          // Allow empty, integers, decimals, and negative numbers, max 20 characters
                           if (val === "" || (/^-?\d*\.?\d*$/.test(val) && val.length <= 20)) {
                             handleAnswerChange(question.id, val);
                           }
                         }}
                         maxLength={20}
-                        className="w-full mt-1.5 px-2 py-1.5 border border-slate-600 dark:border-slate-600 rounded-lg text-center font-medium text-sm bg-slate-800 dark:bg-slate-800 text-white dark:text-white focus:bg-slate-700 dark:focus:bg-slate-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-500 transition-all"
+                        className={`pa-answer-input${answers[question.id] ? ' answered' : ''}`}
+                        style={{width:'100%',marginTop:6,padding:'6px 4px',fontSize:13}}
                         placeholder="?"
                       />
                     </div>
@@ -1161,7 +1160,6 @@ export default function PaperAttempt() {
                 (() => {
                   const questions = block.questions;
                   const numCols = 2;
-                  const numRows = Math.ceil(questions.length / numCols);
                   const columns: Question[][] = Array.from({ length: numCols }, () => []);
                   questions.forEach((q, idx) => {
                     const col = idx % numCols;
@@ -1170,12 +1168,12 @@ export default function PaperAttempt() {
                   return (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {columns.map((colQuestions, colIdx) => (
-                        <div key={colIdx} className="space-y-4">
+                        <div key={colIdx} style={{display:'flex',flexDirection:'column',gap:8}}>
                           {colQuestions.map((question) => (
-                    <div key={question.id} className="flex items-center gap-3 py-2">
-                      <span className="font-semibold text-blue-400 dark:text-blue-400 min-w-[2rem] text-lg">{question.id}.</span>
-                      <div className="flex-1 flex items-center gap-3">
-                        <div className="flex-1">
+                    <div key={question.id} style={{display:'flex',alignItems:'center',gap:12,padding:'10px 0',borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
+                      <span style={{fontWeight:700,color:'#9D7FF0',fontFamily:'JetBrains Mono, monospace',fontSize:13,minWidth:'2rem'}}>{question.id}.</span>
+                      <div style={{flex:1,display:'flex',alignItems:'center',gap:12}}>
+                        <div style={{flex:1}}>
                           <MathQuestion question={question} showAnswer={false} hideSerialNumber={true} largeFont={true} />
                         </div>
                         <input
@@ -1184,13 +1182,13 @@ export default function PaperAttempt() {
                           value={answers[question.id] ?? ""}
                           onChange={(e) => {
                             const val = e.target.value;
-                            // Allow empty, integers, decimals, and negative numbers, max 20 characters
                             if (val === "" || (/^-?\d*\.?\d*$/.test(val) && val.length <= 20)) {
                               handleAnswerChange(question.id, val);
                             }
                           }}
                           maxLength={20}
-                          className="w-32 px-3 py-2 border-2 border-slate-600 dark:border-slate-600 bg-slate-700 dark:bg-slate-700 text-white dark:text-white rounded-lg text-center font-semibold text-lg focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-900/30 transition-all"
+                          className={`pa-answer-input${answers[question.id] ? ' answered' : ''}`}
+                          style={{width:110,padding:'8px 12px',fontSize:16,borderRadius:8,borderBottomWidth:2}}
                           placeholder="?"
                         />
                       </div>
@@ -1207,29 +1205,32 @@ export default function PaperAttempt() {
           })}
         </div>
 
-        {/* Submit Button */}
-        <div className="bg-slate-800 dark:bg-slate-800 rounded-2xl shadow-xl dark:shadow-2xl p-6 sticky bottom-4 border border-slate-700 dark:border-slate-700 transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div className="text-slate-300 dark:text-slate-300">
-              {answeredCount === totalQuestions ? (
-                <span className="text-green-400 dark:text-green-400 font-semibold">All questions answered!</span>
-              ) : (
-                <span>{totalQuestions - answeredCount} questions remaining</span>
-              )}
+        {/* Submit Bar */}
+        <div style={{position:'sticky',bottom:0,left:0,right:0,background:'rgba(6,7,15,0.9)',backdropFilter:'blur(20px)',borderTop:'1px solid rgba(255,255,255,0.07)',padding:'14px 24px',zIndex:30}}>
+          <div style={{maxWidth:1100,margin:'0 auto',display:'flex',alignItems:'center',justifyContent:'space-between',gap:16}}>
+            {/* Progress */}
+            <div style={{flex:1,maxWidth:400}}>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:6,fontSize:12,color:'#525870',fontFamily:'JetBrains Mono, monospace'}}>
+                <span>{answeredCount === totalQuestions ? <span style={{color:'#10B981',fontWeight:600}}>All answered!</span> : <span>{totalQuestions - answeredCount} remaining</span>}</span>
+                <span>{answeredCount}/{totalQuestions}</span>
+              </div>
+              <div style={{height:4,background:'rgba(255,255,255,0.06)',borderRadius:99}}>
+                <div style={{height:'100%',background:'linear-gradient(90deg,#7B5CE5,#10B981)',borderRadius:99,width:`${totalQuestions ? (answeredCount/totalQuestions)*100 : 0}%`,transition:'width 0.3s ease'}} />
+              </div>
             </div>
             <button
               onClick={handleSubmit}
               disabled={submitting || answeredCount === 0}
-              className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              style={{padding:'12px 32px',background:'linear-gradient(135deg,#10B981,#059669)',color:'white',borderRadius:12,fontWeight:700,fontFamily:'DM Sans, sans-serif',fontSize:15,border:'none',cursor:submitting||answeredCount===0?'not-allowed':'pointer',opacity:submitting||answeredCount===0?0.5:1,boxShadow:'0 4px 20px rgba(16,185,129,0.3)',display:'flex',alignItems:'center',gap:8,transition:'all 0.2s'}}
             >
               {submitting ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div style={{width:18,height:18,border:'2px solid white',borderTopColor:'transparent',borderRadius:'50%',animation:'pa-spin 0.8s linear infinite'}}></div>
                   Submitting...
                 </>
               ) : (
                 <>
-                  <CheckSquare className="w-5 h-5" />
+                  <CheckSquare style={{width:18,height:18}} />
                   Submit Paper
                 </>
               )}
@@ -1238,8 +1239,8 @@ export default function PaperAttempt() {
         </div>
 
         {error && (
-          <div className="mt-4 p-4 bg-red-900/30 dark:bg-red-900/30 border-2 border-red-700 dark:border-red-700 rounded-xl transition-all duration-300">
-            <div className="text-red-300 dark:text-red-300">{error}</div>
+          <div style={{margin:'16px 0',padding:'14px 16px',background:'rgba(239,68,68,0.08)',border:'1px solid rgba(239,68,68,0.25)',borderRadius:12,color:'#EF4444',fontFamily:'DM Sans, sans-serif',fontSize:14}}>
+            {error}
           </div>
         )}
       </div>

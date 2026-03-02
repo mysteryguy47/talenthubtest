@@ -1243,49 +1243,93 @@ export default function PaperCreate() {
   };
 
   return (
-    <div className="min-h-screen bg-background pt-32 pb-20 px-6 transition-colors duration-300">
-      <div className="container mx-auto">
-        {/* Page Header */}
-        <header className="mb-12">
-          <div className="flex items-center justify-between mb-6">
+    <div style={{minHeight:'100vh',background:'#06070F',paddingBottom:80}}>
+      <style>{`
+        @keyframes pc-fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pc-scale-in{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+        @keyframes pc-shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+        @keyframes pc-spin{to{transform:rotate(360deg)}}
+        .pc-input{background:#141729;border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;color:#F0F2FF;font-family:'DM Sans',sans-serif;font-size:15px;padding:12px 16px;width:100%;outline:none;transition:all 0.2s;-webkit-appearance:none;appearance:none}
+        .pc-input:focus{border-color:#7B5CE5;box-shadow:0 0 0 3px rgba(123,92,229,0.12)}
+        .pc-input option{background:#141729;color:#F0F2FF}
+        .pc-label{font-size:12px;font-weight:600;color:#525870;font-family:'DM Sans',sans-serif;letter-spacing:0.06em;text-transform:uppercase;display:block;margin-bottom:8px}
+        .pc-block-card{background:#0F1120;border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:24px 28px;transition:all 0.25s;animation:pc-fade-up 0.4s ease both;position:relative;overflow:hidden}
+        .pc-block-card:hover{border-color:rgba(123,92,229,0.3);box-shadow:0 8px 40px rgba(123,92,229,0.12)}
+        .pc-block-card.dragging{opacity:0.45;transform:scale(0.97)}
+        .pc-action-btn{width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:#141729;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.18s;flex-shrink:0}
+        .pc-action-btn:hover.up,.pc-action-btn:hover.down{background:rgba(123,92,229,0.2);border-color:rgba(123,92,229,0.4);color:#9D7FF0}
+        .pc-action-btn:hover.dup{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.35);color:#10B981}
+        .pc-action-btn:hover.del{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.35);color:#EF4444}
+        .pc-action-btn:disabled{opacity:0.3;cursor:not-allowed}
+        .pc-section-label{font-size:11px;font-weight:700;color:#7B5CE5;font-family:'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px}
+        .pc-field-label{font-size:12px;color:#525870;font-family:'DM Sans',sans-serif;font-weight:500;margin-bottom:6px;display:block}
+        .pc-error-text{font-size:12px;color:#EF4444;font-family:'DM Sans',sans-serif;margin-top:4px}
+        .pc-block-card label{font-size:12px!important;color:#525870!important;font-family:'DM Sans',sans-serif!important;font-weight:500!important}
+        .pc-block-card input[type="text"],.pc-block-card input[type="number"]{background:#141729!important;border:1.5px solid rgba(255,255,255,0.08)!important;border-radius:10px!important;color:#F0F2FF!important;font-family:'DM Sans',sans-serif!important;font-size:14px!important;padding:10px 14px!important;outline:none!important;transition:all 0.2s!important;ring:none!important;box-shadow:none!important}
+        .pc-block-card input:focus{border-color:#7B5CE5!important;box-shadow:0 0 0 3px rgba(123,92,229,0.12)!important}
+        .pc-block-card select{background:#141729!important;border:1.5px solid rgba(255,255,255,0.08)!important;border-radius:10px!important;color:#F0F2FF!important;font-family:'DM Sans',sans-serif!important;font-size:14px!important;padding:10px 14px!important;outline:none!important;-webkit-appearance:none;appearance:none!important;transition:all 0.2s!important}
+        .pc-block-card select:focus{border-color:#7B5CE5!important;box-shadow:0 0 0 3px rgba(123,92,229,0.12)!important}
+        .pc-block-card select option,.pc-block-card select optgroup{background:#141729!important;color:#F0F2FF!important}
+        .pc-block-card p.text-red-600,.pc-block-card .text-red-600{color:#EF4444!important;font-size:11px!important}
+        .pc-block-card .grid{display:grid!important}
+        .pc-drag-handle{display:flex;align-items:center;justify-content:center;padding:12px 0 0;margin-top:12px;border-top:1px solid rgba(255,255,255,0.05);cursor:grab;color:#525870;gap:6px;font-size:12px;font-family:'DM Sans',sans-serif}
+        .pc-drag-handle:active{cursor:grabbing}
+      `}</style>
+
+      {/* Sticky header */}
+      <header style={{position:'sticky',top:0,zIndex:40,height:72,background:'rgba(6,7,15,0.88)',backdropFilter:'blur(20px)',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',alignItems:'center',padding:'0 28px'}}>
+        <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',alignItems:'center',width:'100%',maxWidth:1100,margin:'0 auto',gap:16}}>
+          <div>
             <Link href="/">
-              <button className="group flex items-center gap-2 px-6 py-3 bg-background border border-border rounded-xl hover:border-primary hover:bg-primary/5 transition-all">
-                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform text-primary" />
-                <span className="font-bold uppercase tracking-widest text-muted-foreground">Back</span>
+              <button style={{display:'flex',alignItems:'center',gap:8,padding:'8px 16px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:10,color:'#B8BDD8',cursor:'pointer',fontFamily:'DM Sans, sans-serif',fontWeight:500,fontSize:13}}>
+                <ArrowLeft style={{width:15,height:15}} />
+                Back
               </button>
             </Link>
-            <h1 className="text-5xl font-black tracking-tighter uppercase italic text-foreground flex items-center gap-3">
-              <FileDown className="w-10 h-10 text-primary" />
-              Create Paper
-            </h1>
-            <div className="w-32"></div>
           </div>
-        </header>
+          <div style={{display:'flex',alignItems:'center',gap:10}}>
+            <FileDown style={{width:20,height:20,color:'#7B5CE5',flexShrink:0}} />
+            <h1 style={{fontSize:20,fontWeight:800,color:'#F0F2FF',fontFamily:'Syne, sans-serif',margin:0,letterSpacing:'-0.01em'}}>Create Paper</h1>
+          </div>
+          <div style={{display:'flex',justifyContent:'flex-end'}}>
+            {blocks.length > 0 && (
+              <div style={{padding:'6px 12px',background:'rgba(123,92,229,0.1)',border:'1px solid rgba(123,92,229,0.25)',borderRadius:20,fontSize:12,color:'#9D7FF0',fontFamily:'JetBrains Mono, monospace',fontWeight:600}}>
+                {blocks.length} block{blocks.length!==1?'s':''} · {blocks.reduce((s,b)=>s+b.count,0)} Qs
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+      <div style={{maxWidth:1100,margin:'0 auto',padding:'32px 24px'}}>
 
         {step === 1 && (
-          <div className="bg-card border border-border rounded-[2.5rem] p-8 shadow-xl space-y-8">
-            {/* Page Title */}
+          <div style={{background:'#0F1120',border:'1px solid rgba(255,255,255,0.07)',borderRadius:20,padding:'32px 36px',animation:'pc-scale-in 0.4s ease'}}>
+            {/* Page sub‑heading */}
             {isBasicPage && (
-              <div className="mb-8 pb-6 border-b border-border">
-                <h2 className="text-3xl font-black tracking-tight text-card-foreground mb-2">Basic Operations</h2>
-                <p className="text-muted-foreground">Create math papers with basic operations: Addition, Subtraction, Multiplication, and Division</p>
+              <div style={{marginBottom:28,paddingBottom:24,borderBottom:'1px solid rgba(255,255,255,0.06)'}}>
+                <div className="pc-section-label">Basic Operations</div>
+                <h2 style={{fontSize:26,fontWeight:800,color:'#F0F2FF',fontFamily:'Syne, sans-serif',margin:'4px 0 6px'}}>Basic Operations</h2>
+                <p style={{color:'#525870',fontFamily:'DM Sans, sans-serif',fontSize:14,margin:0}}>Create math papers with basic operations: Addition, Subtraction, Multiplication, and Division</p>
               </div>
             )}
             {isJuniorPage && (
-              <div className="mb-8 pb-6 border-b border-border">
-                <h2 className="text-3xl font-black tracking-tight text-card-foreground mb-2">Junior Operations</h2>
-                <p className="text-muted-foreground">Create math papers for junior level abacus training: Direct Add/Sub, Small Friends, and Big Friends</p>
+              <div style={{marginBottom:28,paddingBottom:24,borderBottom:'1px solid rgba(255,255,255,0.06)'}}>
+                <div className="pc-section-label">Junior Operations</div>
+                <h2 style={{fontSize:26,fontWeight:800,color:'#F0F2FF',fontFamily:'Syne, sans-serif',margin:'4px 0 6px'}}>Junior Operations</h2>
+                <p style={{color:'#525870',fontFamily:'DM Sans, sans-serif',fontSize:14,margin:0}}>Create math papers for junior level abacus training: Direct Add/Sub, Small Friends, and Big Friends</p>
               </div>
             )}
             {isAdvancedPage && (
-              <div className="mb-8 pb-6 border-b border-border">
-                <h2 className="text-3xl font-black tracking-tight text-card-foreground mb-2">Advanced Operations</h2>
-                <p className="text-muted-foreground">Create math papers with advanced operations: Decimal operations, LCM, GCD, Square Root, Cube Root, and more</p>
+              <div style={{marginBottom:28,paddingBottom:24,borderBottom:'1px solid rgba(255,255,255,0.06)'}}>
+                <div className="pc-section-label">Advanced Operations</div>
+                <h2 style={{fontSize:26,fontWeight:800,color:'#F0F2FF',fontFamily:'Syne, sans-serif',margin:'4px 0 6px'}}>Advanced Operations</h2>
+                <p style={{color:'#525870',fontFamily:'DM Sans, sans-serif',fontSize:14,margin:0}}>Create math papers with advanced operations: Decimal operations, LCM, GCD, Square Root, Cube Root, and more</p>
               </div>
             )}
             {isVedicPage && (
-              <div className="mb-8 pb-6 border-b border-border">
-                <h2 className="text-3xl font-black tracking-tight text-card-foreground mb-2">
+              <div style={{marginBottom:28,paddingBottom:24,borderBottom:'1px solid rgba(255,255,255,0.06)'}}>
+                <div className="pc-section-label">Vedic Maths</div>
+                <h2 style={{fontSize:26,fontWeight:800,color:'#F0F2FF',fontFamily:'Syne, sans-serif',margin:'4px 0 6px'}}>
                   {level === "Custom" 
                     ? "Vedic Maths Operations" 
                     : level === "Vedic-Level-1" 
@@ -1299,7 +1343,7 @@ export default function PaperCreate() {
                             : "Vedic Maths Operations"
                   }
                 </h2>
-                <p className="text-muted-foreground">
+                <p style={{color:'#525870',fontFamily:'DM Sans, sans-serif',fontSize:14,margin:0}}>
                   {level === "Custom"
                     ? "Create math papers with Vedic Maths operations: Multiplication tricks, division tricks, squares, and special products"
                     : level === "Vedic-Level-1"
@@ -1317,11 +1361,9 @@ export default function PaperCreate() {
             )}
             
             {/* Paper Info */}
-            <div className="grid md:grid-cols-2 gap-6">
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20,marginBottom:28}}>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
-                  Paper Title
-                </label>
+                <label className="pc-label">Paper Title</label>
                 <input
                   type="text"
                   value={title}
@@ -1332,22 +1374,19 @@ export default function PaperCreate() {
                     }
                   }}
                   maxLength={40}
-                  className="w-full px-4 py-3 border-0 rounded-xl focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900/30 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-400"
+                  className="pc-input"
                   placeholder="Practice Paper"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Level
-                </label>
+                <label className="pc-label">Level</label>
                 <select
                   value={level}
                   onChange={(e) => setLevel(e.target.value as PaperConfig["level"])}
-                  className="w-full px-4 py-3 border-0 rounded-xl focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900/30 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                  className="pc-input"
                 >
                   <option value="Custom">Custom</option>
-                  {/* Show Abacus levels on Basic page */}
                   {isBasicPage && (
                     <>
                       <option value="AB-1">Abacus-1</option>
@@ -1358,7 +1397,6 @@ export default function PaperCreate() {
                       <option value="AB-6">Abacus-6</option>
                     </>
                   )}
-                  {/* Show Abacus-7 through Abacus-10 on Advanced page */}
                   {isAdvancedPage && (
                     <>
                       <option value="AB-7">Abacus-7</option>
@@ -1367,7 +1405,6 @@ export default function PaperCreate() {
                       <option value="AB-10">Abacus-10</option>
                     </>
                   )}
-                  {/* Show Vedic Maths levels on Vedic pages */}
                   {isVedicPage && (
                     <>
                       <option value="Vedic-Level-1">Vedic Maths-1</option>
@@ -1382,16 +1419,16 @@ export default function PaperCreate() {
 
             {/* Blocks Section */}
             <div>
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:12,marginBottom:20}}>
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Question Blocks</h2>
+                  <h2 style={{fontSize:20,fontWeight:700,color:'#F0F2FF',fontFamily:'Syne, sans-serif',margin:'0 0 4px'}}>Question Blocks</h2>
                   {blocks.length > 0 && (
-                      <p className="text-sm text-gray-600 dark:text-white mt-1">
-                      Total Questions: <span className="font-bold text-blue-600 dark:text-blue-400">{blocks.reduce((sum, block) => sum + block.count, 0)}</span>
+                    <p style={{fontSize:12,color:'#525870',fontFamily:'JetBrains Mono, monospace',margin:0}}>
+                      Total: <span style={{color:'#9D7FF0',fontWeight:700}}>{blocks.reduce((sum, block) => sum + block.count, 0)}</span> questions
                     </p>
                   )}
                 </div>
-                <div className="flex items-center gap-3 w-full sm:w-auto">
+                <div style={{display:'flex',gap:10}}>
                   <button
                     onClick={() => {
                       if (blocks.length === 0) return;
@@ -1400,27 +1437,23 @@ export default function PaperCreate() {
                       }
                     }}
                     disabled={blocks.length === 0}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-200 whitespace-nowrap ${
-                      blocks.length > 0
-                        ? "bg-destructive text-destructive-foreground hover:shadow-xl transform hover:-translate-y-0.5 cursor-pointer"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed opacity-60"
-                    }`}
+                    style={{display:'flex',alignItems:'center',gap:8,padding:'10px 18px',background:blocks.length>0?'rgba(239,68,68,0.1)':'rgba(255,255,255,0.04)',border:`1px solid ${blocks.length>0?'rgba(239,68,68,0.3)':'rgba(255,255,255,0.06)'}`,color:blocks.length>0?'#EF4444':'#525870',borderRadius:10,fontWeight:600,fontFamily:'DM Sans, sans-serif',fontSize:13,cursor:blocks.length>0?'pointer':'not-allowed',transition:'all 0.2s'}}
                     title={blocks.length > 0 ? "Clear all blocks" : "No blocks to clear"}
                   >
-                    <Trash2 className="w-5 h-5" />
-                    Clear All Blocks
+                    <Trash2 style={{width:15,height:15}} />
+                    Clear All
                   </button>
                   <button
                     onClick={addBlock}
-                    className="flex items-center gap-2 px-6 py-3 premium-gradient text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap"
+                    style={{display:'flex',alignItems:'center',gap:8,padding:'10px 18px',background:'linear-gradient(135deg,#7B5CE5,#9D7FF0)',color:'white',borderRadius:10,fontWeight:700,fontFamily:'DM Sans, sans-serif',fontSize:13,border:'none',cursor:'pointer',boxShadow:'0 4px 16px rgba(123,92,229,0.3)',transition:'all 0.2s'}}
                   >
-                    <Plus className="w-5 h-5" />
+                    <Plus style={{width:15,height:15}} />
                     Add Block
                   </button>
                 </div>
               </div>
 
-              <div className="space-y-6">
+              <div style={{display:'flex',flexDirection:'column',gap:16}}>
                 {blocks.map((block, index) => (
                   <div
                     key={block.id}
@@ -1438,77 +1471,64 @@ export default function PaperCreate() {
                       setDraggedIndex(null);
                     }}
                     onDragEnd={() => setDraggedIndex(null)}
-                    className={`group relative bg-gradient-to-br from-white via-white/95 to-white/90 dark:from-slate-800/95 dark:via-slate-800/90 dark:to-slate-900/95 backdrop-blur-xl border-2 rounded-3xl shadow-xl dark:shadow-2xl p-8 transition-all duration-300 hover:shadow-2xl hover:scale-[1.01] ${
-                      draggedIndex === index
-                        ? 'opacity-40 scale-95 border-primary/60 dark:border-primary/60'
-                        : draggedIndex !== null
-                        ? 'border-primary/40 dark:border-primary/40'
-                        : 'border-slate-200/60 dark:border-slate-700/60 hover:border-primary/30 dark:hover:border-primary/40'
-                    }`}
+                    className={`pc-block-card${draggedIndex === index ? ' dragging' : ''}`}
+                    style={{animationDelay:`${index*0.06}s`}}
                   >
-                    {/* Premium gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 dark:from-primary/10 dark:via-transparent dark:to-primary/10 rounded-3xl pointer-events-none" />
-
-                    {/* Content */}
-                    <div className="relative z-10">
-                      <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-14 h-14 rounded-2xl premium-gradient flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                            <span className="text-2xl font-black text-white">{index + 1}</span>
+                    {/* Block content */}
+                    <div style={{position:'relative',zIndex:1}}>
+                      {/* Block header: badge + title + action buttons */}
+                      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20}}>
+                        <div style={{display:'flex',alignItems:'center',gap:12}}>
+                          <div style={{width:40,height:40,borderRadius:12,background:'linear-gradient(135deg,#7B5CE5,#9D7FF0)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,boxShadow:'0 4px 12px rgba(123,92,229,0.35)'}}>
+                            <span style={{fontSize:16,fontWeight:800,color:'white',fontFamily:'JetBrains Mono, monospace'}}>{index + 1}</span>
                           </div>
                           <div>
-                            <h3 className="text-2xl font-black text-gray-900 dark:text-white group-hover:text-primary transition-colors duration-300">
+                            <h3 style={{fontSize:16,fontWeight:700,color:'#F0F2FF',fontFamily:'Syne, sans-serif',margin:0}}>
                               {generateSectionName(block)}
                             </h3>
                           </div>
                         </div>
-
-                        <div className="flex items-center gap-2">
-                          {/* Move Up Button */}
+                        <div style={{display:'flex',alignItems:'center',gap:6}}>
                           <button
                             onClick={() => moveBlockUp(index)}
                             disabled={index === 0}
-                            className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-primary hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+                            className="pc-action-btn up"
                             title="Move Up"
                           >
-                            <ChevronUp className="w-5 h-5" />
+                            <ChevronUp style={{width:14,height:14,color:'#B8BDD8'}} />
                           </button>
-                          {/* Move Down Button */}
                           <button
                             onClick={() => moveBlockDown(index)}
                             disabled={index === blocks.length - 1}
-                            className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-primary hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+                            className="pc-action-btn down"
                             title="Move Down"
                           >
-                            <ChevronDown className="w-5 h-5" />
+                            <ChevronDown style={{width:14,height:14,color:'#B8BDD8'}} />
                           </button>
-                          {/* Duplicate Button */}
                           <button
                             onClick={() => handleDuplicateBlock(index)}
-                            className="p-2.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all duration-200 shadow-sm hover:shadow-md"
+                            className="pc-action-btn dup"
                             title="Duplicate Block"
                           >
-                            <Copy className="w-5 h-5" />
+                            <Copy style={{width:14,height:14,color:'#10B981'}} />
                           </button>
-                          {/* Delete Button */}
                           <button
                             onClick={() => handleDeleteBlock(index)}
-                            className="p-2.5 rounded-xl bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 hover:bg-red-500 hover:text-white transition-all duration-200 shadow-sm hover:shadow-md"
+                            className="pc-action-btn del"
                             title="Delete Block"
                           >
-                            <Trash2 className="w-5 h-5" />
+                            <Trash2 style={{width:14,height:14,color:'#EF4444'}} />
                           </button>
                         </div>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Type</label>
+                      <div style={{marginBottom:16}}>
+                        <label className="pc-field-label">Type</label>
                         <select
                           value={block.type}
                           onChange={(e) => {
                             const newType = e.target.value as BlockConfig["type"];
                             updateBlock(index, { type: newType });
                           }}
-                          className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900/30 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                         >
                           {/* Show operations based on page route and selected level */}
                           {/* Abacus operations: show when on Abacus pages (Junior, Basic, Advanced) */}
@@ -1847,7 +1867,7 @@ export default function PaperCreate() {
                         </select>
                       </div>
 
-                      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 mt-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 mt-2" style={{gap:12}}>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
                           {block.type === "vedic_tables" || block.type === "vedic_tables_large" ? "Rows" : "Questions (1-200)"}
@@ -4024,12 +4044,10 @@ export default function PaperCreate() {
                       </div>{/* end inputs grid */}
 
                       {/* Drag Handle */}
-                      <div className="flex items-center justify-center pt-4 mt-4 border-t border-slate-200/50 dark:border-slate-700/50 cursor-grab active:cursor-grabbing">
-                        <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors duration-300 select-none">
-                          <GripVertical className="w-5 h-5" />
-                          <span className="text-sm font-medium">Drag to reorder</span>
-                          <GripVertical className="w-5 h-5" />
-                        </div>
+                      <div className="pc-drag-handle">
+                        <GripVertical style={{width:16,height:16}} />
+                        <span>drag to reorder</span>
+                        <GripVertical style={{width:16,height:16}} />
                       </div>
                     </div>
                   </div>
@@ -4037,23 +4055,26 @@ export default function PaperCreate() {
               </div>
 
               {blocks.length === 0 && (
-                <div className="text-center py-12 bg-gray-50 dark:bg-slate-800/50 rounded-xl border-2 border-dashed border-gray-300 dark:border-slate-700">
+                <div style={{textAlign:'center',padding:'48px 24px',background:'rgba(123,92,229,0.04)',border:'1.5px dashed rgba(123,92,229,0.25)',borderRadius:16}}>
                   {loadingPresets ? (
                     <>
-                      <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                      <p className="text-gray-600 mb-2 font-medium">Loading preset blocks for {level}...</p>
-                      <p className="text-sm text-gray-500">Please wait</p>
+                      <div style={{width:36,height:36,border:'3px solid #7B5CE5',borderTopColor:'transparent',borderRadius:'50%',animation:'pc-spin 0.9s linear infinite',margin:'0 auto 16px'}}></div>
+                      <p style={{color:'#B8BDD8',fontFamily:'DM Sans, sans-serif',fontSize:14,marginBottom:4}}>Loading preset blocks for {level}...</p>
+                      <p style={{fontSize:12,color:'#525870',fontFamily:'DM Sans, sans-serif'}}>Please wait</p>
                     </>
                   ) : (
                     <>
-                  <p className="text-gray-500 dark:text-slate-400 mb-4">No question blocks yet</p>
-                  <button
-                    onClick={addBlock}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
-                  >
-                    <Plus className="w-5 h-5" />
-                    Add Your First Block
-                  </button>
+                      <div style={{width:48,height:48,background:'rgba(123,92,229,0.1)',border:'1px solid rgba(123,92,229,0.25)',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px'}}>
+                        <FileDown style={{width:22,height:22,color:'#7B5CE5'}} />
+                      </div>
+                      <p style={{color:'#525870',fontFamily:'DM Sans, sans-serif',fontSize:14,marginBottom:16}}>No question blocks yet. Add your first block to get started.</p>
+                      <button
+                        onClick={addBlock}
+                        style={{display:'inline-flex',alignItems:'center',gap:8,padding:'12px 24px',background:'linear-gradient(135deg,#7B5CE5,#9D7FF0)',color:'white',borderRadius:10,fontWeight:700,fontFamily:'DM Sans, sans-serif',fontSize:14,border:'none',cursor:'pointer',boxShadow:'0 4px 16px rgba(123,92,229,0.3)'}}
+                      >
+                        <Plus style={{width:16,height:16}} />
+                        Add Your First Block
+                      </button>
                     </>
                   )}
                 </div>
@@ -4061,31 +4082,31 @@ export default function PaperCreate() {
             </div>
 
             {/* Generate Button */}
-            <div className="pt-4">
+            <div style={{paddingTop:24,borderTop:'1px solid rgba(255,255,255,0.06)',marginTop:8}}>
               <button
                 onClick={handlePreview}
                 disabled={previewMutation.isPending || loadingPresets}
-                className="w-full group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{width:'100%',display:'flex',alignItems:'center',justifyContent:'center',gap:10,padding:'16px 32px',background:'linear-gradient(135deg,#10B981,#059669)',color:'white',borderRadius:14,fontWeight:700,fontFamily:'DM Sans, sans-serif',fontSize:16,border:'none',cursor:previewMutation.isPending||loadingPresets?'not-allowed':'pointer',opacity:previewMutation.isPending||loadingPresets?0.6:1,boxShadow:'0 6px 24px rgba(16,185,129,0.3)',transition:'all 0.2s'}}
               >
                 {previewMutation.isPending ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div style={{width:20,height:20,border:'2px solid white',borderTopColor:'transparent',borderRadius:'50%',animation:'pc-spin 0.8s linear infinite'}}></div>
                     Generating Preview...
                   </>
                 ) : (
                   <>
-                    <Eye className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    <Eye style={{width:20,height:20}} />
                     Generate Preview
                   </>
                 )}
               </button>
 
               {previewMutation.isError && (
-                <div className="mt-4 p-4 bg-red-50 border-2 border-red-200 rounded-xl flex items-start gap-3">
-                  <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div style={{marginTop:16,padding:'12px 16px',background:'rgba(239,68,68,0.08)',border:'1px solid rgba(239,68,68,0.25)',borderRadius:10,display:'flex',alignItems:'flex-start',gap:10}}>
+                  <XCircle style={{width:16,height:16,color:'#EF4444',flexShrink:0,marginTop:2}} />
                   <div>
-                    <strong className="text-red-800 block">Error:</strong>
-                    <span className="text-red-700">
+                    <strong style={{color:'#EF4444',fontFamily:'DM Sans, sans-serif',fontSize:13,display:'block'}}>Error:</strong>
+                    <span style={{color:'rgba(239,68,68,0.8)',fontFamily:'DM Sans, sans-serif',fontSize:13}}>
                       {previewMutation.error instanceof Error ? previewMutation.error.message : "Unknown error"}
                     </span>
                   </div>
@@ -4096,44 +4117,33 @@ export default function PaperCreate() {
         )}
 
         {step === 2 && previewData && (
-          <div className="relative bg-gradient-to-br from-white/10 via-white/5 to-transparent dark:from-slate-800/60 dark:via-slate-800/40 dark:to-slate-900/60 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 rounded-[2.5rem] shadow-2xl dark:shadow-slate-900/50 p-8 transition-all duration-500">
-            {/* Glass morphism overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 dark:from-slate-700/10 dark:via-transparent dark:to-slate-800/10 rounded-[2.5rem] pointer-events-none" />
-
-            {/* Content */}
-            <div className="relative z-10 space-y-6">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg">
-                    <Eye className="w-6 h-6 text-white" />
+          <div style={{background:'#0F1120',border:'1px solid rgba(255,255,255,0.07)',borderRadius:20,padding:'32px 36px',animation:'pc-scale-in 0.4s ease',position:'relative',overflow:'hidden'}}>
+            <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:'linear-gradient(90deg,#7B5CE5,#9D7FF0)'}} />
+            <div style={{position:'relative',zIndex:1}}>
+              {/* Preview header */}
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:28}}>
+                <div style={{display:'flex',alignItems:'center',gap:14}}>
+                  <div style={{width:48,height:48,borderRadius:14,background:'linear-gradient(135deg,#7B5CE5,#9D7FF0)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 16px rgba(123,92,229,0.4)'}}>
+                    <Eye style={{width:22,height:22,color:'white'}} />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Paper Preview</h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Review your generated questions</p>
+                    <h2 style={{fontSize:20,fontWeight:800,color:'#F0F2FF',fontFamily:'Syne, sans-serif',margin:'0 0 3px'}}>Paper Preview</h2>
+                    <p style={{fontSize:12,color:'#525870',fontFamily:'DM Sans, sans-serif',margin:0}}>Review your generated questions</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div style={{display:'flex',alignItems:'center',gap:10}}>
                   <button
                     onClick={() => setShowAnswers(!showAnswers)}
-                    className="group flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                    style={{display:'flex',alignItems:'center',gap:8,padding:'9px 16px',background:showAnswers?'rgba(123,92,229,0.15)':'rgba(255,255,255,0.05)',border:`1px solid ${showAnswers?'rgba(123,92,229,0.4)':'rgba(255,255,255,0.1)'}`,borderRadius:10,color:showAnswers?'#9D7FF0':'#B8BDD8',fontWeight:600,fontFamily:'DM Sans, sans-serif',fontSize:13,cursor:'pointer',transition:'all 0.2s'}}
                   >
-                    {showAnswers ? (
-                      <>
-                        <EyeOff className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                        Hide Answers
-                      </>
-                    ) : (
-                      <>
-                        <Eye className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                        Show Answers
-                      </>
-                    )}
+                    {showAnswers ? <EyeOff style={{width:15,height:15}} /> : <Eye style={{width:15,height:15}} />}
+                    {showAnswers ? 'Hide Answers' : 'Show Answers'}
                   </button>
                   <button
                     onClick={() => setStep(1)}
-                    className="group flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-600 to-slate-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                    style={{display:'flex',alignItems:'center',gap:8,padding:'9px 16px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:10,color:'#B8BDD8',fontWeight:600,fontFamily:'DM Sans, sans-serif',fontSize:13,cursor:'pointer',transition:'all 0.2s'}}
                   >
-                    <ArrowLeft className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <ArrowLeft style={{width:15,height:15}} />
                     Back to Edit
                   </button>
                 </div>
@@ -4214,8 +4224,8 @@ export default function PaperCreate() {
                           {groupSet.blocks.map((block, blockInGroupIndex) => {
                             const originalIndex = groupSet.indices[blockInGroupIndex];
                             return (
-                              <div key={originalIndex} className="flex-1 bg-card border-2 border-border rounded-xl p-4 min-w-0 transition-all duration-300">
-                                <h3 className="font-bold text-base mb-3 text-gray-900 dark:text-white">
+                              <div key={originalIndex} style={{flex:1,background:'#141729',border:'1px solid rgba(255,255,255,0.08)',borderRadius:16,padding:'16px 18px',minWidth:0,transition:'all 0.2s'}}>
+                                <h3 style={{fontWeight:800,fontSize:15,marginBottom:12,color:'#F0F2FF',fontFamily:'Syne, sans-serif'}}>
                                   {block.config.title || `Section ${originalIndex + 1}`}
                 </h3>
                                 <div className="grid grid-cols-1 gap-2">
@@ -4228,7 +4238,7 @@ export default function PaperCreate() {
                           })}
                           {/* Fill remaining slots if less than 3 blocks */}
                           {Array.from({ length: 3 - groupSet.blocks.length }).map((_, idx) => (
-                            <div key={`empty-${idx}`} className="flex-1 bg-slate-800/50 dark:bg-slate-800/50 rounded-xl border-2 border-slate-700/50 dark:border-slate-700/50"></div>
+                            <div key={`empty-${idx}`} style={{flex:1,background:'rgba(15,17,32,0.5)',borderRadius:16,border:'1px solid rgba(255,255,255,0.05)'}}></div>
                           ))}
                         </div>
                       ))}
@@ -4250,8 +4260,8 @@ export default function PaperCreate() {
                        block.config.type === "big_friends_add_sub");
                     
                     return (
-                      <div key={originalIndex} className="bg-card border-2 border-border rounded-xl p-4 transition-all duration-300">
-                        <h3 className="font-bold text-base mb-3 text-white dark:text-white">
+                      <div key={originalIndex} style={{background:'#141729',border:'1px solid rgba(255,255,255,0.08)',borderRadius:16,padding:'16px 18px',transition:'all 0.2s',marginBottom:12}}>
+                        <h3 style={{fontWeight:800,fontSize:15,marginBottom:12,color:'#F0F2FF',fontFamily:'Syne, sans-serif'}}>
                           {block.config.title || `Section ${originalIndex + 1}`}
                         </h3>
                         {isVerticalBlock ? (
@@ -4273,12 +4283,12 @@ export default function PaperCreate() {
                                 rows.push(
                                   <tr key={`sno-row-${rowIndex}`}>
                                     {questionRow.map((q) => (
-                                      <td key={`sno-${q.id}`} className="p-1 align-center border border-slate-600 dark:border-slate-600 bg-slate-700/50 dark:bg-slate-700/50 text-center" style={{ width: '10%' }}>
-                                        <span className="font-bold text-sm text-white dark:text-white">{q.id}.</span>
+                                      <td key={`sno-${q.id}`} style={{padding:'4px 6px',textAlign:'center',border:'1px solid rgba(255,255,255,0.08)',background:'rgba(123,92,229,0.12)',width:'10%'}}>
+                                        <span style={{fontWeight:700,fontSize:13,color:'#C4ADFF',fontFamily:'JetBrains Mono, monospace'}}>{q.id}.</span>
                                       </td>
                                     ))}
                                     {Array.from({ length: Math.max(0, questionsPerRow - questionRow.length) }).map((_, idx) => (
-                                        <td key={`empty-sno-${idx}`} className="p-1 border border-slate-600 dark:border-slate-600 bg-slate-800/30 dark:bg-slate-800/30" style={{ width: '10%' }}></td>
+                                        <td key={`empty-sno-${idx}`} style={{padding:'4px 6px',border:'1px solid rgba(255,255,255,0.05)',background:'rgba(20,23,41,0.4)',width:'10%'}}></td>
                                     ))}
                                   </tr>
                                 );
@@ -4290,7 +4300,7 @@ export default function PaperCreate() {
                                       {questionRow.map((q) => {
                                         const op = q.operands[rowIdx];
                                         if (op === undefined) {
-                                          return <td key={`empty-${q.id}-${rowIdx}`} className="p-1 border border-slate-600 dark:border-slate-600 bg-slate-700/50 dark:bg-slate-700/50" style={{ width: '10%' }}></td>;
+                                          return <td key={`empty-${q.id}-${rowIdx}`} style={{padding:'4px 6px',border:'1px solid rgba(255,255,255,0.08)',background:'#141729',width:'10%'}}></td>;
                                         }
                                         
                                         // Determine operator
@@ -4315,7 +4325,7 @@ export default function PaperCreate() {
                                         );
                                       })}
                                       {Array.from({ length: Math.max(0, questionsPerRow - questionRow.length) }).map((_, idx) => (
-                                        <td key={`empty-op-${idx}-${rowIdx}`} className="p-1 border border-slate-600 dark:border-slate-600 bg-slate-800/30 dark:bg-slate-800/30" style={{ width: '10%' }}></td>
+                                        <td key={`empty-op-${idx}-${rowIdx}`} style={{padding:'4px 6px',border:'1px solid rgba(255,255,255,0.05)',background:'rgba(20,23,41,0.4)',width:'10%'}}></td>
                                       ))}
                                     </tr>
                                   );
@@ -4325,12 +4335,12 @@ export default function PaperCreate() {
                                 rows.push(
                                   <tr key={`line-row-${rowIndex}`}>
                                     {questionRow.map((q) => (
-                                      <td key={`line-${q.id}`} className="p-1 border border-slate-600 dark:border-slate-600 bg-slate-700/50 dark:bg-slate-700/50" style={{ width: '10%' }}>
-                                        <div className="border-t border-slate-500 dark:border-slate-500 w-full"></div>
+                                      <td key={`line-${q.id}`} style={{padding:'2px 6px',border:'1px solid rgba(255,255,255,0.08)',background:'#141729',width:'10%'}}>
+                                        <div style={{borderTop:'1px solid rgba(123,92,229,0.5)',width:'100%'}}></div>
                                       </td>
                                     ))}
                                     {Array.from({ length: Math.max(0, questionsPerRow - questionRow.length) }).map((_, idx) => (
-                                      <td key={`empty-line-${idx}`} className="p-1 border border-slate-600 dark:border-slate-600 bg-slate-800/30 dark:bg-slate-800/30" style={{ width: '10%' }}></td>
+                                      <td key={`empty-line-${idx}`} style={{padding:'4px 6px',border:'1px solid rgba(255,255,255,0.05)',background:'rgba(20,23,41,0.4)',width:'10%'}}></td>
                                     ))}
                                   </tr>
                                 );
@@ -4339,22 +4349,22 @@ export default function PaperCreate() {
                                 rows.push(
                                   <tr key={`answer-row-${rowIndex}`}>
                                     {questionRow.map((q) => (
-                                      <td key={`answer-${q.id}`} className="p-1 border border-slate-600 dark:border-slate-600 bg-slate-700/50 dark:bg-slate-700/50 text-center" style={{ width: '10%', minHeight: '1.2rem' }}>
-                                        <div style={{ minHeight: '1.2rem' }} className="text-center">
+                                      <td key={`answer-${q.id}`} style={{padding:'4px 6px',border:'1px solid rgba(255,255,255,0.08)',background:'rgba(16,185,129,0.06)',textAlign:'center',width:'10%',minHeight:'1.2rem'}}>
+                                        <div style={{ minHeight: '1.2rem',textAlign:'center'}}>
                                           {showAnswers && (
-                                            <div className="text-white dark:text-white font-mono text-sm font-bold text-center">{q.answer}</div>
+                                            <div style={{color:'#10B981',fontFamily:'JetBrains Mono, monospace',fontSize:12,fontWeight:700,textAlign:'center'}}>{q.answer}</div>
                                           )}
                                         </div>
                                       </td>
                                     ))}
                                     {Array.from({ length: Math.max(0, questionsPerRow - questionRow.length) }).map((_, idx) => (
-                                      <td key={`empty-answer-${idx}`} className="p-1 border border-slate-600 dark:border-slate-600 bg-slate-800/30 dark:bg-slate-800/30" style={{ width: '10%' }}></td>
+                                      <td key={`empty-answer-${idx}`} style={{padding:'4px 6px',border:'1px solid rgba(255,255,255,0.05)',background:'rgba(20,23,41,0.4)',width:'10%'}}></td>
                                     ))}
                                   </tr>
                                 );
                                 
                                 return (
-                                  <table key={`table-row-${rowIndex}`} className="w-full border-collapse mb-4" style={{ tableLayout: 'fixed' }}>
+                                  <table key={`table-row-${rowIndex}`} style={{width:'100%',borderCollapse:'collapse',marginBottom:16,tableLayout:'fixed'}}>
                                     <tbody>{rows}</tbody>
                                   </table>
                                 );
@@ -4376,67 +4386,68 @@ export default function PaperCreate() {
               });
             })()}
 
-            <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/20 dark:border-slate-700/50">
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,paddingTop:24,borderTop:'1px solid rgba(255,255,255,0.08)',marginTop:24}}>
               <button
                 onClick={handleAttemptPaper}
-                className="group flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 text-sm"
+                style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10,padding:'14px 24px',background:'linear-gradient(135deg,#EF4444,#DC2626)',border:'none',borderRadius:12,color:'white',fontWeight:700,fontFamily:'DM Sans, sans-serif',fontSize:14,cursor:'pointer',boxShadow:'0 4px 20px rgba(239,68,68,0.35)',transition:'all 0.2s'}}
               >
-                <Play className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <Play style={{width:18,height:18}} />
                 Attempt Paper
               </button>
 
               <button
                 onClick={() => setDownloadDropdownOpen(!downloadDropdownOpen)}
                 disabled={downloadMutation.isPending}
-                className="w-full group flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 text-sm"
+                style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10,padding:'14px 24px',background:'linear-gradient(135deg,#7B5CE5,#9D7FF0)',border:'none',borderRadius:12,color:'white',fontWeight:700,fontFamily:'DM Sans, sans-serif',fontSize:14,cursor:'pointer',boxShadow:'0 4px 20px rgba(123,92,229,0.35)',transition:'all 0.2s',opacity:downloadMutation.isPending?0.6:1}}
               >
-                <FileDown className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                {downloadMutation.isPending ? "Generating..." : "Download"}
-                <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${downloadDropdownOpen ? 'rotate-180' : ''}`} />
+                <FileDown style={{width:18,height:18}} />
+                {downloadMutation.isPending ? 'Generating...' : 'Download'}
+                <ChevronDownIcon style={{width:15,height:15,transition:'transform 0.2s',transform:downloadDropdownOpen?'rotate(180deg)':'rotate(0deg)'}} />
               </button>
             </div>
 
-            {/* Premium Modal-Style Download Menu */}
+            {/* Download Modal */}
             {downloadDropdownOpen && (
-              <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-                {/* Backdrop with blur */}
-                <div 
-                  className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
+              <div style={{position:'fixed',inset:0,zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center',padding:16}}>
+                {/* Backdrop */}
+                <div
+                  style={{position:'absolute',inset:0,background:'rgba(0,0,0,0.72)',backdropFilter:'blur(12px)'}}
                   onClick={() => setDownloadDropdownOpen(false)}
                 />
-                
-                {/* Modal Content */}
-                <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-md overflow-hidden transform transition-all duration-300 scale-100 opacity-100">
+                {/* Modal */}
+                <div style={{position:'relative',background:'#0F1120',borderRadius:20,boxShadow:'0 24px 80px rgba(0,0,0,0.7)',border:'1px solid rgba(255,255,255,0.1)',width:'100%',maxWidth:440,overflow:'hidden',animation:'pc-scale-in 0.25s ease'}}>
+                  {/* Header accent */}
+                  <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:'linear-gradient(90deg,#7B5CE5,#9D7FF0)'}} />
                   {/* Header */}
-                  <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
-                      <FileDown className="w-5 h-5" />
-                      Download Options
-                    </h3>
-                    <p className="text-sm text-blue-100 mt-1">Choose your preferred format</p>
+                  <div style={{padding:'24px 28px 16px',borderBottom:'1px solid rgba(255,255,255,0.07)'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:12}}>
+                      <div style={{width:40,height:40,borderRadius:12,background:'linear-gradient(135deg,#7B5CE5,#9D7FF0)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                        <FileDown style={{width:18,height:18,color:'white'}} />
+                      </div>
+                      <div>
+                        <h3 style={{fontSize:18,fontWeight:800,color:'#F0F2FF',fontFamily:'Syne, sans-serif',margin:'0 0 2px'}}>Download Options</h3>
+                        <p style={{fontSize:12,color:'#525870',fontFamily:'DM Sans, sans-serif',margin:0}}>Choose your preferred format</p>
+                      </div>
+                    </div>
                   </div>
-
-                  {/* Modal Content */}
                   {/* Options */}
-                  <div className="p-4 space-y-2">
+                  <div style={{padding:'16px 20px',display:'flex',flexDirection:'column',gap:10}}>
                     <button
                       onClick={() => {
                         downloadMutation.mutate({ withAnswers: false, answersOnly: false });
                         setDownloadDropdownOpen(false);
                       }}
                       disabled={downloadMutation.isPending}
-                      className="w-full group flex items-center gap-4 px-5 py-4 rounded-xl bg-secondary hover:bg-secondary/80 border border-border transition-all duration-200 disabled:opacity-50 transform hover:scale-[1.02] hover:shadow-lg"
+                      style={{display:'flex',alignItems:'center',gap:14,padding:'14px 16px',background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:14,cursor:'pointer',transition:'all 0.15s',opacity:downloadMutation.isPending?0.5:1,width:'100%'}}
                     >
-                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-500 dark:bg-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <FileDown className="w-5 h-5 text-white" />
+                      <div style={{flexShrink:0,width:40,height:40,borderRadius:10,background:'linear-gradient(135deg,#3B82F6,#2563EB)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                        <FileDown style={{width:18,height:18,color:'white'}} />
                       </div>
-                      <div className="flex-1 text-left">
-                        <div className="font-semibold text-gray-900 dark:text-white">Question Paper</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-300">Questions only, no answers</div>
+                      <div style={{flex:1,textAlign:'left'}}>
+                        <div style={{fontWeight:700,color:'#F0F2FF',fontFamily:'DM Sans, sans-serif',fontSize:14}}>Question Paper</div>
+                        <div style={{fontSize:12,color:'#525870',fontFamily:'DM Sans, sans-serif',marginTop:2}}>Questions only, no answers</div>
                       </div>
-                      <div className="flex-shrink-0 text-blue-600 dark:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                        →
-                      </div>
+                      <span style={{color:'#525870',fontSize:16}}>→</span>
                     </button>
 
                     <button
@@ -4445,18 +4456,16 @@ export default function PaperCreate() {
                         setDownloadDropdownOpen(false);
                       }}
                       disabled={downloadMutation.isPending}
-                      className="w-full group flex items-center gap-4 px-5 py-4 rounded-xl bg-secondary hover:bg-secondary/80 border border-border transition-all duration-200 disabled:opacity-50 transform hover:scale-[1.02] hover:shadow-lg"
+                      style={{display:'flex',alignItems:'center',gap:14,padding:'14px 16px',background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:14,cursor:'pointer',transition:'all 0.15s',opacity:downloadMutation.isPending?0.5:1,width:'100%'}}
                     >
-                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-500 dark:bg-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <FileDown className="w-5 h-5 text-white" />
+                      <div style={{flexShrink:0,width:40,height:40,borderRadius:10,background:'linear-gradient(135deg,#7B5CE5,#9D7FF0)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                        <FileDown style={{width:18,height:18,color:'white'}} />
                       </div>
-                      <div className="flex-1 text-left">
-                        <div className="font-semibold text-gray-900 dark:text-white">Answer Key</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-300">Questions with answers included</div>
+                      <div style={{flex:1,textAlign:'left'}}>
+                        <div style={{fontWeight:700,color:'#F0F2FF',fontFamily:'DM Sans, sans-serif',fontSize:14}}>Answer Key</div>
+                        <div style={{fontSize:12,color:'#525870',fontFamily:'DM Sans, sans-serif',marginTop:2}}>Questions with answers included</div>
                       </div>
-                      <div className="flex-shrink-0 text-purple-600 dark:text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                        →
-                      </div>
+                      <span style={{color:'#525870',fontSize:16}}>→</span>
                     </button>
 
                     <button
@@ -4465,26 +4474,23 @@ export default function PaperCreate() {
                         setDownloadDropdownOpen(false);
                       }}
                       disabled={downloadMutation.isPending}
-                      className="w-full group flex items-center gap-4 px-5 py-4 rounded-xl bg-secondary hover:bg-secondary/80 border border-border transition-all duration-200 disabled:opacity-50 transform hover:scale-[1.02] hover:shadow-lg"
+                      style={{display:'flex',alignItems:'center',gap:14,padding:'14px 16px',background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:14,cursor:'pointer',transition:'all 0.15s',opacity:downloadMutation.isPending?0.5:1,width:'100%'}}
                     >
-                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-500 dark:bg-green-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <FileDown className="w-5 h-5 text-white" />
+                      <div style={{flexShrink:0,width:40,height:40,borderRadius:10,background:'linear-gradient(135deg,#10B981,#059669)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                        <FileDown style={{width:18,height:18,color:'white'}} />
                       </div>
-                      <div className="flex-1 text-left">
-                        <div className="font-semibold text-gray-900 dark:text-white">Question Paper + Answer Key</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-300">Separate pages for questions and answers</div>
+                      <div style={{flex:1,textAlign:'left'}}>
+                        <div style={{fontWeight:700,color:'#F0F2FF',fontFamily:'DM Sans, sans-serif',fontSize:14}}>Question Paper + Answer Key</div>
+                        <div style={{fontSize:12,color:'#525870',fontFamily:'DM Sans, sans-serif',marginTop:2}}>Separate pages for questions and answers</div>
                       </div>
-                      <div className="flex-shrink-0 text-green-600 dark:text-green-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                        →
-                      </div>
+                      <span style={{color:'#525870',fontSize:16}}>→</span>
                     </button>
                   </div>
-
-                  {/* Close Button */}
-                  <div className="px-4 pb-4">
+                  {/* Close */}
+                  <div style={{padding:'8px 20px 20px'}}>
                     <button
                       onClick={() => setDownloadDropdownOpen(false)}
-                      className="w-full px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                      style={{width:'100%',padding:'10px',fontSize:13,fontWeight:600,color:'#525870',background:'transparent',border:'1px solid rgba(255,255,255,0.07)',borderRadius:10,cursor:'pointer',fontFamily:'DM Sans, sans-serif',transition:'all 0.15s'}}
                     >
                       Cancel
                     </button>
@@ -4494,12 +4500,12 @@ export default function PaperCreate() {
             )}
 
             {downloadMutation.isError && (
-              <div className="p-4 bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 backdrop-blur-sm border border-red-200/50 dark:border-red-800/50 rounded-2xl flex items-start gap-3">
-                <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div style={{marginTop:16,padding:'14px 18px',background:'rgba(239,68,68,0.08)',border:'1px solid rgba(239,68,68,0.25)',borderRadius:12,display:'flex',alignItems:'flex-start',gap:10}}>
+                <XCircle style={{width:18,height:18,color:'#EF4444',flexShrink:0,marginTop:2}} />
                 <div>
-                  <strong className="text-red-800 dark:text-red-200 block">Error:</strong>
-                  <span className="text-red-700 dark:text-red-300">
-                    {downloadMutation.error instanceof Error ? downloadMutation.error.message : "Unknown error"}
+                  <strong style={{color:'#FCA5A5',display:'block',fontFamily:'DM Sans, sans-serif',fontSize:14,fontWeight:700}}>Error:</strong>
+                  <span style={{color:'#FCA5A5',fontFamily:'DM Sans, sans-serif',fontSize:13}}>
+                    {downloadMutation.error instanceof Error ? downloadMutation.error.message : 'Unknown error'}
                   </span>
                 </div>
               </div>
