@@ -159,7 +159,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log("✅ [AUTH] User state updated, user:", response.user.email);
     } catch (error) {
       console.error("❌ [AUTH] Login error in context:", error);
-      setAuthReady(false);
+      // Do NOT call setAuthReady(false) here — if auth was already ready
+      // (re-auth scenario), doing so would cause all pending API calls to
+      // block inside waitForAuth() for up to 5 seconds.
       setApiAuthToken(null);
       throw error;
     }
@@ -169,8 +171,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     removeAuthToken();
     localStorage.removeItem("user_data");
     setUser(null);
-    setAuthReady(false);
     setApiAuthToken(null);
+    // Hard-navigate to login so all component state and React Query caches are cleared.
+    // Without this, ProtectedRoute re-renders Login in-place while setAuthReady(false)
+    // causes waitForAuth() to stall pending requests, freezing the UI.
+    window.location.replace("/login");
   };
 
   const refreshUser = async () => {

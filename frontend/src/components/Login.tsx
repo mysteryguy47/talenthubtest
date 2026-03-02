@@ -18,6 +18,22 @@ declare global {
   }
 }
 
+// Pre-computed star positions — deterministic LCG, zero loop risk.
+// The previous do...while used a fixed-seed RNG that produced the same
+// x/y on every iteration → guaranteed infinite loop for some stars.
+const STAR_DATA = Array.from({ length: 28 }, (_, i) => {
+  // Knuth LCG — each star uses a unique seed derived from its index.
+  const h = (n: number) => (((n * 1664525 + 1013904223) >>> 0) / 0x100000000);
+  return {
+    x:       h(i * 97  + 3)  * 100,
+    y:       h(i * 53  + 7)  * 100,
+    size:    i % 9 === 0 ? 3 : i % 4 === 0 ? 1 : 2,
+    dur:     4 + h(i * 31 + 1) * 4,
+    delay:   h(i * 67 + 11) * 8,
+    isCross: i % 8 === 0,
+  };
+});
+
 export default function Login() {
   const { login, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
@@ -146,23 +162,7 @@ export default function Login() {
     };
   }, [login]);
 
-  // Stable star positions (memo-like, computed once per component mount)
-  const stars = (() => {
-    const rng = (seed: number, max: number) => ((seed * 9301 + 49297) % 233280) / 233280 * max;
-    return Array.from({ length: 28 }, (_, i) => {
-      // Distribute mostly to outer quadrants — skip centre 300×300
-      let x: number, y: number;
-      do {
-        x = rng(i * 7 + 1, 100);
-        y = rng(i * 13 + 3, 100);
-      } while (x > 35 && x < 65 && y > 30 && y < 70);
-      const size = i % 9 === 0 ? 3 : i % 4 === 0 ? 1 : 2;
-      const dur = 4 + rng(i * 3, 4);
-      const delay = rng(i * 5 + 2, 8);
-      const isCross = i % 8 === 0;
-      return { x, y, size, dur, delay, isCross };
-    });
-  })();
+  const stars = STAR_DATA;
 
   const features = [
     { icon: <TrendingUp style={{ width: 20, height: 20 }} />, label: "Progress" },
