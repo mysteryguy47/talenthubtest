@@ -89,6 +89,9 @@ class PracticeSessionCreate(BaseModel):
     time_taken: float
     points_earned: int
     attempts: List[dict]  # List of attempt data
+    # Point system fields (optional for backward compat)
+    preset_key: Optional[str] = None   # e.g. '2x1', '3d2', 'rows_6_9'
+    row_count: Optional[int] = None    # Number of rows for add_sub family
 
 
 class AttemptResponse(BaseModel):
@@ -115,6 +118,8 @@ class PracticeSessionResponse(BaseModel):
     score: int
     time_taken: float
     points_earned: int
+    preset_key: Optional[str] = None
+    row_count: Optional[int] = None
     started_at: datetime
     completed_at: Optional[datetime]
     

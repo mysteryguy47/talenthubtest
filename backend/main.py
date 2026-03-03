@@ -29,6 +29,8 @@ from user_schemas import PaperAttemptCreate, PaperAttemptResponse, PaperAttemptD
 from auth import get_current_user
 from models import User
 from gamification import calculate_points
+from point_rule_engine import point_rule_engine
+from session_validator import session_validator
 from math_generator import generate_block
 from pdf_generator_playwright import generate_pdf_playwright
 from presets import get_preset_blocks
@@ -85,6 +87,22 @@ try:
 except Exception as e:
     import traceback
     logger.exception("[IMPORT] admin_access_routes failed: %s", str(e))
+
+reward_router = None
+try:
+    from reward_routes import router as reward_router
+    logger.info("[IMPORT] reward_routes loaded")
+except Exception as e:
+    import traceback
+    logger.exception("[IMPORT] reward_routes failed: %s", str(e))
+
+admin_reward_router = None
+try:
+    from admin_reward_routes import router as admin_reward_router
+    logger.info("[IMPORT] admin_reward_routes loaded")
+except Exception as e:
+    import traceback
+    logger.exception("[IMPORT] admin_reward_routes failed: %s", str(e))
 
 app = FastAPI(title="Abacus Paper Generator", version="3.0.0")
 app_start_time = time.monotonic()
@@ -218,6 +236,8 @@ for _name, _rtr in [
     ("subscription_router", subscription_router),
     ("payment_router", payment_router),
     ("admin_access_router", admin_access_router),
+    ("reward_router", reward_router),
+    ("admin_reward_router", admin_reward_router),
 ]:
     if _rtr:
         try:
@@ -235,8 +255,30 @@ async def startup_event() -> None:
         logger.info("[STARTUP] initializing database")
         # Register subscription models with Base.metadata
         import subscription_models  # noqa: F401  — ensures tables are created
+        import point_rule_engine as _pre  # noqa: F401  — register PointRule model
+        import reward_models as _rm  # noqa: F401  — register reward system tables
         init_db()
         logger.info("[STARTUP] database initialized")
+
+        # Run point system migration + seed (idempotent)
+        try:
+            from migrations.add_point_system_columns import migrate as _migrate_pts
+            _migrate_pts()
+            from seed_point_rules import seed as _seed_pts
+            _seed_pts()
+            logger.info("[STARTUP] point system tables ready")
+        except Exception as _pts_err:
+            logger.warning("[STARTUP] point system setup: %s", _pts_err)
+
+        # Seed reward system data (idempotent — skips existing rows)
+        try:
+            from seed_reward_data import seed_all_reward_data
+            _reward_db = next(get_db())
+            seed_all_reward_data(_reward_db)
+            _reward_db.close()
+            logger.info("[STARTUP] reward system data seeded")
+        except Exception as _rwd_err:
+            logger.warning("[STARTUP] reward system seed failed: %s", _rwd_err)
 
         # Seed default subscription plans (idempotent)
         try:
@@ -346,6 +388,64 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
             "message": "An internal server error occurred"
         }
     )
+
+
+# ── Point Rules API ──────────────────────────────────────────────────────────
+
+from point_rule_engine import PointRule, normalize_operation
+
+@app.get("/api/point-rules")
+async def list_point_rules(
+    tool: Optional[str] = None,
+    operation: Optional[str] = None,
+    db: Session = Depends(get_db),
+):
+    """
+    List point rules, optionally filtered by tool and/or operation.
+    No auth required — rules are public so the UI can show point badges.
+    """
+    q = db.query(PointRule).filter(PointRule.is_active == True)
+    if tool:
+        q = q.filter(PointRule.tool == tool)
+    if operation:
+        q = q.filter(PointRule.operation == operation)
+    rules = q.order_by(PointRule.tool, PointRule.operation, PointRule.display_order).all()
+    return [
+        {
+            "id": r.id,
+            "tool": r.tool,
+            "operation": r.operation,
+            "mode": r.mode,
+            "preset_key": r.preset_key,
+            "points_correct": r.points_correct,
+            "display_label": r.display_label,
+            "tier": r.tier,
+            "display_order": r.display_order,
+        }
+        for r in rules
+    ]
+
+
+@app.get("/api/point-rules/resolve")
+async def resolve_point_rule(
+    tool: str,
+    operation: str,
+    config_mode: str = "preset",
+    preset_key: Optional[str] = None,
+    row_count: Optional[int] = None,
+    db: Session = Depends(get_db),
+):
+    """
+    Resolve the point value for a specific configuration.
+    Used by the frontend to show live points preview.
+    """
+    norm_op = normalize_operation(operation)
+    points, rule_id = point_rule_engine.resolve_points(
+        db, tool, norm_op, config_mode,
+        preset_key=preset_key,
+        row_count=row_count,
+    )
+    return {"points_per_correct": points, "rule_id": rule_id}
 
 
 @app.get("/papers", response_model=List[PaperResponse])
@@ -964,16 +1064,19 @@ async def submit_paper_attempt(
         # Calculate attempted questions (answered questions, right or wrong)
         attempted_questions = correct_count + wrong_count
         
-        # Calculate points: +1 per attempted, +5 per correct
-        points_earned = calculate_points(
-            correct_answers=correct_count,
-            total_questions=total,
-            time_taken=time_taken,
-            difficulty_mode="custom",  # Papers are custom
-            accuracy=accuracy,
-            is_mental_math=False,  # Paper attempt
-            attempted_questions=attempted_questions
+        # ── Points via PointRuleEngine ────────────────────────────────────
+        is_valid, _reason = session_validator.validate_practice_paper(
+            total, attempted_questions
         )
+        if is_valid:
+            per_correct, rule_id = point_rule_engine.resolve_points(
+                db, "practice_paper", "all", "preset", preset_key="all"
+            )
+            points_earned = per_correct * correct_count
+        else:
+            per_correct = 0
+            rule_id = None
+            points_earned = 0
         
         # Update attempt
         paper_attempt.answers = answers
@@ -1009,12 +1112,15 @@ async def submit_paper_attempt(
             source_type="paper_attempt",
             description=(
                 f"Practice paper: {paper_attempt.paper_title} ({paper_attempt.paper_level}): "
-                f"{correct_count}/{attempted_questions} correct"
+                f"{correct_count}/{attempted_questions} correct "
+                f"@ {per_correct}pts/correct"
             ),
             source_id=paper_attempt.id,
             extra_data={
                 "paper_title":  paper_attempt.paper_title,
                 "paper_level":  paper_attempt.paper_level,
+                "per_correct":     per_correct,
+                "rule_id":         rule_id,
                 "correct_answers": correct_count,
                 "wrong_answers":   wrong_count,
                 "attempted_questions": attempted_questions,
@@ -1024,6 +1130,29 @@ async def submit_paper_attempt(
                 "balance_after":  balance_after,
             }
         )
+
+        # ── Reward Events (streak, badge evaluation) ──────────────────────────
+        reward_result = None
+        try:
+            from reward_engine import reward_engine
+            reward_result = reward_engine.record_session_completed(
+                db=db,
+                student_id=current_user.id,
+                source_tool="practice_paper",
+                points_earned=points_earned,
+                correct_answers=correct_count,
+                metadata={
+                    "paper_title": paper_attempt.paper_title,
+                    "paper_level": paper_attempt.paper_level,
+                    "per_correct": per_correct,
+                    "rule_id": rule_id,
+                    "attempted_questions": attempted_questions,
+                    "total_questions": total,
+                    "session_id": paper_attempt.id,
+                },
+            )
+        except Exception as _rwd_err:
+            logger.warning("[REWARD] paper_attempt reward failed: %s", _rwd_err)
         
         db.commit()
         db.refresh(paper_attempt)
@@ -1032,7 +1161,19 @@ async def submit_paper_attempt(
         elapsed = time.time() - request_start
         logger.info("[SUBMIT] path=/papers/attempt/%s duration_s=%.2f", attempt_id, elapsed)
         
-        return PaperAttemptResponse.model_validate(paper_attempt)
+        response = PaperAttemptResponse.model_validate(paper_attempt)
+
+        # Attach reward data to response if available
+        if reward_result and (reward_result.badges_unlocked or reward_result.streak_updated):
+            response_dict = response.model_dump()
+            response_dict["reward_data"] = {
+                "badges_unlocked": reward_result.badges_unlocked,
+                "streak_updated": reward_result.streak_updated,
+                "bonus_points": reward_result.points_awarded if reward_result.points_awarded != points_earned else 0,
+            }
+            return response_dict
+
+        return response
     except HTTPException:
         # Re-raise HTTP exceptions as-is
         raise

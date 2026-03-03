@@ -45,6 +45,8 @@ export interface PracticeSessionData {
   score: number;
   time_taken: number;
   points_earned: number;
+  preset_key?: string | null;   // e.g. '2x1', '3d2', 'rows_6_9'
+  row_count?: number | null;    // Number of rows for add_sub family
   attempts: Array<{
     question_data: any;
     user_answer: number | null;
@@ -656,4 +658,50 @@ export async function deleteCertificateAdmin(
   certId: number
 ): Promise<void> {
   return apiClient.delete<void>(`/users/admin/students/${studentId}/certificates/${certId}`);
+}
+
+
+// ── Point Rules API ──────────────────────────────────────────────────────────
+
+export interface PointRule {
+  id: number;
+  tool: string;       // 'practice_paper' | 'mental_math' | 'burst_mode'
+  operation: string;   // 'multiply', 'divide', 'add_sub', etc.
+  mode: string;        // 'preset' | 'custom'
+  preset_key: string | null;   // '2x1', '3d2', 'rows_6_9', 'all', etc.
+  points_correct: number;      // Points per correct answer
+  display_label: string;       // '2 × 1', '3–5 Rows', etc.
+  tier: string;                // '+3', '+5', '+8', 'no_points'
+  display_order: number;
+}
+
+export interface ResolvedPoints {
+  points_per_correct: number;
+  rule_id: number | null;
+}
+
+/** Fetch point rules (public, no auth needed). */
+export async function getPointRules(
+  tool?: string,
+  operation?: string
+): Promise<PointRule[]> {
+  const params = new URLSearchParams();
+  if (tool) params.set("tool", tool);
+  if (operation) params.set("operation", operation);
+  const qs = params.toString();
+  return apiClient.get<PointRule[]>(`/api/point-rules${qs ? `?${qs}` : ""}`);
+}
+
+/** Resolve point value for a specific configuration (public, no auth needed). */
+export async function resolvePoints(
+  tool: string,
+  operation: string,
+  configMode: string = "preset",
+  presetKey?: string,
+  rowCount?: number
+): Promise<ResolvedPoints> {
+  const params = new URLSearchParams({ tool, operation, config_mode: configMode });
+  if (presetKey) params.set("preset_key", presetKey);
+  if (rowCount != null) params.set("row_count", String(rowCount));
+  return apiClient.get<ResolvedPoints>(`/api/point-rules/resolve?${params}`);
 }

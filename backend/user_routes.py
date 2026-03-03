@@ -41,6 +41,11 @@ class UpdateDisplayNameRequest(BaseModel):
     display_name: Optional[str] = None
 
 from gamification import calculate_points
+from point_rule_engine import (
+    point_rule_engine, normalize_operation, determine_tool,
+    determine_config_mode, normalize_burst_preset_key,
+)
+from session_validator import session_validator
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -176,6 +181,20 @@ async def login(request: Request, login_data: LoginRequest, db: Session = Depend
         profile = db.query(StudentProfile).filter(StudentProfile.user_id == user.id).first()
         if profile:
             user_dict["public_id"] = profile.public_id
+
+        # ── Daily login bonus (idempotent per IST day) ────────────────────────
+        login_bonus_points = 0
+        try:
+            from reward_engine import reward_engine
+            login_result = reward_engine.record_daily_login(db, user.id)
+            login_bonus_points = login_result.points_awarded
+            if login_bonus_points > 0:
+                db.commit()
+                db.refresh(user)
+                user_dict["total_points"] = user.total_points
+                print(f"🎁 [LOGIN] Daily login bonus: +{login_bonus_points} pts for user {user.id}")
+        except Exception as _login_err:
+            logger.warning("[REWARD] daily login bonus failed: %s", _login_err)
         
         print(f"✅ [LOGIN] Login successful for user: {user.email}, access_token and refresh_token generated")
         return LoginResponse(
@@ -355,18 +374,42 @@ async def save_practice_session(
                 existing_session.completed_at = existing_session.completed_at.replace(tzinfo=timezone.utc)
             return PracticeSessionResponse.model_validate(existing_session)
 
-        # ── Points calculation ────────────────────────────────────────────────
-        # +1 per attempted question (right or wrong), +5 per correct answer
+        # ── Points calculation via PointRuleEngine ─────────────────────────────
         attempted_questions = session_data.correct_answers + session_data.wrong_answers
-        points_earned = calculate_points(
-            correct_answers=session_data.correct_answers,
-            total_questions=session_data.total_questions,
-            time_taken=session_data.time_taken,
-            difficulty_mode=session_data.difficulty_mode,
-            accuracy=session_data.accuracy,
-            is_mental_math=True,
-            attempted_questions=attempted_questions
-        )
+
+        # Determine tool, operation, mode from request fields
+        tool = determine_tool(session_data.difficulty_mode)
+        operation = normalize_operation(session_data.operation_type)
+        config_mode = determine_config_mode(session_data.difficulty_mode)
+
+        # Resolve preset_key
+        preset_key = session_data.preset_key or None
+        row_count = session_data.row_count
+
+        # For burst mode, normalise the preset_key format
+        if tool == "burst_mode" and preset_key:
+            preset_key = normalize_burst_preset_key(preset_key, operation)
+
+        # Validate session meets minimum thresholds
+        if tool == "burst_mode":
+            is_valid, _reason = session_validator.validate_burst_mode(attempted_questions)
+        else:
+            is_valid, _reason = session_validator.validate_mental_math(
+                operation, attempted_questions, row_count
+            )
+
+        if is_valid and config_mode != "custom":
+            # Resolve per-correct points from rule engine
+            per_correct, rule_id = point_rule_engine.resolve_points(
+                db, tool, operation, config_mode,
+                preset_key=preset_key,
+                row_count=row_count,
+            )
+            points_earned = per_correct * session_data.correct_answers
+        else:
+            per_correct = 0
+            rule_id = None
+            points_earned = 0
         
         # ── Create practice session ───────────────────────────────────────────
         session = PracticeSession(
@@ -380,6 +423,8 @@ async def save_practice_session(
             score=session_data.score,
             time_taken=session_data.time_taken,
             points_earned=points_earned,
+            preset_key=preset_key,
+            row_count=row_count,
             completed_at=datetime.utcnow().replace(tzinfo=timezone.utc)
         )
         db.add(session)
@@ -387,14 +432,17 @@ async def save_practice_session(
         
         # ── Save individual attempts ──────────────────────────────────────────
         for attempt_data in session_data.attempts:
+            is_correct = attempt_data.get("is_correct", False)
             attempt = Attempt(
                 session_id=session.id,
                 question_data=attempt_data.get("question_data", {}),
                 user_answer=attempt_data.get("user_answer"),
                 correct_answer=attempt_data.get("correct_answer"),
-                is_correct=attempt_data.get("is_correct", False),
+                is_correct=is_correct,
                 time_taken=attempt_data.get("time_taken", 0),
-                question_number=attempt_data.get("question_number", 0)
+                question_number=attempt_data.get("question_number", 0),
+                points_awarded=per_correct if is_correct else 0,
+                point_rule_id=rule_id,
             )
             db.add(attempt)
         
@@ -420,16 +468,20 @@ async def save_practice_session(
             db=db,
             user=current_user,
             points=points_earned,
-            source_type="mental_math",
+            source_type="mental_math" if tool == "mental_math" else "burst_mode",
             description=(
                 f"{session_data.operation_type.replace('_', ' ').title()} "
                 f"({session_data.difficulty_mode}): "
-                f"{session_data.correct_answers}/{attempted_questions} correct"
+                f"{session_data.correct_answers}/{attempted_questions} correct "
+                f"@ {per_correct}pts/correct"
             ),
             source_id=session.id,
             extra_data={
                 "operation_type":  session_data.operation_type,
                 "difficulty_mode": session_data.difficulty_mode,
+                "preset_key":      preset_key,
+                "per_correct":     per_correct,
+                "rule_id":         rule_id,
                 "correct_answers": session_data.correct_answers,
                 "wrong_answers":   session_data.wrong_answers,
                 "attempted_questions": attempted_questions,
@@ -439,6 +491,46 @@ async def save_practice_session(
                 "balance_after":    balance_after,
             }
         )
+
+        # ── Reward Events (streak, badge evaluation, burst bonus) ─────────────
+        reward_result = None
+        try:
+            from reward_engine import reward_engine
+
+            reward_result = reward_engine.record_session_completed(
+                db=db,
+                student_id=current_user.id,
+                source_tool=tool,
+                points_earned=points_earned,
+                correct_answers=session_data.correct_answers,
+                metadata={
+                    "config_mode": config_mode,
+                    "operation": operation,
+                    "preset_key": preset_key,
+                    "per_correct": per_correct,
+                    "rule_id": rule_id,
+                    "attempted_questions": attempted_questions,
+                    "total_questions": session_data.total_questions,
+                    "session_id": session.id,
+                },
+            )
+
+            # Burst mode completion bonus (+15)
+            if tool == "burst_mode":
+                burst_result = reward_engine.record_burst_completion(
+                    db=db,
+                    student_id=current_user.id,
+                    score=session_data.correct_answers,
+                    session_id=session.id,
+                )
+                # Merge badges from burst bonus
+                if burst_result.badges_unlocked:
+                    if reward_result:
+                        reward_result.badges_unlocked.extend(burst_result.badges_unlocked)
+        except Exception as _rwd_err:
+            import traceback
+            logger.warning("[REWARD] session reward failed: %s", _rwd_err)
+            logger.debug(traceback.format_exc())
         
         db.commit()
         db.refresh(session)
@@ -453,7 +545,19 @@ async def save_practice_session(
         elapsed = time.time() - request_start
         print(f"⏱ [PRACTICE_SESSION] POST /users/practice-session took {elapsed:.2f}s (fast path)")
         
-        return PracticeSessionResponse.model_validate(session)
+        response = PracticeSessionResponse.model_validate(session)
+
+        # Attach reward data to response if available (badges unlocked, streak update)
+        if reward_result and (reward_result.badges_unlocked or reward_result.streak_updated):
+            response_dict = response.model_dump()
+            response_dict["reward_data"] = {
+                "badges_unlocked": reward_result.badges_unlocked,
+                "streak_updated": reward_result.streak_updated,
+                "bonus_points": reward_result.points_awarded if reward_result.points_awarded != points_earned else 0,
+            }
+            return response_dict
+
+        return response
     except HTTPException:
         # Re-raise HTTP exceptions as-is
         raise

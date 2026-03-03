@@ -3,6 +3,7 @@ import { Zap, ArrowLeft, CheckCircle2, XCircle, Clock, Trophy, Flame, RotateCcw,
 import { Link } from "wouter";
 import { useAuth } from "../contexts/AuthContext";
 import { savePracticeSession, PracticeSessionData } from "../lib/userApi";
+import { usePointRules, buildPointsLookup } from "../hooks/usePointRules";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -73,11 +74,12 @@ const BURST_OPERATIONS: Record<BurstOperationType, BurstConfig> = {
     icon: "➗",
     gradient: "from-emerald-500 to-teal-500",
     options: [
-      { label: "2 / 1", value: "2/1" },
-      { label: "3 / 1", value: "3/1" },
-      { label: "4 / 1", value: "4/1" },
-      { label: "3 / 2", value: "3/2" },
-      { label: "4 / 2", value: "4/2" },
+      { label: "2 ÷ 1", value: "2/1" },
+      { label: "3 ÷ 1", value: "3/1" },
+      { label: "4 ÷ 1", value: "4/1" },
+      { label: "3 ÷ 2", value: "3/2" },
+      { label: "4 ÷ 2", value: "4/2" },
+      { label: "4 ÷ 3", value: "4/3" },
     ],
   },
   burst_decimal_multiplication: {
@@ -91,6 +93,7 @@ const BURST_OPERATIONS: Record<BurstOperationType, BurstConfig> = {
       { label: "2 × 1", value: "2x1" },
       { label: "3 × 1", value: "3x1" },
       { label: "2 × 2", value: "2x2" },
+      { label: "3 × 2", value: "3x2" },
     ],
   },
   burst_decimal_division: {
@@ -99,11 +102,12 @@ const BURST_OPERATIONS: Record<BurstOperationType, BurstConfig> = {
     icon: "📐",
     gradient: "from-rose-500 to-pink-500",
     options: [
-      { label: "2 / 1", value: "2/1" },
-      { label: "3 / 1", value: "3/1" },
-      { label: "4 / 1", value: "4/1" },
-      { label: "3 / 2", value: "3/2" },
-      { label: "4 / 2", value: "4/2" },
+      { label: "2 ÷ 1", value: "2/1" },
+      { label: "3 ÷ 1", value: "3/1" },
+      { label: "4 ÷ 1", value: "4/1" },
+      { label: "3 ÷ 2", value: "3/2" },
+      { label: "4 ÷ 2", value: "4/2" },
+      { label: "4 ÷ 3", value: "4/3" },
     ],
   },
   burst_lcm: {
@@ -170,6 +174,7 @@ const BURST_OPERATIONS: Record<BurstOperationType, BurstConfig> = {
       { label: "4-digit number", value: "4" },
       { label: "5-digit number", value: "5" },
       { label: "6-digit number", value: "6" },
+      { label: "7-digit number", value: "7" },
     ],
   },
 };
@@ -385,12 +390,64 @@ function compareAnswers(userAnswer: number, correctAnswer: number): boolean {
   return Math.abs(userAnswer - correctAnswer) < 0.01;
 }
 
+// ── Preset key normalisation for backend ─────────────────────────────────
+
+/** Convert BurstMode option values to the backend point_rules preset_key format. */
+function toBurstPresetKey(optionValue: string, opType: BurstOperationType): string {
+  // Division: "2/1" → "2d1"
+  if (optionValue.includes("/")) return optionValue.replace("/", "d");
+  // LCM/GCD: "2,1" → "2_1"
+  if (optionValue.includes(",")) return optionValue.replace(",", "_");
+  // Square root, cube root, percentage: bare digit → "4d"
+  if (
+    (opType === "burst_square_root" || opType === "burst_cube_root" || opType === "burst_percentage") &&
+    /^\d+$/.test(optionValue)
+  ) return `${optionValue}d`;
+  // Multiplication, decimal_multiply, tables: already "2x1" format
+  return optionValue;
+}
+
+/** Map burst operation type to engine operation name */
+function toBurstOperation(opType: BurstOperationType): string {
+  const MAP: Record<BurstOperationType, string> = {
+    burst_tables: "tables",
+    burst_multiplication: "multiply",
+    burst_division: "divide",
+    burst_decimal_multiplication: "decimal_multiply",
+    burst_decimal_division: "decimal_divide",
+    burst_lcm: "lcm",
+    burst_gcd: "gcd",
+    burst_square_root: "square_root",
+    burst_cube_root: "cube_root",
+    burst_percentage: "percentage",
+  };
+  return MAP[opType] || opType;
+}
+
 // ── Component ────────────────────────────────────────────────────────────────
 
 type Phase = "select" | "config" | "countdown" | "playing" | "results";
 
 export default function BurstMode() {
   const { refreshUser } = useAuth();
+
+  // Fetch point rules for burst mode (cached, public)
+  const { data: burstRules } = usePointRules("burst_mode");
+  const pointsLookup = burstRules ? buildPointsLookup(burstRules) : new Map<string, number>();
+
+  /** Look up points per correct answer for a given operation + option. */
+  const getPointsForOption = (opType: BurstOperationType, optionValue: string): number => {
+    const op = toBurstOperation(opType);
+    const pk = toBurstPresetKey(optionValue, opType);
+    return pointsLookup.get(`${op}:${pk}`) ?? 0;
+  };
+
+  /** Get the point range (min–max) across all options of an operation type. */
+  const getPointsRange = (opType: BurstOperationType): { min: number; max: number } => {
+    const config = BURST_OPERATIONS[opType];
+    const pts = config.options.map(o => getPointsForOption(opType, o.value));
+    return { min: Math.min(...pts), max: Math.max(...pts) };
+  };
 
   // Phase state
   const [phase, setPhase] = useState<Phase>("select");
@@ -409,6 +466,8 @@ export default function BurstMode() {
   const [sessionSaved, setSessionSaved] = useState(false);
   // useRef guard prevents React StrictMode double-invocation from saving twice
   const savingRef = useRef(false);
+  // Backend-synced points (overrides local estimate once save completes)
+  const [backendPoints, setBackendPoints] = useState<number | null>(null);
   const [exitConfirm, setExitConfirm] = useState(false);
 
   // Refs
@@ -493,6 +552,8 @@ export default function BurstMode() {
     setUserInput("");
     setFlashColor("");
     setSessionSaved(false);
+    savingRef.current = false;  // Reset save guard so new game can save
+    setBackendPoints(null);     // Reset backend-synced points
     setExitConfirm(false);
     recentTextsRef.current = [];
   };
@@ -626,11 +687,16 @@ export default function BurstMode() {
         accuracy: Math.round(accuracy * 100) / 100,
         score: correct,
         time_taken: totalTime,
-        points_earned: 0, // No points for burst mode
+        points_earned: 0, // Backend recalculates via PointRuleEngine
+        preset_key: selectedOption, // Raw option value — backend normalises
         attempts,
       };
 
-      await savePracticeSession(sessionData);
+      const savedSession = await savePracticeSession(sessionData);
+      // Sync points from backend — single source of truth
+      if (savedSession && savedSession.points_earned != null) {
+        setBackendPoints(savedSession.points_earned);
+      }
       setSessionSaved(true);
       if (refreshUser) await refreshUser();
     } catch (err) {
@@ -673,6 +739,8 @@ export default function BurstMode() {
     setFlashColor("");
     setCurrentQuestion(null);
     setSessionSaved(false);
+    savingRef.current = false;  // Reset save guard
+    setBackendPoints(null);     // Reset backend-synced points
     setExitConfirm(false);
     if (timerRef.current) clearInterval(timerRef.current);
   };
@@ -730,7 +798,12 @@ export default function BurstMode() {
           {/* Mode cards grid */}
           <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 16px", display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 14 }}>
             {(Object.entries(BURST_OPERATIONS) as [BurstOperationType, BurstConfig][]).map(
-              ([key, config], index) => (
+              ([key, config], index) => {
+                const range = getPointsRange(key);
+                const badgeText = range.min === range.max
+                  ? (range.min === 0 ? "" : `+${range.min}`)
+                  : `+${range.min}–${range.max}`;
+                return (
                 <button
                   key={key}
                   onClick={() => handleSelectOperation(key)}
@@ -744,13 +817,24 @@ export default function BurstMode() {
                   }}
                 >
                   <div className="bm-card-accent" style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, var(--bm-burst), transparent)", opacity: 0, transition: "opacity .3s ease" }} />
+                  {/* Points badge */}
+                  {badgeText && (
+                    <div style={{
+                      position: "absolute", top: 10, right: 10,
+                      background: "rgba(16,185,129,.12)", border: "1px solid rgba(16,185,129,.25)",
+                      borderRadius: 8, padding: "3px 8px",
+                      fontFamily: "var(--bm-fm)", fontSize: 10, fontWeight: 700,
+                      color: "var(--bm-green)", letterSpacing: ".02em"
+                    }}>{badgeText}</div>
+                  )}
                   <div className="bm-card-icon" style={{ width: 52, height: 52, borderRadius: 16, margin: "0 auto 16px", background: "var(--bm-surf2)", border: "1px solid var(--bm-bdr)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, transition: "all .3s ease" }}>
                     {config.icon}
                   </div>
                   <div style={{ fontFamily: "var(--bm-fd)", fontSize: 16, fontWeight: 700, color: "var(--bm-white)", marginBottom: 6, lineHeight: 1.2 }}>{config.label}</div>
                   <div style={{ fontFamily: "var(--bm-fb)", fontSize: 12, fontWeight: 300, color: "var(--bm-muted)", lineHeight: 1.5 }}>{config.description}</div>
                 </button>
-              )
+                );
+              }
             )}
           </div>
 
@@ -801,15 +885,27 @@ export default function BurstMode() {
           <div style={{ padding: "0 24px 8px" }}>
             <div style={{ fontFamily: "var(--bm-fm)", fontSize: 10, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: "var(--bm-muted)", marginBottom: 12 }}>Choose Difficulty</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-              {config.options.map((opt) => (
+              {config.options.map((opt) => {
+                const pts = getPointsForOption(selectedOp, opt.value);
+                return (
                 <button
                   key={opt.value}
                   onClick={() => setSelectedOption(opt.value)}
                   className={`bm-diff-btn${selectedOption === opt.value ? " selected" : ""}`}
+                  style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
                 >
                   {opt.label}
+                  {pts > 0 && (
+                    <span style={{
+                      background: "rgba(16,185,129,.12)", border: "1px solid rgba(16,185,129,.2)",
+                      borderRadius: 6, padding: "1px 6px",
+                      fontFamily: "var(--bm-fm)", fontSize: 10, fontWeight: 700,
+                      color: "var(--bm-green)", letterSpacing: ".02em"
+                    }}>+{pts}</span>
+                  )}
                 </button>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -1026,6 +1122,10 @@ export default function BurstMode() {
       }
       return max;
     })();
+    // Calculate points earned for display — use backend value when available
+    const perCorrectPts = selectedOp ? getPointsForOption(selectedOp, selectedOption) : 0;
+    const localPtsEstimate = perCorrectPts * correctCount;
+    const totalPtsEarned = backendPoints != null ? backendPoints : localPtsEstimate;
 
     return (
       <div style={{ minHeight: "100vh", background: "var(--bm-bg)", position: "relative" }}>
@@ -1047,12 +1147,13 @@ export default function BurstMode() {
           </div>
 
           {/* Primary stats grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10, marginBottom: 14 }}>
             {[
               { value: results.length, label: "Attempted", bg: "rgba(123,92,229,.08)", border: "rgba(123,92,229,.2)", color: "var(--bm-white)", delay: 0 },
               { value: correctCount, label: "Correct", bg: "rgba(16,185,129,.08)", border: "rgba(16,185,129,.2)", color: "var(--bm-green)", delay: 0.07 },
               { value: wrongCount, label: "Wrong", bg: "rgba(239,68,68,.08)", border: "rgba(239,68,68,.2)", color: "var(--bm-red)", delay: 0.14 },
               { value: `${accuracy}%`, label: "Accuracy", bg: "rgba(249,115,22,.08)", border: "rgba(249,115,22,.22)", color: "var(--bm-burst2)", delay: 0.21 },
+              { value: `+${totalPtsEarned}`, label: "Points", bg: "rgba(245,158,11,.08)", border: "rgba(245,158,11,.22)", color: "var(--bm-gold)", delay: 0.28 },
             ].map(({ value, label, bg, border, color, delay }) => (
               <div key={label} className="bm-count-up" style={{ borderRadius: 18, padding: "22px 12px", textAlign: "center", background: bg, border: `1px solid ${border}`, animationDelay: `${delay}s` }}>
                 <div style={{ fontFamily: "var(--bm-fm)", fontSize: "clamp(26px,3vw,36px)", fontWeight: 800, color }}>{value}</div>

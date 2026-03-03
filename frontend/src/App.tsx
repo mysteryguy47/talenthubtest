@@ -29,6 +29,9 @@ import GridMaster from "./pages/GridMaster";
 import SorobanAbacus from "./pages/SorobanAbacus";
 import Pricing from "./pages/Pricing";
 import AdminAccessControl from "./pages/AdminAccessControl";
+import StudentRewards from "./pages/StudentRewards";
+import AdminRewards from "./pages/AdminRewards";
+import BadgeUnlockCinematic from "./components/rewards/BadgeUnlockCinematic";
 import { ReactNode } from "react";
 import { useScrollRestoration } from "./hooks/useScrollRestoration";
 import { useInactivityDetection } from "./hooks/useInactivityDetection";
@@ -172,6 +175,11 @@ function AppContent() {
                   <StudentAttendance />
                 </ProtectedRoute>
               </Route>
+              <Route path="/rewards">
+                <ProtectedRoute>
+                  <StudentRewardsWithUser />
+                </ProtectedRoute>
+              </Route>
               <Route path="/courses/abacus" component={AbacusCourse} />
               <Route path="/courses/vedic-maths" component={VedicMathsCourse} />
               <Route path="/courses/handwriting" component={HandwritingCourse} />
@@ -184,14 +192,26 @@ function AppContent() {
                   <AdminAccessControl />
                 </AdminRoute>
               </Route>
+              <Route path="/admin/rewards">
+                <AdminRoute>
+                  <AdminRewards />
+                </AdminRoute>
+              </Route>
               <Route component={NotFound} />
             </Switch>
           </ErrorBoundary>
         </main>
         <Footer />
       </div>
+      <BadgeUnlockCinematic />
     </ErrorBoundary>
   );
+}
+
+/** Wrapper that passes currentUserId to StudentRewards */
+function StudentRewardsWithUser() {
+  const { user } = useAuth();
+  return <StudentRewards currentUserId={user?.id} />;
 }
 
 function App() {

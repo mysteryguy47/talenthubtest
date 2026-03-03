@@ -1,10 +1,114 @@
-import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, CheckCircle2, XCircle, Clock, Trophy, X, Sparkles, Play, Zap, Target, Flame, Loader2, RotateCcw, Square } from "lucide-react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { ArrowLeft, CheckCircle2, XCircle, Clock, Trophy, X, Sparkles, Play, Zap, Target, Flame, Loader2, RotateCcw, Square, Star, AlertTriangle } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "../contexts/AuthContext";
 import { savePracticeSession, PracticeSessionData } from "../lib/userApi";
+import { usePointRules, buildPointsLookup } from "../hooks/usePointRules";
 import TimeLimitSlider from "../components/TimeLimitSlider";
 import ErrorBoundary from "../components/ErrorBoundary";
+
+// ────────────────────────────────────────────────
+// Preset definitions – each entry maps to a seed rule
+// ────────────────────────────────────────────────
+
+interface PresetOption {
+  label: string;
+  presetKey: string;          // matches seed rule preset_key
+  points: number;             // display hint (overridden by API at runtime)
+  /** Setter callback receives (state setters) to auto-configure digit fields */
+  apply: (s: Record<string, (v: number) => void>) => void;
+}
+
+const MENTAL_PRESETS: Record<string, PresetOption[]> = {
+  multiplication: [
+    { label: "2 × 1", presetKey: "2x1", points: 3, apply: s => { s.setA(2); s.setB(1); } },
+    { label: "3 × 1", presetKey: "3x1", points: 3, apply: s => { s.setA(3); s.setB(1); } },
+    { label: "4 × 1", presetKey: "4x1", points: 5, apply: s => { s.setA(4); s.setB(1); } },
+    { label: "2 × 2", presetKey: "2x2", points: 5, apply: s => { s.setA(2); s.setB(2); } },
+    { label: "3 × 2", presetKey: "3x2", points: 8, apply: s => { s.setA(3); s.setB(2); } },
+    { label: "4 × 2", presetKey: "4x2", points: 8, apply: s => { s.setA(4); s.setB(2); } },
+  ],
+  division: [
+    { label: "2 ÷ 1", presetKey: "2d1", points: 3, apply: s => { s.setA(2); s.setB(1); } },
+    { label: "3 ÷ 1", presetKey: "3d1", points: 3, apply: s => { s.setA(3); s.setB(1); } },
+    { label: "4 ÷ 1", presetKey: "4d1", points: 5, apply: s => { s.setA(4); s.setB(1); } },
+    { label: "3 ÷ 2", presetKey: "3d2", points: 5, apply: s => { s.setA(3); s.setB(2); } },
+    { label: "4 ÷ 2", presetKey: "4d2", points: 8, apply: s => { s.setA(4); s.setB(2); } },
+    { label: "4 ÷ 3", presetKey: "4d3", points: 8, apply: s => { s.setA(4); s.setB(3); } },
+  ],
+  decimal_multiplication: [
+    { label: "1 × 0", presetKey: "1x0", points: 3, apply: s => { s.setA(1); s.setB(0); } },
+    { label: "1 × 1", presetKey: "1x1", points: 3, apply: s => { s.setA(1); s.setB(1); } },
+    { label: "2 × 1", presetKey: "2x1", points: 5, apply: s => { s.setA(2); s.setB(1); } },
+    { label: "3 × 1", presetKey: "3x1", points: 5, apply: s => { s.setA(3); s.setB(1); } },
+    { label: "2 × 2", presetKey: "2x2", points: 8, apply: s => { s.setA(2); s.setB(2); } },
+    { label: "3 × 2", presetKey: "3x2", points: 8, apply: s => { s.setA(3); s.setB(2); } },
+  ],
+  decimal_division: [
+    { label: "2 ÷ 1", presetKey: "2d1", points: 3, apply: s => { s.setA(2); s.setB(1); } },
+    { label: "3 ÷ 1", presetKey: "3d1", points: 3, apply: s => { s.setA(3); s.setB(1); } },
+    { label: "4 ÷ 1", presetKey: "4d1", points: 5, apply: s => { s.setA(4); s.setB(1); } },
+    { label: "3 ÷ 2", presetKey: "3d2", points: 5, apply: s => { s.setA(3); s.setB(2); } },
+    { label: "4 ÷ 2", presetKey: "4d2", points: 8, apply: s => { s.setA(4); s.setB(2); } },
+    { label: "4 ÷ 3", presetKey: "4d3", points: 8, apply: s => { s.setA(4); s.setB(3); } },
+  ],
+  lcm: [
+    { label: "(1, 1)", presetKey: "1_1", points: 3, apply: s => { s.setA(1); s.setB(1); } },
+    { label: "(2, 1)", presetKey: "2_1", points: 3, apply: s => { s.setA(2); s.setB(1); } },
+    { label: "(2, 2)", presetKey: "2_2", points: 5, apply: s => { s.setA(2); s.setB(2); } },
+    { label: "(3, 2)", presetKey: "3_2", points: 5, apply: s => { s.setA(3); s.setB(2); } },
+  ],
+  gcd: [
+    { label: "(1, 1)", presetKey: "1_1", points: 3, apply: s => { s.setA(1); s.setB(1); } },
+    { label: "(2, 1)", presetKey: "2_1", points: 3, apply: s => { s.setA(2); s.setB(1); } },
+    { label: "(2, 2)", presetKey: "2_2", points: 5, apply: s => { s.setA(2); s.setB(2); } },
+    { label: "(3, 2)", presetKey: "3_2", points: 5, apply: s => { s.setA(3); s.setB(2); } },
+  ],
+  square_root: [
+    { label: "2 Digit", presetKey: "2d", points: 3, apply: s => { s.setA(2); } },
+    { label: "3 Digit", presetKey: "3d", points: 3, apply: s => { s.setA(3); } },
+    { label: "4 Digit", presetKey: "4d", points: 5, apply: s => { s.setA(4); } },
+    { label: "5 Digit", presetKey: "5d", points: 5, apply: s => { s.setA(5); } },
+    { label: "6 Digit", presetKey: "6d", points: 8, apply: s => { s.setA(6); } },
+    { label: "7 Digit", presetKey: "7d", points: 8, apply: s => { s.setA(7); } },
+    { label: "8 Digit", presetKey: "8d", points: 8, apply: s => { s.setA(8); } },
+  ],
+  cube_root: [
+    { label: "3 Digit", presetKey: "3d", points: 3, apply: s => { s.setA(3); } },
+    { label: "4 Digit", presetKey: "4d", points: 3, apply: s => { s.setA(4); } },
+    { label: "5 Digit", presetKey: "5d", points: 5, apply: s => { s.setA(5); } },
+    { label: "6 Digit", presetKey: "6d", points: 5, apply: s => { s.setA(6); } },
+    { label: "7 Digit", presetKey: "7d", points: 8, apply: s => { s.setA(7); } },
+    { label: "8 Digit", presetKey: "8d", points: 8, apply: s => { s.setA(8); } },
+  ],
+  percentage: [
+    { label: "2-Digit", presetKey: "2d", points: 3, apply: s => { s.setA(2); } },
+    { label: "3-Digit", presetKey: "3d", points: 3, apply: s => { s.setA(3); } },
+    { label: "4-Digit", presetKey: "4d", points: 5, apply: s => { s.setA(4); } },
+    { label: "5-Digit", presetKey: "5d", points: 5, apply: s => { s.setA(5); } },
+    { label: "6-Digit", presetKey: "6d", points: 8, apply: s => { s.setA(6); } },
+    { label: "7-Digit", presetKey: "7d", points: 8, apply: s => { s.setA(7); } },
+  ],
+  add_sub: [
+    { label: "3–5 Rows", presetKey: "rows_3_5", points: 3, apply: s => { s.setA(3); } },
+    { label: "6–9 Rows", presetKey: "rows_6_9", points: 5, apply: s => { s.setA(6); } },
+    { label: "10+ Rows", presetKey: "rows_10_up", points: 8, apply: s => { s.setA(10); } },
+  ],
+  integer_add_sub: [
+    { label: "3–5 Rows", presetKey: "rows_3_5", points: 3, apply: s => { s.setA(3); } },
+    { label: "6–9 Rows", presetKey: "rows_6_9", points: 5, apply: s => { s.setA(6); } },
+    { label: "10+ Rows", presetKey: "rows_10_up", points: 8, apply: s => { s.setA(10); } },
+  ],
+};
+
+/** Map frontend operation name → backend engine operation name */
+const _OP_MAP_FE: Record<string, string> = {
+  multiplication: "multiply",
+  division: "divide",
+  decimal_multiplication: "decimal_multiply",
+  decimal_division: "decimal_divide",
+};
+function toEngineOp(op: string) { return _OP_MAP_FE[op] || op; }
 
 type OperationType = 
   | "multiplication" 
@@ -387,6 +491,89 @@ export default function Mental() {
   // Mode selection
   type DifficultyMode = "custom" | "easy" | "medium" | "hard";
   const [difficultyMode, setDifficultyMode] = useState<DifficultyMode>("custom");
+
+  // Standard / Custom config mode for point system
+  type ConfigMode = "standard" | "custom";
+  const [configMode, setConfigMode] = useState<ConfigMode>("standard");
+  const [selectedPresetKey, setSelectedPresetKey] = useState<string>("");
+
+  // Point rules from API
+  const { data: mmRules = [] } = usePointRules("mental_math");
+  const pointsLookup = useMemo(() => buildPointsLookup(mmRules), [mmRules]);
+
+  /** Resolve the live points value for a given preset key and engine operation */
+  const getPresetPoints = (engineOp: string, pk: string): number => {
+    return pointsLookup.get(`${engineOp}:${pk}`) ?? 0;
+  };
+
+  /** Auto-select the first preset when switching to standard mode or changing operation */
+  useEffect(() => {
+    if (configMode === "standard") {
+      const presets = MENTAL_PRESETS[operationType];
+      if (presets && presets.length > 0) {
+        const first = presets[0];
+        setSelectedPresetKey(first.presetKey);
+        // Apply digit setters for the first preset
+        applyPreset(first);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [configMode, operationType]);
+
+  /** Digit setter map — used by PresetOption.apply */
+  const presetSetters = (): Record<string, (v: number) => void> => {
+    const op = operationType;
+    if (op === "multiplication") return { setA: setMultiplicandDigits, setB: setMultiplierDigits };
+    if (op === "division") return { setA: setDividendDigits, setB: setDivisorDigits };
+    if (op === "decimal_multiplication") return { setA: setDecimalMultMultiplicandDigits, setB: setDecimalMultMultiplierDigits };
+    if (op === "decimal_division") return { setA: setDecimalDivDividendDigits, setB: setDecimalDivDivisorDigits };
+    if (op === "lcm" || op === "gcd") return { setA: setLcmGcdFirstDigits, setB: setLcmGcdSecondDigits };
+    if (op === "square_root" || op === "cube_root") return { setA: setRootDigits };
+    if (op === "percentage") return { setA: setPercentageNumberDigits };
+    if (op === "add_sub") return { setA: setAddSubRows };
+    if (op === "integer_add_sub") return { setA: setIntegerAddSubRows };
+    return {};
+  };
+
+  const applyPreset = (preset: PresetOption) => {
+    preset.apply(presetSetters());
+  };
+
+  /** Derive preset_key from current digit config (for save — same as backend derive_preset_key_from_digits) */
+  const derivePresetKey = (): string => {
+    const op = toEngineOp(operationType);
+    if (op === "multiply" || op === "decimal_multiply") {
+      const a = op === "multiply" ? multiplicandDigits : decimalMultMultiplicandDigits;
+      const b = op === "multiply" ? multiplierDigits : decimalMultMultiplierDigits;
+      return `${a}x${b}`;
+    }
+    if (op === "divide" || op === "decimal_divide") {
+      const a = op === "divide" ? dividendDigits : decimalDivDividendDigits;
+      const b = op === "divide" ? divisorDigits : decimalDivDivisorDigits;
+      return `${a}d${b}`;
+    }
+    if (op === "lcm" || op === "gcd") return `${lcmGcdFirstDigits}_${lcmGcdSecondDigits}`;
+    if (op === "square_root" || op === "cube_root") return `${rootDigits}d`;
+    if (op === "percentage") return `${percentageNumberDigits}d`;
+    if (op === "tables") return "1x1";
+    return "";
+  };
+
+  /** Current points preview (shown on the start button) */
+  const currentPointsPreview = useMemo(() => {
+    if (configMode === "custom") return 0;
+    const engineOp = toEngineOp(operationType);
+    // For add_sub / integer_add_sub, points depend on row count
+    if (operationType === "add_sub" || operationType === "integer_add_sub") {
+      const rows = operationType === "add_sub" ? addSubRows : integerAddSubRows;
+      if (rows <= 5) return getPresetPoints(engineOp, "rows_3_5");
+      if (rows <= 9) return getPresetPoints(engineOp, "rows_6_9");
+      return getPresetPoints(engineOp, "rows_10_up");
+    }
+    const pk = selectedPresetKey || derivePresetKey();
+    return getPresetPoints(engineOp, pk);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [configMode, operationType, selectedPresetKey, pointsLookup, addSubRows, integerAddSubRows, multiplicandDigits, multiplierDigits, dividendDigits, divisorDigits, decimalMultMultiplicandDigits, decimalMultMultiplierDigits, decimalDivDividendDigits, decimalDivDivisorDigits, lcmGcdFirstDigits, lcmGcdSecondDigits, rootDigits, percentageNumberDigits]);
   
   const [isStarted, setIsStarted] = useState(false);
   const [countdown, setCountdown] = useState(0);
@@ -1483,23 +1670,44 @@ export default function Mental() {
         
         console.log("🟢 [PRACTICE] Prepared attempts:", attempts.length);
         
-        // Calculate points: +1 per attempted, +10 per correct
-        const attemptedQuestions = finalResults.length; // All results are attempted
-        const estimatedPoints = (attemptedQuestions * 1) + (correctAnswers * 10);
+        // Calculate points using new point rule engine
+        const perCorrect = currentPointsPreview; // points per correct answer from rule engine
+        // Mental math requires ≥10 attempted questions to earn points (matches backend)
+        const meetsMinimum = finalResults.length >= 10;
+        const estimatedPoints = (meetsMinimum && configMode === "standard") ? (perCorrect * correctAnswers) : 0;
         
         // Set points immediately so they show even if save fails
         setPointsEarned(estimatedPoints);
-        
+
+        // Determine row_count for add_sub family
+        const effectiveRowCount = (operationType === "add_sub") ? addSubRows
+          : (operationType === "integer_add_sub") ? integerAddSubRows
+          : undefined;
+
+        // Determine the preset_key to send
+        const effectivePresetKey = configMode === "standard"
+          ? (selectedPresetKey || derivePresetKey())
+          : undefined; // custom → backend resolves to 0 pts
+
+        // When configMode is "standard", ensure difficulty_mode is never "custom"
+        // (because backend maps "custom" → config_mode "custom" → 0 points).
+        // When configMode is "custom", always send "custom".
+        const effectiveDifficultyMode = configMode === "custom"
+          ? "custom"
+          : (difficultyMode === "custom" ? "standard" : difficultyMode);
+
         const sessionData: PracticeSessionData = {
           operation_type: operationType,
-          difficulty_mode: difficultyMode,
+          difficulty_mode: effectiveDifficultyMode,
           total_questions: numQuestions, // Total questions generated, including unanswered
           correct_answers: correctAnswers,
           wrong_answers: wrongAnswers,
           accuracy: accuracy,
-          score: score,
+          score: correctAnswers,  // Use computed correctAnswers — React state 'score' can be stale
           time_taken: totalTime,
           points_earned: estimatedPoints,
+          preset_key: effectivePresetKey,
+          row_count: effectiveRowCount,
           attempts: attempts
         };
         
@@ -1507,8 +1715,8 @@ export default function Mental() {
         try {
           const savedSession = await savePracticeSession(sessionData);
           console.log("✅ [PRACTICE] Session saved successfully!", savedSession);
-          // Update with actual points from backend if different
-          if (savedSession.points_earned) {
+          // Always sync points with what the backend actually stored
+          if (savedSession.points_earned != null) {
             setPointsEarned(savedSession.points_earned);
           }
           setSessionSaved(true);
@@ -1822,7 +2030,9 @@ export default function Mental() {
   }
 
   if (isGameOver) {
-    const percentage = (score / numQuestions) * 100;
+    // Use results array as source of truth — score state can be stale
+    const actualCorrect = results.filter(r => r.isCorrect).length;
+    const percentage = (actualCorrect / numQuestions) * 100;
     const getPerformanceMessage = () => {
       if (percentage === 100) return "Perfect! 🌟";
       if (percentage >= 80) return "Excellent! 🎉";
@@ -1866,7 +2076,7 @@ export default function Mental() {
               {/* Stats grid */}
               <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:10,marginBottom:24}}>
                 {[
-                  {label:"CORRECT",value:score,color:"var(--mm-grn)",bg:"rgba(16,185,129,.08)",bdr:"rgba(16,185,129,.2)",delay:".05s"},
+                  {label:"CORRECT",value:actualCorrect,color:"var(--mm-grn)",bg:"rgba(16,185,129,.08)",bdr:"rgba(16,185,129,.2)",delay:".05s"},
                   {label:"WRONG",value:results.filter(r=>!r.isCorrect).length,color:"var(--mm-red)",bg:"rgba(239,68,68,.08)",bdr:"rgba(239,68,68,.2)",delay:".1s"},
                   {label:"MISSED",value:numQuestions-results.length,color:"var(--mm-gld)",bg:"rgba(245,158,11,.08)",bdr:"rgba(245,158,11,.2)",delay:".15s"},
                   {label:"ACCURACY",value:`${percentage.toFixed(1)}%`,color:"var(--mm-pur2)",bg:"rgba(123,92,229,.08)",bdr:"rgba(123,92,229,.2)",delay:".2s"},
@@ -1897,7 +2107,7 @@ export default function Mental() {
                 <div style={{background:"var(--mm-bdr)"}} />
                 <div style={{padding:"18px 20px",textAlign:"center"}}>
                   <div style={{fontFamily:"var(--mm-fb)",fontSize:11,fontWeight:600,letterSpacing:".1em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:6}}>Score</div>
-                  <div style={{fontFamily:"var(--mm-fm)",fontSize:22,fontWeight:700,color:"var(--mm-whi)"}}>{score} / {numQuestions}</div>
+                  <div style={{fontFamily:"var(--mm-fm)",fontSize:22,fontWeight:700,color:"var(--mm-whi)"}}>{actualCorrect} / {numQuestions}</div>
                 </div>
               </div>
 
@@ -2485,6 +2695,36 @@ export default function Mental() {
               </select>
             </div>
 
+            {/* Standard / Custom Toggle */}
+            <div>
+              <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Config Mode</label>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:0,background:"var(--mm-surf2)",borderRadius:12,padding:3,border:"1.5px solid var(--mm-bdr2)"}}>
+                {(["standard","custom"] as ConfigMode[]).map(m => (
+                  <button key={m} onClick={() => setConfigMode(m)} style={{
+                    padding:"10px 0",
+                    borderRadius:10,
+                    border:"none",
+                    fontFamily:"var(--mm-fm)",
+                    fontSize:13,
+                    fontWeight:700,
+                    cursor:"pointer",
+                    transition:"all .2s",
+                    background: configMode===m ? "var(--mm-pur)" : "transparent",
+                    color: configMode===m ? "#fff" : "var(--mm-muted)",
+                    boxShadow: configMode===m ? "0 2px 8px rgba(123,92,229,.35)" : "none",
+                  }}>
+                    {m === "standard" ? "Standard" : "Custom"}
+                  </button>
+                ))}
+              </div>
+              {configMode === "custom" && (
+                <p style={{marginTop:8,fontFamily:"var(--mm-fb)",fontSize:11,color:"var(--mm-red)",display:"flex",alignItems:"center",gap:4}}>
+                  <XCircle style={{width:12,height:12,flexShrink:0}} />
+                  Custom config earns 0 points
+                </p>
+              )}
+            </div>
+
             {/* Number of Questions */}
                 <div>
                   <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Number of Questions <span style={{fontWeight:400,opacity:.6}}>(1–50)</span></label>
@@ -2496,11 +2736,104 @@ export default function Mental() {
                     className="mm-form-input"
                     style={{width:"100%",padding:"12px 16px",background:"var(--mm-surf2)",border:"1.5px solid var(--mm-bdr2)",borderRadius:12,fontFamily:"var(--mm-fm)",fontSize:14,fontWeight:600,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box" as const}}
               />
+                  {configMode === "standard" && numQuestions < 10 && (
+                    <div style={{marginTop:8,padding:"8px 12px",background:"rgba(245,158,11,.08)",border:"1px solid rgba(245,158,11,.18)",borderRadius:10,display:"flex",alignItems:"center",gap:8}}>
+                      <AlertTriangle style={{width:13,height:13,color:"#F59E0B",flexShrink:0}} />
+                      <span style={{fontFamily:"var(--mm-fb)",fontSize:11,fontWeight:500,color:"#F59E0B",lineHeight:1.4}}>Minimum 10 questions required to earn points</span>
+                    </div>
+                  )}
                 </div>
           </div>
 
           {/* Right Column */}
           <div className="mm-fade-up" style={{background:"var(--mm-surf)",border:"1px solid var(--mm-bdr)",borderRadius:20,padding:28,display:"flex",flexDirection:"column",gap:20,animationDelay:".2s"}}>
+
+            {/* ── STANDARD MODE: Preset Grid ── */}
+            {configMode === "standard" && (() => {
+              const presets = MENTAL_PRESETS[operationType] || [];
+              const engineOp = toEngineOp(operationType);
+              return (
+                <>
+                  <div>
+                    <label style={{display:"flex",alignItems:"center",gap:6,fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:10}}>
+                      <Star style={{width:12,height:12,color:"#F59E0B"}} />
+                      Select Difficulty Preset
+                    </label>
+                    <div style={{display:"grid",gridTemplateColumns: presets.length <= 4 ? "1fr 1fr" : "1fr 1fr 1fr",gap:10}}>
+                      {presets.map(p => {
+                        const active = selectedPresetKey === p.presetKey;
+                        const pts = getPresetPoints(engineOp, p.presetKey) || p.points;
+                        return (
+                          <button
+                            key={p.presetKey}
+                            onClick={() => {
+                              setSelectedPresetKey(p.presetKey);
+                              applyPreset(p);
+                            }}
+                            style={{
+                              position:"relative",
+                              padding:"16px 10px 14px",
+                              borderRadius:14,
+                              border: active ? "2px solid var(--mm-pur2)" : "1.5px solid var(--mm-bdr2)",
+                              background: active ? "rgba(123,92,229,.15)" : "var(--mm-surf2)",
+                              cursor:"pointer",
+                              transition:"all .2s",
+                              textAlign:"center",
+                              boxShadow: active ? "0 0 16px rgba(123,92,229,.25)" : "none",
+                            }}
+                          >
+                            <div style={{fontFamily:"var(--mm-fd)",fontSize:16,fontWeight:800,color: active ? "var(--mm-pur2)" : "var(--mm-whi)",letterSpacing:"-.01em"}}>{p.label}</div>
+                            <div style={{
+                              position:"absolute",top:6,right:8,
+                              padding:"2px 7px",borderRadius:8,
+                              fontSize:10,fontWeight:700,fontFamily:"var(--mm-fm)",
+                              background: pts >= 8 ? "rgba(245,158,11,.18)" : pts >= 5 ? "rgba(16,185,129,.18)" : "rgba(123,92,229,.18)",
+                              color: pts >= 8 ? "#F59E0B" : pts >= 5 ? "#10B981" : "var(--mm-pur2)",
+                            }}>
+                              +{pts}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Points Preview Card */}
+                  <div style={{
+                    background:"linear-gradient(135deg, rgba(245,158,11,.08), rgba(245,158,11,.03))",
+                    border:"1px solid rgba(245,158,11,.2)",
+                    borderRadius:14,
+                    padding:"14px 18px",
+                    display:"flex",
+                    alignItems:"center",
+                    gap:10,
+                  }}>
+                    <div style={{width:36,height:36,borderRadius:10,background:"rgba(245,158,11,.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                      <Zap style={{width:18,height:18,color:"#F59E0B"}} />
+                    </div>
+                    <div>
+                      <div style={{fontFamily:"var(--mm-fm)",fontSize:11,fontWeight:600,color:"rgba(245,158,11,.7)",letterSpacing:".05em",textTransform:"uppercase"}}>Points per correct</div>
+                      <div style={{fontFamily:"var(--mm-fd)",fontSize:22,fontWeight:800,color:"#F59E0B",letterSpacing:"-.02em"}}>+{currentPointsPreview}</div>
+                    </div>
+                  </div>
+
+                  {/* Time Limit Slider (always shown in standard mode) */}
+                  <div style={{background:"var(--mm-surf2)",border:"1px solid var(--mm-bdr)",borderRadius:16,padding:20}}>
+                    <TimeLimitSlider
+                      value={operationType === "add_sub" || operationType === "integer_add_sub" ? addSubRowTime : timeLimit}
+                      onChange={operationType === "add_sub" || operationType === "integer_add_sub" ? setAddSubRowTime : setTimeLimit}
+                      operationType={operationType}
+                      difficultyMode={difficultyMode}
+                      onDifficultyChange={setDifficultyMode}
+                    />
+                  </div>
+                </>
+              );
+            })()}
+
+            {/* ── CUSTOM MODE: Free-form inputs ── */}
+            {configMode === "custom" && (
+              <>
 
             {/* Multiplication/Division specific inputs */}
             {(operationType === "multiplication" || operationType === "division") && (
@@ -2829,6 +3162,8 @@ export default function Mental() {
                     </div>
               </>
             )}
+            </>
+            )}
           </div>
         </div>
 
@@ -2843,6 +3178,9 @@ export default function Mental() {
             <Play style={{width:20,height:20}} />
             Start Practice
             <span style={{fontFamily:"var(--mm-fm)",fontSize:12,fontWeight:400,opacity:.55,marginLeft:4}}>{numQuestions} questions · {operationType==="add_sub"||operationType==="integer_add_sub" ? `${addSubRowTime.toFixed(1)}s/row` : `${timeLimit}s each`}</span>
+            {currentPointsPreview > 0 && (
+              <span style={{marginLeft:6,padding:"2px 8px",borderRadius:8,fontSize:11,fontWeight:700,fontFamily:"var(--mm-fm)",background:"rgba(245,158,11,.2)",color:"#F59E0B"}}>+{currentPointsPreview}/correct</span>
+            )}
           </button>
         </div>
       </div>

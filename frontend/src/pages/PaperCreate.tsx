@@ -4387,13 +4387,27 @@ export default function PaperCreate() {
             })()}
 
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,paddingTop:24,borderTop:'1px solid rgba(255,255,255,0.08)',marginTop:24}}>
-              <button
-                onClick={handleAttemptPaper}
-                style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10,padding:'14px 24px',background:'linear-gradient(135deg,#EF4444,#DC2626)',border:'none',borderRadius:12,color:'white',fontWeight:700,fontFamily:'DM Sans, sans-serif',fontSize:14,cursor:'pointer',boxShadow:'0 4px 20px rgba(239,68,68,0.35)',transition:'all 0.2s'}}
-              >
-                <Play style={{width:18,height:18}} />
-                Attempt Paper
-              </button>
+              {(() => {
+                const totalQ = blocks.reduce((s, b) => s + b.count, 0);
+                const tooFew = totalQ < 30;
+                return (
+                  <div style={{display:'flex',flexDirection:'column',gap:6}}>
+                    <button
+                      onClick={handleAttemptPaper}
+                      disabled={tooFew}
+                      style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10,padding:'14px 24px',background: tooFew ? 'rgba(239,68,68,.25)' : 'linear-gradient(135deg,#EF4444,#DC2626)',border:'none',borderRadius:12,color:'white',fontWeight:700,fontFamily:'DM Sans, sans-serif',fontSize:14,cursor: tooFew ? 'not-allowed' : 'pointer',boxShadow: tooFew ? 'none' : '0 4px 20px rgba(239,68,68,0.35)',transition:'all 0.2s',opacity: tooFew ? 0.55 : 1}}
+                    >
+                      <Play style={{width:18,height:18}} />
+                      Attempt Paper
+                    </button>
+                    {tooFew && (
+                      <p style={{margin:0,fontSize:11,fontFamily:'DM Sans, sans-serif',color:'#F87171',textAlign:'center'}}>
+                        Minimum 30 questions required ({totalQ} added)
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
 
               <button
                 onClick={() => setDownloadDropdownOpen(!downloadDropdownOpen)}

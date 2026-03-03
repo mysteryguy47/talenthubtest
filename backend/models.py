@@ -50,7 +50,6 @@ class User(Base):
     # Relationships
     practice_sessions = relationship("PracticeSession", back_populates="user", cascade="all, delete-orphan")
     paper_attempts = relationship("PaperAttempt", back_populates="user", cascade="all, delete-orphan")
-    rewards = relationship("Reward", back_populates="user", cascade="all, delete-orphan")
     student_profile = relationship("StudentProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
     points_logs = relationship("PointsLog", back_populates="user", cascade="all, delete-orphan")
 
@@ -70,6 +69,10 @@ class PracticeSession(Base):
     score = Column(Integer, default=0, nullable=False)
     time_taken = Column(Float, nullable=False)  # in seconds
     points_earned = Column(Integer, default=0, nullable=False)
+    # Preset key for point rule resolution (e.g. '2x1', '3d2', 'rows_6_9')
+    preset_key = Column(String(50), nullable=True)
+    # Row count for add_sub-family operations (used by PointRuleEngine)
+    row_count = Column(Integer, nullable=True)
     # Store all datetimes in UTC for database consistency
     # Conversion to IST happens in API response serializers
     started_at = Column(DateTime(timezone=True), default=lambda: datetime.utcnow().replace(tzinfo=timezone.utc))
@@ -96,31 +99,20 @@ class Attempt(Base):
     is_correct = Column(Boolean, default=False, nullable=False)
     time_taken = Column(Float, nullable=False)  # Time to answer in seconds
     question_number = Column(Integer, nullable=False)
+    # Points awarded for this specific answer (from PointRuleEngine)
+    points_awarded = Column(Integer, nullable=True)
+    # FK to the point_rule that was applied (nullable for legacy data)
+    point_rule_id = Column(Integer, ForeignKey("point_rules.id", ondelete="SET NULL"), nullable=True)
     created_at = Column(DateTime, default=get_utc_now)
     
     # Relationships
     session = relationship("PracticeSession", back_populates="attempts")
 
 
-class Reward(Base):
-    """Rewards and badges earned by users."""
-    __tablename__ = "rewards"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    badge_type = Column(String, nullable=False)  # e.g., "accuracy_ace", "perfect_precision", "monthly_streak"
-    badge_name = Column(String, nullable=False)
-    badge_category = Column(String, default="general", nullable=False)  # "monthly", "lifetime", "super", "attendance", "leaderboard"
-    is_lifetime = Column(Boolean, default=False, nullable=False)  # True for lifetime badges
-    month_earned = Column(String, nullable=True, index=True)  # "YYYY-MM" format for monthly badges - indexed for performance
-    earned_at = Column(DateTime, default=get_utc_now)
-    
-    # Relationships
-    user = relationship("User", back_populates="rewards")
-    
-    __table_args__ = (
-        Index('idx_user_badge', 'user_id', 'badge_type'),
-    )
+# NOTE: Old Reward and Leaderboard models have been removed.
+# The new reward system lives in reward_models.py:
+#   - RewardRule, RewardEvent, BadgeDefinition, StudentBadgeAward,
+#     MonthlyLeaderboardSnapshot, RewardAuditLog
 
 
 class PaperAttempt(Base):
@@ -152,27 +144,6 @@ class PaperAttempt(Base):
     
     __table_args__ = (
         Index('idx_paper_user_created', 'user_id', 'started_at'),
-    )
-
-
-class Leaderboard(Base):
-    """Leaderboard entries for ranking users."""
-    __tablename__ = "leaderboard"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False, index=True)
-    total_points = Column(Integer, default=0, nullable=False)
-    rank = Column(Integer, nullable=True)  # Updated periodically
-    weekly_points = Column(Integer, default=0, nullable=False)
-    weekly_rank = Column(Integer, nullable=True)
-    last_updated = Column(DateTime, default=get_utc_now, onupdate=get_utc_now)
-    
-    # Relationships
-    user = relationship("User", foreign_keys=[user_id])
-    
-    __table_args__ = (
-        Index('idx_points_rank', 'total_points', 'rank'),
-        Index('idx_weekly_points', 'weekly_points', 'weekly_rank'),
     )
 
 

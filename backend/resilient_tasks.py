@@ -295,25 +295,3 @@ def safe_update_weekly_leaderboard(user_id: int) -> bool:
     except Exception as e:
         logger.error(f"❌ [WEEKLY_LEADERBOARD] Failed for user {user_id}: {e}")
         raise
-
-
-def safe_check_badges(user_id: int) -> bool:
-    """Safely check and award badges with error recovery.
-    
-    Args:
-        user_id: User ID
-        
-    Returns:
-        True if successful
-    """
-    try:
-        from gamification import check_and_award_badges
-        from models import SessionLocal
-        db = SessionLocal()
-        check_and_award_badges(db, user_id)
-        db.close()
-        logger.info(f"✅ [BADGES] Checked for user {user_id}")
-        return True
-    except Exception as e:
-        logger.error(f"❌ [BADGES] Failed for user {user_id}: {e}")
-        raise
