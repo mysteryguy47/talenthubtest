@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { Link, useLocation } from "wouter";
+import { useLocation } from "wouter";
 import { useAuth } from "../contexts/AuthContext";
 import {
   ArrowRight, Trophy, Zap, BarChart3, Flame, FileText,
@@ -212,7 +212,7 @@ const MARQUEE_ITEMS = [
 
 const STATS = [
   { value: 18, suffix: "+", label: "Years of Excellence" },
-  { value: 900, suffix: "+", label: "Students Developed" },
+  { value: 900, suffix: "+", label: "Students Guided" },
   { value: 4, suffix: "", label: "Programs Offered" },
   { value: 3, suffix: "", label: "Branches in Delhi NCR" },
 ];
@@ -231,7 +231,7 @@ const COURSES = [
   {
     id: "vedic", name: "Vedic Maths", tag: "Ages 10+ · 4 Levels",
     tagline: "Ancient Speed. Modern Edge.",
-    desc: "16 sacred sutras from ancient Indian mathematics. Solve 997 × 998 in under 3 seconds. Competitive exam prep unlike anything taught in school.",
+    desc: "16 sacred sutras from ancient Indian mathematics. Solve 997 × 998 in seconds. Competitive exam prep unlike anything taught in school.",
     color: "#F59E0B", dimColor: "rgba(245,158,11,0.10)", glowColor: "rgba(245,158,11,0.20)", borderColor: "rgba(245,158,11,0.25)",
     icon: BookOpen,
     outcomes: ["Exam speed tactics", "Complex mental arithmetic", "LCM, GCD, roots", "Competitive edge"],
@@ -241,7 +241,7 @@ const COURSES = [
   {
     id: "handwriting", name: "Handwriting", tag: "All Ages · 3 Months",
     tagline: "Precision. Clarity. Confidence.",
-    desc: "English and Hindi tracks. Fine motor control meets cognitive rhythm. Students see measurable improvement within weeks — not months.",
+    desc: "English and Hindi tracks. Fine motor control meets cognitive rhythm. Students see measurable improvement within weeks.",
     color: "#0FB8A0", dimColor: "rgba(15,184,160,0.10)", glowColor: "rgba(15,184,160,0.20)", borderColor: "rgba(15,184,160,0.25)",
     icon: PenTool,
     outcomes: ["Legibility & speed", "English & Hindi tracks", "Creative calligraphy", "Exam handwriting"],
@@ -272,7 +272,7 @@ const WHY_ITEMS = [
     icon: Trophy, label: "PROVEN RESULTS",
     title: "18 years. 900+ students. Medals to prove it.",
     desc: "Every year, our students compete in national and international olympiads — and win. Tablets, cycles, cash prizes, and the confidence that comes from beating your best self.",
-    color: "#F59E0B", stat: "900+", statLabel: "students developed across 18 years",
+    color: "#F59E0B", stat: "900+", statLabel: "students guided across 18 years",
   },
   {
     icon: Target, label: "STRUCTURED PROGRESSION",
@@ -291,12 +291,12 @@ const TOOLKIT_ITEMS = [
   {
     icon: Brain, title: "Mental Math Practice",
     desc: "Targeted drills by operation, level, and difficulty. Track accuracy and speed across sessions.",
-    color: "#7C3AED", cta: "Practice", path: "/mental", featured: false,
+    color: "#7C3AED", cta: "Practice", path: "/mental", featured: true,
   },
   {
     icon: Zap, title: "Burst Mode",
     desc: "60 seconds. Maximum questions. Compete against yourself and the institute leaderboard.",
-    color: "#EA580C", cta: "Start Burst", path: "/burst", featured: false, pulse: true,
+    color: "#EA580C", cta: "Start Burst", path: "/burst", featured: true, pulse: true,
   },
   {
     icon: BarChart3, title: "Progress Dashboard",
@@ -306,31 +306,39 @@ const TOOLKIT_ITEMS = [
   {
     icon: Trophy, title: "Leaderboard",
     desc: "Institute-wide rankings updated in real time. Compete for the top spot every week.",
-    color: "#F59E0B", cta: "See Rankings", path: "/leaderboard", featured: false,
+    color: "#F59E0B", cta: "See Rankings", path: "/leaderboard", featured: false, comingSoon: true,
   },
   {
     icon: Flame, title: "Streaks & Rewards",
     desc: "Daily streaks, badges, and milestone rewards. Consistency becomes its own motivation.",
-    color: "#7C3AED", cta: "View Badges", path: "/dashboard", featured: false,
+    color: "#7C3AED", cta: "View Badges", path: "/rewards", featured: false,
   },
 ];
 
 const TESTIMONIALS = [
   {
-    quote: "My daughter completed Level 4 Abacus in 14 months and can now mentally add 5-digit numbers faster than I can on a calculator. The focus improvement is real — her school results show it.",
-    name: "Shikha Khandelwal", role: "Parent · Rohini Sector 16", initials: "SK", course: "Abacus", courseColor: "#7C3AED", stars: 5,
+    quote: "Abacus is a very good and effective technique to speed up calculations. It has great advantages as it helps in perfecting the brain as a whole. The brain is sharpened which is not only useful for maths but other subjects as well.",
+    name: "Neha Khanna", role: "Parent · Rohini Sector 16 · 9 reviews", initials: "NK", course: "Abacus", courseColor: "#7C3AED", stars: 5,
   },
   {
-    quote: "Abacus is a very good and effective technique to speed up calculations. The confidence level of my child is also boosted. Ms. Khurana's method is genuinely different.",
-    name: "Neha Khanna", role: "Parent · Rohini Sector 11", initials: "NK", course: "Abacus", courseColor: "#7C3AED", stars: 5,
+    quote: "Very good institute for Abacus and vedic maths. My son's numeracy skills have considerably developed under the guidance of Ms. Sunita Khurana. Personal attention is given to each kid and visible difference can be seen in the performance level at school.",
+    name: "Shikha Khandelwal", role: "Local Guide · 6 reviews", initials: "SK", course: "Abacus", courseColor: "#7C3AED", stars: 5,
   },
   {
-    quote: "Vedic Maths changed how my son prepares for competitive exams. He was struggling with calculation speed — now he finishes sections 20 minutes early. Unbelievable improvement.",
-    name: "Rahul Mehta", role: "Parent · Gurgaon", initials: "RM", course: "Vedic Maths", courseColor: "#F59E0B", stars: 5,
+    quote: "My child has learnt a lot from Sunita ma'am. She is one of the finest teachers at Talent Hub. Now Lavya can calculate orally bigger numbers too. Thanks ma'am for your support and dedication towards kids.",
+    name: "Lavya Singal", role: "Parent · 4 reviews", initials: "LS", course: "Abacus", courseColor: "#0FB8A0", stars: 5,
   },
   {
-    quote: "Children are being nurtured well. I hope that Talent Hub and parents continually make sure children grow beyond just being prize-oriented — and this school does exactly that.",
-    name: "Yash", role: "Student, Talent Hub", initials: "Y", course: "Abacus", courseColor: "#7C3AED", stars: 5,
+    quote: "I really want to thank Sunita ma'am for her efforts and guidance. Due to her hard work and support my son has developed a good understanding of the concepts and he has shown remarkable progress over the course.",
+    name: "Neha Sachdeva", role: "Parent · 2 reviews", initials: "NS", course: "Vedic Maths", courseColor: "#F59E0B", stars: 5,
+  },
+  {
+    quote: "Children are being nurtured well, thanks for that. I hope that Talent Hub and parents continuously make sure that the children do not get prize-oriented alone, and are continually made aware of the need for practising human values.",
+    name: "Yash", role: "Student · 1 review", initials: "Y", course: "Abacus", courseColor: "#7C3AED", stars: 5,
+  },
+  {
+    quote: "My Class 2 child enjoys attending abacus classes and has shown clear improvement in calculation speed, focus, and confidence in maths. The teacher is patient and explains concepts in a simple, engaging way. Highly recommend.",
+    name: "Mehak Garg", role: "Parent · 4 reviews · 1 month ago", initials: "MG", course: "Abacus", courseColor: "#EA580C", stars: 5,
   },
 ];
 
@@ -371,7 +379,7 @@ function StatsBar() {
           {STATS.map((stat, i) => (
             <InView key={i} delay={i * 0.1}>
               <div style={{ background: "var(--th-surface)", padding: "36px 28px", borderRight: i < 3 ? "1px solid var(--th-border)" : "none", textAlign: "center" }}>
-                <div style={{ fontFamily: "var(--th-font-display)", fontSize: "clamp(36px, 4vw, 52px)", fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 8 }} className="th-gradient-text">
+                <div style={{ fontFamily: "var(--th-font-display)", fontSize: "clamp(36px, 4vw, 52px)", fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.15, marginBottom: 8, paddingBottom: "0.1em", overflow: "visible" }} className="th-gradient-text">
                   <AnimatedCounter end={stat.value} suffix={stat.suffix} />
                 </div>
                 <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, color: "var(--th-muted)", letterSpacing: "0.1em", textTransform: "uppercase" }}>{stat.label}</div>
@@ -415,7 +423,7 @@ function Programs() {
                 className="th-card-hover"
                 onMouseEnter={() => setHovered(i)}
                 onMouseLeave={() => setHovered(null)}
-                onClick={() => course.external ? window.open("https://blackmonkey.in", "_blank") : setLocation(course.path)}
+                onClick={() => setLocation(course.path)}
                 style={{
                   background: hovered === i ? `linear-gradient(135deg, ${course.dimColor.replace("0.10","0.18")}, var(--th-surface))` : "var(--th-surface)",
                   border: `1px solid ${hovered === i ? course.borderColor : "var(--th-border)"}`,
@@ -428,9 +436,7 @@ function Programs() {
                 <div style={{ position: "absolute", top: -48, right: -48, width: 180, height: 180, borderRadius: "50%", background: `radial-gradient(circle, ${course.glowColor} 0%, transparent 70%)`, opacity: hovered === i ? 1 : 0, transition: "opacity 0.35s ease", pointerEvents: "none" }} />
 
                 {course.external && (
-                  <div style={{ position: "absolute", top: 18, right: 18, background: "rgba(234,88,12,0.15)", border: "1px solid rgba(234,88,12,0.3)", borderRadius: 8, padding: "4px 10px", fontFamily: "var(--th-font-mono)", fontSize: 10, color: "#EA580C", letterSpacing: "0.04em" }}>
-                    ↗ blackmonkey.in
-                  </div>
+                  <div style={{ position: "absolute", top: 18, right: 18, background: "rgba(234,88,12,0.1)", border: "1px solid rgba(234,88,12,0.25)", borderRadius: 8, padding: "4px 10px", fontFamily: "var(--th-font-mono)", fontSize: 10, color: "#EA580C", letterSpacing: "0.04em" }}>STEM · 5 Courses</div>
                 )}
 
                 <div style={{ width: 50, height: 50, borderRadius: 15, marginBottom: 18, background: course.dimColor, border: `1px solid ${course.borderColor}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
@@ -440,16 +446,14 @@ function Programs() {
                 <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", color: course.color, textTransform: "uppercase", marginBottom: 6 }}>{course.tag}</div>
                 <h3 style={{ fontFamily: "var(--th-font-display)", fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 4, color: "var(--th-white)" }}>{course.name}</h3>
                 <div style={{ fontFamily: "var(--th-font-body)", fontSize: 13, fontWeight: 500, color: course.color, marginBottom: 14, opacity: 0.85 }}>{course.tagline}</div>
-                <p style={{ color: "var(--th-white2)", fontSize: 14, lineHeight: 1.65, marginBottom: 20 }}>{course.desc}</p>
+                <p style={{ color: "var(--th-white2)", fontSize: 14, lineHeight: 1.65, marginBottom: 16 }}>{course.desc}</p>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 14px", marginBottom: 22 }}>
-                  {course.outcomes.map((o, oi) => (
-                    <div key={oi} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--th-white2)" }}>
-                      <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke={course.color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                      {o}
-                    </div>
-                  ))}
-                </div>
+                {course.image && (
+                  <div style={{ borderRadius: 12, overflow: "hidden", marginBottom: 20, height: 140, position: "relative" }}>
+                    <img src={course.image} alt={course.name} loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s ease", transform: hovered === i ? "scale(1.05)" : "scale(1)" }} />
+                    <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, ${course.dimColor.replace("0.10", "0.6")} 0%, transparent 60%)` }} />
+                  </div>
+                )}
 
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 18, borderTop: "1px solid var(--th-border)" }}>
                   <span style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, color: "var(--th-muted)", letterSpacing: "0.05em" }}>{course.stat}</span>
@@ -457,7 +461,7 @@ function Programs() {
                     onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.gap = "10px"}
                     onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.gap = "6px"}
                   >
-                    {course.external ? "Visit blackmonkey.in" : "Learn More"}
+                    {course.external ? "Explore STEM" : "Learn More"}
                     <ArrowRight size={14} />
                   </button>
                 </div>
@@ -485,7 +489,7 @@ function WhySection() {
                 The Talent Hub <span className="th-gradient-text">Difference</span>
               </h2>
             </div>
-            <p style={{ color: "var(--th-muted)", fontSize: 15, maxWidth: 300, lineHeight: 1.65 }}>
+            <p style={{ color: "var(--th-white2)", fontSize: 15, maxWidth: 300, lineHeight: 1.65 }}>
               18 years of refining our methods — here's what makes our students stand apart.
             </p>
           </div>
@@ -502,19 +506,19 @@ function WhySection() {
               onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.borderColor = `${item.color}50`; el.style.transform = "translateX(5px)"; el.style.background = "var(--th-surface2)"; }}
               onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.borderColor = "var(--th-border)"; el.style.transform = "none"; el.style.background = "var(--th-surface)"; }}
               >
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  <div style={{ width: 46, height: 46, borderRadius: 13, background: `linear-gradient(135deg, ${item.color}25, ${item.color}10)`, border: `1px solid ${item.color}30`, display: "flex", alignItems: "center", justifyContent: "center", color: item.color }}>
-                    <item.icon size={20} strokeWidth={1.6} />
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ width: 50, height: 50, borderRadius: 15, background: `linear-gradient(135deg, ${item.color}30, ${item.color}12)`, border: `1px solid ${item.color}35`, display: "flex", alignItems: "center", justifyContent: "center", color: item.color, flexShrink: 0 }}>
+                    <item.icon size={22} strokeWidth={1.5} />
                   </div>
-                  <div className="th-section-label" style={{ color: item.color, fontSize: 10 }}>{item.label}</div>
+                  <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: item.color }}>{item.label}</div>
                 </div>
                 <div>
-                  <h3 style={{ fontFamily: "var(--th-font-display)", fontSize: "clamp(17px, 2vw, 23px)", fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 10, color: "var(--th-white)" }}>{item.title}</h3>
-                  <p style={{ color: "var(--th-white2)", fontSize: 15, lineHeight: 1.7 }}>{item.desc}</p>
+                  <h3 style={{ fontFamily: "var(--th-font-display)", fontSize: "clamp(18px, 2vw, 24px)", fontWeight: 800, letterSpacing: "-0.025em", marginBottom: 12, color: "var(--th-white)", lineHeight: 1.2 }}>{item.title}</h3>
+                  <p style={{ color: "var(--th-white2)", fontSize: 15, lineHeight: 1.75 }}>{item.desc}</p>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontFamily: "var(--th-font-display)", fontSize: "clamp(28px, 3vw, 42px)", fontWeight: 800, letterSpacing: "-0.04em", color: item.color, lineHeight: 1 }}>{item.stat}</div>
-                  <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, color: "var(--th-muted)", letterSpacing: "0.04em", marginTop: 6, lineHeight: 1.5 }}>{item.statLabel}</div>
+                  <div style={{ fontFamily: "var(--th-font-display)", fontSize: "clamp(30px, 3vw, 44px)", fontWeight: 800, letterSpacing: "-0.04em", color: item.color, lineHeight: 1.15, paddingBottom: "0.1em", overflow: "visible" }}>{item.stat}</div>
+                  <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 11, color: "var(--th-white2)", letterSpacing: "0.04em", marginTop: 6, lineHeight: 1.5 }}>{item.statLabel}</div>
                 </div>
               </div>
             </InView>
@@ -563,7 +567,7 @@ function Toolkit() {
                 onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = "none"; el.style.borderColor = item.featured ? "rgba(124,58,237,0.35)" : "var(--th-border)"; }}
               >
                 {item.featured && (
-                  <div style={{ position: "absolute", top: 14, right: 14, background: "rgba(124,58,237,0.2)", border: "1px solid rgba(124,58,237,0.35)", borderRadius: 6, padding: "3px 8px", fontFamily: "var(--th-font-mono)", fontSize: 9, color: "var(--th-purple2)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Featured</div>
+                  <div style={{ position: "absolute", top: 14, right: 14, width: 8, height: 8, borderRadius: "50%", background: item.color, boxShadow: `0 0 8px ${item.color}` }} />
                 )}
                 <div style={{
                   width: 46, height: 46, borderRadius: 13, marginBottom: 16,
@@ -752,14 +756,14 @@ function CTABanner() {
                 <span className="th-shimmer-text">the Journey?</span>
               </h2>
               <p style={{ fontSize: 17, color: "rgba(255,255,255,0.62)", lineHeight: 1.7, marginBottom: 36 }}>
-                The first step to mathematical mastery begins with a single session. See the Talent Hub difference yourself — before committing to anything.
+                The first step to mathematical mastery begins with a single session. See the difference yourself — before committing to anything.
               </p>
               <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-                <button onClick={() => setLocation("/login")} style={{ background: "white", color: "#1a1040", border: "none", padding: "14px 30px", borderRadius: 13, fontFamily: "var(--th-font-body)", fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "all 0.25s ease" }}
+                <button onClick={() => setLocation("/dashboard")} style={{ background: "white", color: "#1a1040", border: "none", padding: "14px 30px", borderRadius: 13, fontFamily: "var(--th-font-body)", fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "all 0.25s ease" }}
                   onMouseEnter={e => { const el = e.currentTarget as HTMLButtonElement; el.style.transform = "translateY(-2px) scale(1.02)"; el.style.boxShadow = "0 14px 40px rgba(255,255,255,0.2)"; }}
                   onMouseLeave={e => { const el = e.currentTarget as HTMLButtonElement; el.style.transform = "none"; el.style.boxShadow = "none"; }}
                 >
-                  Get Started Free <ArrowRight size={16} />
+                  Get Started <ArrowRight size={16} />
                 </button>
                 <a href="tel:+919266117055" style={{ background: "transparent", color: "white", border: "1px solid rgba(255,255,255,0.2)", padding: "14px 26px", borderRadius: 13, fontFamily: "var(--th-font-body)", fontSize: 16, fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none", transition: "all 0.25s ease" }}
                   onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.4)"; (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.06)"; }}
@@ -767,14 +771,6 @@ function CTABanner() {
                 >
                   <Phone size={16} /> Call Us Now
                 </a>
-              </div>
-              <div style={{ marginTop: 28, display: "flex", gap: 22, justifyContent: "center", flexWrap: "wrap" }}>
-                {["No registration fee", "Free trial class", "Flexible batch timings"].map((trust) => (
-                  <div key={trust} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "rgba(255,255,255,0.42)" }}>
-                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke="rgba(255,255,255,0.4)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    {trust}
-                  </div>
-                ))}
               </div>
             </div>
           </div>
@@ -847,8 +843,6 @@ export default function Home() {
             <div style={{ opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(14px)", transition: "all 0.6s cubic-bezier(.4,0,.2,1) 0.1s", display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(124,58,237,0.10)", border: "1px solid rgba(124,58,237,0.22)", borderRadius: 100, padding: "7px 14px", marginBottom: 24 }}>
               <span style={{ color: "var(--th-purple2)", fontSize: 11 }}>✦</span>
               <span style={{ fontFamily: "var(--th-font-mono)", fontSize: 12, fontWeight: 500, color: "var(--th-purple2)", letterSpacing: "0.04em" }}>18+ Years of Excellence</span>
-              <span style={{ width: 1, height: 11, background: "rgba(124,58,237,0.3)" }} />
-              <span style={{ fontFamily: "var(--th-font-mono)", fontSize: 12, color: "var(--th-muted)" }}>900+ Students</span>
             </div>
 
             <h1 style={{ fontFamily: "var(--th-font-display)", fontWeight: 800, lineHeight: 1.01, letterSpacing: "-0.03em", marginBottom: 20, opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateY(22px)", transition: "all 0.7s cubic-bezier(.4,0,.2,1) 0.2s" }}>
@@ -871,19 +865,11 @@ export default function Home() {
               </button>
             </div>
 
-            <div style={{ display: "flex", gap: 28, marginTop: 40, opacity: loaded ? 1 : 0, transition: "opacity 0.7s cubic-bezier(.4,0,.2,1) 0.6s", paddingTop: 28, borderTop: "1px solid var(--th-border)" }}>
-              {[{ val: "18+", label: "Years Active" }, { val: "900+", label: "Students Shaped" }, { val: "4", label: "Programs" }].map((s) => (
-                <div key={s.label}>
-                  <div style={{ fontFamily: "var(--th-font-display)", fontSize: 28, fontWeight: 800, letterSpacing: "-0.03em", color: "var(--th-white)" }}>{s.val}</div>
-                  <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 10, color: "var(--th-muted)", letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 2 }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* Right visual */}
-          <div className="th-hide-mobile" style={{ position: "relative", opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateX(28px)", transition: "all 0.9s cubic-bezier(.4,0,.2,1) 0.3s" }}>
-            <div style={{ background: "linear-gradient(145deg, var(--th-surface), var(--th-bg3))", border: "1px solid var(--th-border2)", borderRadius: 26, overflow: "hidden", height: 460, position: "relative", boxShadow: "0 48px 100px rgba(0,0,0,0.55), 0 0 60px rgba(124,58,237,0.12)" }}>
+          <div className="th-hide-mobile" style={{ position: "relative", opacity: loaded ? 1 : 0, transform: loaded ? "none" : "translateX(28px)", transition: "all 0.9s cubic-bezier(.4,0,.2,1) 0.3s", alignSelf: "flex-start", marginTop: 20 }}>
+            <div style={{ background: "linear-gradient(145deg, var(--th-surface), var(--th-bg3))", border: "1px solid var(--th-border2)", borderRadius: 26, overflow: "hidden", height: 520, position: "relative", boxShadow: "0 48px 100px rgba(0,0,0,0.55), 0 0 60px rgba(124,58,237,0.12)" }}>
               <AnimatePresence mode="wait">
                 <motion.div key={currentImageIndex} initial={{ opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.9 }} style={{ position: "absolute", inset: 0 }}>
                   <img
@@ -897,22 +883,9 @@ export default function Home() {
                 </motion.div>
               </AnimatePresence>
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(7,8,15,0.75) 0%, rgba(7,8,15,0.1) 50%, transparent 100%)" }} />
-              <div style={{ position: "absolute", bottom: 18, left: 18, right: 18, background: "rgba(7,8,15,0.82)", backdropFilter: "blur(16px)", border: "1px solid rgba(124,58,237,0.22)", borderRadius: 14, padding: "13px 16px", display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 38, height: 38, borderRadius: 11, background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.25)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--th-purple2)", flexShrink: 0 }}>
-                  <Trophy size={17} strokeWidth={1.6} />
-                </div>
-                <div>
-                  <div style={{ fontFamily: "var(--th-font-display)", fontSize: 16, fontWeight: 800, color: "var(--th-white)" }}>900+ Students Guided</div>
-                  <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 10, color: "var(--th-muted)", letterSpacing: "0.05em" }}>Across 18 years of excellence</div>
-                </div>
-              </div>
             </div>
 
-            <div style={{ position: "absolute", top: -14, right: -14, background: "var(--th-purple)", borderRadius: 13, padding: "9px 14px", fontFamily: "var(--th-font-display)", fontWeight: 700, fontSize: 13, color: "white", boxShadow: "0 8px 30px rgba(124,58,237,0.45)", animation: "th-float 4s ease-in-out infinite", zIndex: 2 }}>
-              🏆 Olympiad Winners
-            </div>
-
-            <div style={{ position: "absolute", bottom: 92, left: -18, background: "rgba(7,8,15,0.88)", backdropFilter: "blur(16px)", border: "1px solid rgba(245,158,11,0.22)", borderRadius: 13, padding: "11px 14px", animation: "th-float 5s ease-in-out infinite 1.2s", boxShadow: "0 8px 30px rgba(0,0,0,0.4)", zIndex: 2 }}>
+            <div style={{ position: "absolute", bottom: 22, left: -18, background: "rgba(7,8,15,0.88)", backdropFilter: "blur(16px)", border: "1px solid rgba(245,158,11,0.22)", borderRadius: 13, padding: "11px 14px", animation: "th-float 5s ease-in-out infinite 1.2s", boxShadow: "0 8px 30px rgba(0,0,0,0.4)", zIndex: 2 }}>
               <div style={{ fontFamily: "var(--th-font-mono)", fontSize: 9, color: "var(--th-gold)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 3 }}>Latest Achievement</div>
               <div style={{ fontFamily: "var(--th-font-display)", fontSize: 14, fontWeight: 700, color: "white" }}>National Olympiad 🥇</div>
             </div>

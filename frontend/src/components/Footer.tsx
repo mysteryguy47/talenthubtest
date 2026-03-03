@@ -66,7 +66,7 @@ export default function Footer() {
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
 
         {/* Main grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1.4fr 1fr", gap: "48px 40px", marginBottom: 48 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px 40px", marginBottom: 48 }}>
 
           {/* Brand */}
           <div>
@@ -97,11 +97,11 @@ export default function Footer() {
               </div>
             </div>
 
-            <p style={{ fontSize: 13.5, color: D.muted, lineHeight: 1.72, maxWidth: 260, marginBottom: 18 }}>
+            <p style={{ fontSize: 13.5, color: D.white2, lineHeight: 1.72, maxWidth: 260, marginBottom: 18 }}>
               Transforming how children learn and think through proven, structured, and genuinely engaging programs since 2006.
             </p>
 
-            <div style={{ fontFamily: fontMono, fontSize: 11, color: D.muted2, letterSpacing: "0.05em", marginBottom: 22 }}>
+            <div style={{ fontFamily: fontMono, fontSize: 11, color: D.muted, letterSpacing: "0.05em", marginBottom: 22 }}>
               🏆 18+ Years &nbsp;·&nbsp; 👥 900+ Students &nbsp;·&nbsp; 📍 3 Branches
             </div>
 
@@ -138,13 +138,24 @@ export default function Footer() {
             ))}
           </div>
 
-          {/* Practice & Games */}
+          {/* Practice */}
           <div>
-            <div style={sectionLabel}>Practice &amp; Games</div>
+            <div style={sectionLabel}>Practice</div>
             {([
               ["📄 Create Papers",   "/create"],
               ["🧠 Mental Math",     "/mental"],
               ["⚡ Burst Mode",      "/burst"],
+            ] as [string, string][]).map(([label, href]) => (
+              <Link href={href} key={label}>
+                <a style={linkStyle} onMouseEnter={onLinkEnter} onMouseLeave={onLinkLeave}>{label}</a>
+              </Link>
+            ))}
+          </div>
+
+          {/* Games */}
+          <div>
+            <div style={sectionLabel}>Games</div>
+            {([
               ["🧮 Soroban Abacus",  "/tools/soroban"],
               ["⊞ Vedic Grid",       "/tools/gridmaster"],
               ["✨ Magic Square",    "/tools/gridmaster?tab=magic"],
@@ -166,7 +177,7 @@ export default function Footer() {
               <div key={b.name} style={{ display: "flex", gap: 7, marginBottom: 16 }}>
                 <MapPin size={13} color={D.purple2} style={{ marginTop: 3, flexShrink: 0 }} />
                 <div>
-                  <div style={{ fontSize: 13.5, color: D.white2, lineHeight: 1.3 }}>📍 {b.name}</div>
+                  <div style={{ fontSize: 13.5, color: D.white2, lineHeight: 1.3 }}>{b.name}</div>
                   <div style={{ fontFamily: fontMono, fontSize: 10.5, color: D.muted, marginTop: 2 }}>{b.city}</div>
                 </div>
               </div>
@@ -186,7 +197,6 @@ export default function Footer() {
             {([
               ["🔒 Privacy Policy",   "#"],
               ["📜 Terms of Service", "#"],
-              ["📬 Contact",          "mailto:ayushkhurana47@gmail.com"],
             ] as [string, string][]).map(([label, href]) => (
               <a key={label} href={href}
                 style={{ fontFamily: fontMono, fontSize: 11.5, color: D.muted, textDecoration: "none", transition: "color 0.2s" }}

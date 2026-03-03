@@ -31,6 +31,7 @@ import Pricing from "./pages/Pricing";
 import AdminAccessControl from "./pages/AdminAccessControl";
 import StudentRewards from "./pages/StudentRewards";
 import AdminRewards from "./pages/AdminRewards";
+import LeaderboardComingSoon from "./pages/LeaderboardComingSoon";
 import BadgeUnlockCinematic from "./components/rewards/BadgeUnlockCinematic";
 import { ReactNode } from "react";
 import { useScrollRestoration } from "./hooks/useScrollRestoration";
@@ -180,6 +181,7 @@ function AppContent() {
                   <StudentRewardsWithUser />
                 </ProtectedRoute>
               </Route>
+              <Route path="/leaderboard" component={LeaderboardComingSoon} />
               <Route path="/courses/abacus" component={AbacusCourse} />
               <Route path="/courses/vedic-maths" component={VedicMathsCourse} />
               <Route path="/courses/handwriting" component={HandwritingCourse} />

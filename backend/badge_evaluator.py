@@ -154,7 +154,7 @@ class BadgeEvaluator:
             db.query(func.count(func.distinct(RewardEvent.source_tool)))
             .filter(
                 RewardEvent.student_id == student_id,
-                RewardEvent.event_type == "question_correct",
+                RewardEvent.event_type == "session_completed",
                 RewardEvent.is_voided == False,
                 RewardEvent.event_timestamp >= utc_start,
                 RewardEvent.event_timestamp < utc_end,
@@ -330,11 +330,14 @@ class BadgeEvaluator:
         """Insert a StudentBadgeAward row."""
         from timezone_utils import get_utc_now
 
+        # Column is String(50), NOT NULL — convert int/None to proper string
+        awarded_by_str = "system" if awarded_by is None else f"admin:{awarded_by}"
+
         award = StudentBadgeAward(
             student_id=student_id,
             badge_id=badge_def.id,
             awarded_at=get_utc_now(),
-            awarded_by=awarded_by,
+            awarded_by=awarded_by_str,
             is_active=True,
         )
         db.add(award)

@@ -28,6 +28,7 @@ from timezone_utils import get_utc_now
 # ─── Valid string constants (enforced at service layer, not DB enum) ──────────
 
 REWARD_EVENT_TYPES = frozenset([
+    "session_completed",
     "question_correct",
     "burst_mode_completed",
     "daily_login",

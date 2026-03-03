@@ -4,7 +4,7 @@ import {
   ChevronDown, ChevronRight, LogOut, BarChart3, Shield, GraduationCap,
   Calculator, BookOpen, PenTool, Rocket, Menu, X, Brain, FileText,
   Trophy, User, Moon, Sun, ArrowRight, Lock, Zap, Calendar, Grid3X3,
-  Gamepad2, Sparkles
+  Gamepad2, Sparkles, Award
 } from "lucide-react";
 import { useAuthSafe } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
@@ -320,6 +320,9 @@ export default function Header() {
                             <Link href="/profile">
                               <div className={navItem(isActive("/profile"))}><User className="w-4 h-4" />Student Profile</div>
                             </Link>
+                            <Link href="/rewards">
+                              <div className={navItem(isActive("/rewards"))}><Award className="w-4 h-4" />Rewards</div>
+                            </Link>
                             {isAdmin && (
                               <>
                                 <div className="mx-4 my-1 border-t border-border/50" />
@@ -336,6 +339,11 @@ export default function Header() {
                                 <Link href="/admin/access-control">
                                   <div className="px-4 py-3 text-sm font-medium text-card-foreground hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:shadow-sm flex items-center gap-2 cursor-pointer transition-all rounded-xl">
                                     <Lock className="w-4 h-4" />Access Control
+                                  </div>
+                                </Link>
+                                <Link href="/admin/rewards">
+                                  <div className="px-4 py-3 text-sm font-medium text-card-foreground hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:shadow-sm flex items-center gap-2 cursor-pointer transition-all rounded-xl">
+                                    <Award className="w-4 h-4" />Rewards Admin
                                   </div>
                                 </Link>
                               </>
@@ -415,6 +423,15 @@ export default function Header() {
                   </span>
                 </div>
               </Link>
+              {isAuthenticated && (
+                <>
+                  <div className="border-t border-border my-2" />
+                  <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Rewards</div>
+                  <Link href="/rewards" onClick={() => setMobileMenuOpen(false)}>
+                    <div className="px-4 py-2.5 text-sm font-medium text-card-foreground hover:bg-secondary rounded-lg flex items-center gap-3 transition-colors"><Award className="w-4 h-4" />My Rewards</div>
+                  </Link>
+                </>
+              )}
               <div className="border-t border-border my-2" />
               <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Games</div>
               <Link href="/tools/soroban" onClick={() => setMobileMenuOpen(false)}>

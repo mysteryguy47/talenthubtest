@@ -256,12 +256,12 @@ def simulate_month(
 
     entries = [
         SimulationResultEntry(
-            student_id=e["student_id"],
-            student_name=e["student_name"],
-            branch=e["branch"],
-            monthly_points=e["monthly_points"],
-            projected_rank=e["projected_rank"],
-            projected_bonus=e["projected_bonus"],
+            student_id=e.get("student_id", 0),
+            student_name=e.get("student_name", ""),
+            branch=e.get("branch", ""),
+            monthly_points=e.get("monthly_points", 0),
+            projected_rank=e.get("projected_rank", 0),
+            projected_bonus=e.get("projected_bonus", 0),
         )
         for e in preview
     ]
@@ -319,7 +319,7 @@ def get_audit_log(
     per_page: int = Query(20, ge=1, le=100),
 ):
     """Paginated admin audit log."""
-    query = db.query(RewardAuditLog).order_by(desc(RewardAuditLog.created_at))
+    query = db.query(RewardAuditLog).order_by(desc(RewardAuditLog.performed_at))
 
     if student_id:
         query = query.filter(RewardAuditLog.target_student_id == student_id)
@@ -339,7 +339,7 @@ def get_audit_log(
             old_values=log.old_values or {},
             new_values=log.new_values or {},
             reason=log.reason or "",
-            created_at=utc_to_ist(log.created_at).isoformat() if log.created_at else None,
+            created_at=utc_to_ist(log.performed_at).isoformat() if log.performed_at else None,
         ))
 
     return {

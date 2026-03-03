@@ -140,7 +140,7 @@ BADGE_DEFINITIONS_SEED = [
         "tier": "bronze",
         "category": "streak",
         "icon_emoji": "🔥",
-        "evaluation_rule": {"type": "streak_milestone", "streak_days": 3},
+        "evaluation_rule": {"type": "streak_milestone", "threshold": 3},
         "display_order": 10,
     },
     {
@@ -150,7 +150,7 @@ BADGE_DEFINITIONS_SEED = [
         "tier": "silver",
         "category": "streak",
         "icon_emoji": "🔥",
-        "evaluation_rule": {"type": "streak_milestone", "streak_days": 7},
+        "evaluation_rule": {"type": "streak_milestone", "threshold": 7},
         "display_order": 11,
     },
     {
@@ -160,7 +160,7 @@ BADGE_DEFINITIONS_SEED = [
         "tier": "gold",
         "category": "streak",
         "icon_emoji": "⚡",
-        "evaluation_rule": {"type": "streak_milestone", "streak_days": 14},
+        "evaluation_rule": {"type": "streak_milestone", "threshold": 14},
         "display_order": 12,
     },
     {
@@ -170,7 +170,7 @@ BADGE_DEFINITIONS_SEED = [
         "tier": "platinum",
         "category": "streak",
         "icon_emoji": "👑",
-        "evaluation_rule": {"type": "streak_milestone", "streak_days": 30},
+        "evaluation_rule": {"type": "streak_milestone", "threshold": 30},
         "display_order": 13,
     },
     {
@@ -180,7 +180,7 @@ BADGE_DEFINITIONS_SEED = [
         "tier": "platinum",
         "category": "streak",
         "icon_emoji": "🌟",
-        "evaluation_rule": {"type": "streak_milestone", "streak_days": 60},
+        "evaluation_rule": {"type": "streak_milestone", "threshold": 60},
         "display_order": 14,
     },
     {
@@ -190,7 +190,7 @@ BADGE_DEFINITIONS_SEED = [
         "tier": "special",
         "category": "streak",
         "icon_emoji": "🏆",
-        "evaluation_rule": {"type": "streak_milestone", "streak_days": 100},
+        "evaluation_rule": {"type": "streak_milestone", "threshold": 100},
         "display_order": 15,
     },
 
@@ -247,7 +247,7 @@ BADGE_DEFINITIONS_SEED = [
         "evaluation_rule": {
             "type": "multi_tool_same_day",
             "tools": ["practice_paper", "mental_math", "burst_mode"],
-            "min_tools": 3,
+            "threshold": 3,
         },
         "display_order": 30,
     },
