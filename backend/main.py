@@ -305,6 +305,13 @@ async def startup_event() -> None:
         except Exception as _sched_err:
             logger.warning("[STARTUP] expiry scheduler failed to start: %s", _sched_err)
 
+        # Start nightly streak reset scheduler (00:05 IST daily)
+        try:
+            from streak_scheduler import start_streak_scheduler
+            start_streak_scheduler()
+        except Exception as _streak_sched_err:
+            logger.warning("[STARTUP] streak reset scheduler failed to start: %s", _streak_sched_err)
+
         # Clean up stale incomplete attempts on startup
         try:
             db = next(get_db())

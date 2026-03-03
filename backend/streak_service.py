@@ -142,16 +142,19 @@ class StreakService:
 
         Returns (streak_was_incremented, milestone_badges_unlocked).
 
-        IMPORTANT: Uses populate_existing() to bypass SQLAlchemy's identity-map
-        cache.  Without this, a Core sa_update() earlier in the same DB session
-        (e.g. from a previous check_and_update call triggered by _award_milestone
-        → record_event) leaves the ORM object stale, causing the
-        "already incremented today" guard to silently fail and the streak to
-        increment multiple times per day.
+        IMPORTANT: Uses with_for_update() to acquire an exclusive row-level lock
+        so that two concurrent requests (e.g. two rapid practice-session submits)
+        cannot both pass the idempotency guard before either commits — the second
+        request blocks at this SELECT until the first transaction commits, then
+        re-reads the already-updated last_practice_date and exits early.
+        populate_existing() is kept in addition: it ensures SQLAlchemy's identity
+        map does not serve a stale cached copy when a previous Core sa_update()
+        was issued in the same session (e.g. from _award_milestone → record_event).
         """
         user = (
             db.query(User)
-            .populate_existing()          # always read fresh from DB
+            .populate_existing()          # bypass ORM identity-map cache
+            .with_for_update()            # exclusive row lock — prevents race condition
             .filter(User.id == student_id)
             .first()
         )
@@ -224,6 +227,11 @@ class StreakService:
         Returns { reset_count, skipped_count }.
         """
         today_ist = get_ist_now().date()
+        # The reset job runs at 00:05 IST — the new day has just started.
+        # "yesterday" is the day that just ended.  Streaks are safe for any
+        # student who practiced yesterday (or today — shouldn't happen at
+        # 00:05 but included as a safety net).
+        yesterday = today_ist - timedelta(days=1)
         reset_count = 0
         skipped_count = 0
 
@@ -237,8 +245,8 @@ class StreakService:
         for user in active_users:
             last_date = _to_ist_date(user.last_practice_date)
 
-            if last_date == today_ist:
-                # Student DID practice today — streak is safe
+            if last_date is not None and last_date >= yesterday:
+                # Student practiced yesterday (or today) — streak is safe
                 skipped_count += 1
                 continue
 
