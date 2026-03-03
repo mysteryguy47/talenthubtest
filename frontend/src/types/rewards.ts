@@ -138,6 +138,43 @@ export interface RewardData {
   bonus_points: number;
 }
 
+// ── SUPER Journey Types ─────────────────────────────────────────────
+
+export type SuperMilestoneType = "chocolate" | "letter" | "mystery" | "party";
+
+export interface SuperMilestone {
+  points: number;
+  badge_key: string;
+  type: SuperMilestoneType;
+  label: string;
+  emoji: string;
+  letter?: string;
+  unlocked: boolean;
+}
+
+export interface SuperNextMilestone {
+  points: number;
+  badge_key: string;
+  type: SuperMilestoneType;
+  label: string;
+  emoji: string;
+  letter?: string;
+  points_needed: number;
+  range_start: number;
+  range_end: number;
+  progress_in_range: number;
+  range_size: number;
+  pct: number;
+}
+
+export interface SuperJourneyResponse {
+  total_points: number;
+  milestones: SuperMilestone[];
+  next_milestone: SuperNextMilestone | null;
+  all_letters_done: boolean;
+  letters_unlocked_count: number;
+}
+
 // ── Admin Types ─────────────────────────────────────────────────────
 
 export interface AdminPointsAdjustment {

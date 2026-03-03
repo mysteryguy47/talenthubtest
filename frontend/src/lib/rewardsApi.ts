@@ -15,6 +15,7 @@ import type {
   BadgeDefinition,
   AdminCacheRebuild,
   AuditLogEntry,
+  SuperJourneyResponse,
 } from "../types/rewards";
 
 // ── Student Endpoints ────────────────────────────────────────────────
@@ -54,6 +55,10 @@ export async function fetchLeaderboard(
 
 export async function fetchWeeklySummary(): Promise<WeeklySummary> {
   return apiClient.get<WeeklySummary>("/rewards/weekly-summary");
+}
+
+export async function fetchSuperJourney(): Promise<SuperJourneyResponse> {
+  return apiClient.get<SuperJourneyResponse>("/rewards/super-journey");
 }
 
 // ── Admin Endpoints ─────────────────────────────────────────────────

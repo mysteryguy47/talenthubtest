@@ -13,6 +13,7 @@ import BadgeGrid from "../components/rewards/BadgeGrid";
 import WeeklySummaryCard from "../components/rewards/WeeklySummaryCard";
 import LeaderboardTable from "../components/rewards/LeaderboardTable";
 import PointsHistoryList from "../components/rewards/PointsHistoryList";
+import SuperJourneySection from "../components/rewards/SuperJourneySection";
 
 type Tab = "badges" | "streak" | "leaderboard" | "history" | "weekly";
 
@@ -58,6 +59,9 @@ export default function StudentRewards({
 
       {/* Summary bar */}
       <RewardsSummaryBar />
+
+      {/* SUPER Journey */}
+      <SuperJourneySection />
 
       {/* Tab nav */}
       <div className="flex gap-1 bg-zinc-900/60 border border-zinc-800 rounded-xl p-1 overflow-x-auto scrollbar-none">

@@ -1358,25 +1358,18 @@ export default function PaperCreate() {
 
           {/* Vedic Maths group label */}
           <span style={{fontSize:10,fontWeight:700,color:'#7B5CE5',fontFamily:"'JetBrains Mono',monospace",letterSpacing:'0.12em',textTransform:'uppercase',marginRight:2,flexShrink:0}}>Vedic Maths</span>
-          {([1,2,3,4] as const).map(lvl => {
-            const path = `/vedic-maths/level-${lvl}` as const;
-            const active = location === path;
-            return (
-              <button
-                key={lvl}
-                onClick={() => setLocation(path)}
-                style={{
-                  display:'flex',alignItems:'center',
-                  padding:'5px 13px',borderRadius:999,
-                  fontSize:13,fontWeight:600,fontFamily:"'DM Sans',sans-serif",
-                  background:active?'rgba(123,92,229,0.22)':'rgba(255,255,255,0.04)',
-                  border:active?'1.5px solid rgba(123,92,229,0.55)':'1.5px solid rgba(255,255,255,0.07)',
-                  color:active?'#C4A8FF':'#9DA3BC',
-                  cursor:'pointer',transition:'all 0.18s',outline:'none',
-                }}
-              >Level {lvl}</button>
-            );
-          })}
+          <button
+            onClick={() => setLocation('/vedic-maths/level-1')}
+            style={{
+              display:'flex',alignItems:'center',
+              padding:'5px 13px',borderRadius:999,
+              fontSize:13,fontWeight:600,fontFamily:"'DM Sans',sans-serif",
+              background:isVedicPage?'rgba(123,92,229,0.22)':'rgba(255,255,255,0.04)',
+              border:isVedicPage?'1.5px solid rgba(123,92,229,0.55)':'1.5px solid rgba(255,255,255,0.07)',
+              color:isVedicPage?'#C4A8FF':'#9DA3BC',
+              cursor:'pointer',transition:'all 0.18s',outline:'none',
+            }}
+          >Vedic Maths</button>
         </div>
       </div>
 

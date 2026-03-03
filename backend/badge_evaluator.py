@@ -402,10 +402,31 @@ class BadgeEvaluator:
     # Evaluator registry
     # ──────────────────────────────────────────────────────────────────────────
 
+    def _eval_cumulative_points(
+        self, db: Session, student_id: int, rule: dict
+    ) -> bool:
+        """
+        Award when User.total_points >= threshold.
+        Used for the SUPER Journey milestones (chocolate, letters, mystery gift, party).
+        """
+        threshold = rule.get("threshold", 0)
+        if not threshold:
+            return False
+        user = (
+            db.query(User)
+            .populate_existing()
+            .filter(User.id == student_id)
+            .first()
+        )
+        if not user:
+            return False
+        return (user.total_points or 0) >= threshold
+
     _EVALUATORS = {
         "cumulative_correct_count": _eval_cumulative_correct,
         "streak_milestone": _eval_streak_milestone,
         "multi_tool_same_day": _eval_multi_tool_same_day,
+        "cumulative_points": _eval_cumulative_points,
     }
 
 

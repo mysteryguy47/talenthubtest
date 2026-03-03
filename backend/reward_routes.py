@@ -8,6 +8,7 @@ Provides:
   - GET  /rewards/streak           — current streak info
   - GET  /rewards/leaderboard      — live leaderboard (+ optional branch filter)
   - GET  /rewards/weekly-summary   — weekly points breakdown
+  - GET  /rewards/super-journey    — SUPER badge journey progress
 """
 
 import logging
@@ -394,6 +395,88 @@ def get_weekly_summary(
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# GET /rewards/super-journey
+# ──────────────────────────────────────────────────────────────────────────────
+
+# All SUPER journey milestones in order
+_SUPER_MILESTONES = [
+    {"points": 500,   "badge_key": "super_chocolate_1", "type": "chocolate", "label": "🍫 Chocolate",    "emoji": "🍫"},
+    {"points": 1500,  "badge_key": "super_letter_s",    "type": "letter",    "label": "S",               "emoji": "⭐", "letter": "S"},
+    {"points": 3000,  "badge_key": "super_chocolate_2", "type": "chocolate", "label": "🍫 Chocolate",    "emoji": "🍫"},
+    {"points": 5000,  "badge_key": "super_letter_u",    "type": "letter",    "label": "U",               "emoji": "⭐", "letter": "U"},
+    {"points": 7500,  "badge_key": "super_chocolate_3", "type": "chocolate", "label": "🍫 Chocolate",    "emoji": "🍫"},
+    {"points": 10000, "badge_key": "super_letter_p",    "type": "letter",    "label": "P",               "emoji": "⭐", "letter": "P"},
+    {"points": 13000, "badge_key": "super_chocolate_4", "type": "chocolate", "label": "🍫 Chocolate",    "emoji": "🍫"},
+    {"points": 16000, "badge_key": "super_letter_e",    "type": "letter",    "label": "E",               "emoji": "⭐", "letter": "E"},
+    {"points": 19000, "badge_key": "super_chocolate_5", "type": "chocolate", "label": "🍫 Chocolate",    "emoji": "🍫"},
+    {"points": 22000, "badge_key": "super_letter_r",    "type": "letter",    "label": "R",               "emoji": "⭐", "letter": "R"},
+    {"points": 25000, "badge_key": "super_mystery_gift","type": "mystery",   "label": "🎁 Mystery Gift", "emoji": "🎁"},
+    {"points": 30000, "badge_key": "super_party",       "type": "party",     "label": "🎉 Party",        "emoji": "🎉"},
+]
+
+@router.get("/super-journey")
+def get_super_journey(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Returns SUPER Journey progress — milestones, unlocked status,
+    current points, next milestone info, and percentage to next.
+    """
+    student_id = current_user.id
+    total_points = current_user.total_points or 0
+
+    # Get all awarded super badges for this student
+    awarded_keys = set(
+        row.badge_key
+        for row in db.query(StudentBadgeAward.badge_key)
+        .join(BadgeDefinition, StudentBadgeAward.badge_id == BadgeDefinition.id)
+        .filter(
+            StudentBadgeAward.student_id == student_id,
+            StudentBadgeAward.is_active == True,
+            BadgeDefinition.badge_key.in_([m["badge_key"] for m in _SUPER_MILESTONES]),
+        )
+        .all()
+    )
+
+    milestones = []
+    next_milestone = None
+    prev_points = 0
+
+    for m in _SUPER_MILESTONES:
+        unlocked = m["badge_key"] in awarded_keys
+        milestones.append({
+            **m,
+            "unlocked": unlocked,
+        })
+        if not unlocked and next_milestone is None:
+            next_milestone = {
+                **m,
+                "points_needed": max(0, m["points"] - total_points),
+                "range_start": prev_points,
+                "range_end": m["points"],
+                "progress_in_range": max(0, total_points - prev_points),
+                "range_size": max(1, m["points"] - prev_points),
+                "pct": min(100.0, round(
+                    max(0, total_points - prev_points) / max(1, m["points"] - prev_points) * 100, 1
+                )),
+            }
+        prev_points = m["points"]
+
+    # How many letters unlocked
+    letters_unlocked = [m for m in milestones if m["type"] == "letter" and m["unlocked"]]
+    all_letters_done = len(letters_unlocked) == 5
+
+    return {
+        "total_points": total_points,
+        "milestones": milestones,
+        "next_milestone": next_milestone,
+        "all_letters_done": all_letters_done,
+        "letters_unlocked_count": len(letters_unlocked),
+    }
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # Helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -471,5 +554,11 @@ def _compute_badge_progress(
 
     elif rule_type == "multi_tool_same_day":
         return "Use multiple tools in one day", None
+
+    elif rule_type == "cumulative_points" and threshold > 0:
+        user = db.query(User).filter(User.id == student_id).first()
+        current = user.total_points if user else 0
+        pct = min(round(((current or 0) / threshold) * 100, 1), 100.0)
+        return f"{current or 0}/{threshold} points", pct
 
     return None, None

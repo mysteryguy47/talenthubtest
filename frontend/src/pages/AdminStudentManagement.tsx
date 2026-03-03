@@ -921,9 +921,9 @@ export default function AdminStudentManagement() {
       if (sortKey === "name") {
         aVal = (a.display_name || a.name).toLowerCase();
         bVal = (b.display_name || b.name).toLowerCase();
-      } else if (sortKey === "total_points") {
-        aVal = a.total_points;
-        bVal = b.total_points;
+      } else if (sortKey === "total_points" || sortKey === "class_name") {
+        aVal = parseInt((a[sortKey as keyof User] as string | null | undefined) ?? "0", 10) || 0;
+        bVal = parseInt((b[sortKey as keyof User] as string | null | undefined) ?? "0", 10) || 0;
       } else {
         aVal = ((a[sortKey as keyof User] as string | null | undefined) ?? "").toString().toLowerCase();
         bVal = ((b[sortKey as keyof User] as string | null | undefined) ?? "").toString().toLowerCase();

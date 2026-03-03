@@ -36,6 +36,7 @@ import AdminRewards from "./pages/AdminRewards";
 import LeaderboardComingSoon from "./pages/LeaderboardComingSoon";
 import BadgeUnlockCinematic from "./components/rewards/BadgeUnlockCinematic";
 import StreakCelebrationOverlay from "./components/rewards/StreakCelebrationOverlay";
+import SuperLetterCinematic from "./components/rewards/SuperLetterCinematic";
 import { ReactNode } from "react";
 import { useScrollRestoration } from "./hooks/useScrollRestoration";
 import { useInactivityDetection } from "./hooks/useInactivityDetection";
@@ -226,6 +227,7 @@ function AppContent() {
       </div>
       <BadgeUnlockCinematic />
       <StreakCelebrationOverlay />
+      <SuperLetterCinematic />
     </ErrorBoundary>
   );
 }

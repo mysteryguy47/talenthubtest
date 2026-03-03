@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { savePracticeSession, PracticeSessionData } from "../lib/userApi";
 import { useBadgeUnlockStore } from "../stores/badgeUnlockStore";
 import { useStreakCelebrationStore } from "../stores/streakCelebrationStore";
+import { useSuperLetterStore } from "../stores/superLetterStore";
 import { usePointRules, buildPointsLookup } from "../hooks/usePointRules";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -703,6 +704,16 @@ export default function BurstMode() {
       const rewardBadges = savedSession?.reward_data?.badges_unlocked;
       if (rewardBadges && rewardBadges.length > 0) {
         useBadgeUnlockStore.getState().enqueue(rewardBadges);
+      }
+      // Trigger SUPER letter unlock cinematic
+      const _superLetterMap: Record<string, string> = { super_letter_s: "S", super_letter_u: "U", super_letter_p: "P", super_letter_e: "E", super_letter_r: "R" };
+      const superLetters = (rewardBadges || []).filter(b => b.badge_key.startsWith("super_letter_"));
+      if (superLetters.length > 0) {
+        useSuperLetterStore.getState().enqueue(superLetters.map(b => ({
+          letter: _superLetterMap[b.badge_key] ?? b.badge_key,
+          badge_key: b.badge_key,
+          isAllDone: b.badge_key === "super_letter_r",
+        })));
       }
       const streakUpdated = savedSession?.reward_data?.streak_updated;
       setSessionSaved(true);
