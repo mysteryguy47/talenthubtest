@@ -65,6 +65,9 @@ class BadgeEvaluator:
             if rule_type == "manual_only":
                 continue  # Only admin can award
 
+            # streak_milestone uses == comparison (not >=) so only fires on the
+            # exact day the milestone is reached. No mass-award risk.
+
             handler = self._EVALUATORS.get(rule_type)
             if not handler:
                 logger.warning("Unknown evaluator type: %s for badge %s", rule_type, badge_def.badge_key)
@@ -129,12 +132,35 @@ class BadgeEvaluator:
     def _eval_streak_milestone(
         self, db: Session, student_id: int, rule: dict
     ) -> bool:
-        """Award when User.current_streak ≥ threshold."""
-        threshold = rule.get("threshold", 0)
-        user = db.query(User).filter(User.id == student_id).first()
+        """Award exactly when User.current_streak == threshold (exact milestone match).
+
+        Uses populate_existing() to bypass SQLAlchemy's identity-map cache, which
+        would otherwise return the pre-UPDATE stale value when streak_service uses
+        a Core sa_update that doesn't expire the ORM object.
+
+        Using == instead of >= prevents all lower-milestone badges from firing at
+        once when a high streak is first evaluated after the reward system was added.
+
+        NOTE: badge_definitions stores the day count under the key "streak_days"
+        (not "threshold"), so we check both keys for forward/backward compatibility.
+        """
+        # "streak_days" is the actual key in badge_definitions.evaluation_rule.
+        # "threshold" is kept as a fallback for any legacy or hand-crafted rules.
+        threshold = rule.get("streak_days") or rule.get("threshold", 0)
+        if not threshold:
+            logger.warning("streak_milestone rule has no streak_days/threshold: %s", rule)
+            return False
+        # populate_existing() forces a fresh SELECT from the DB,
+        # bypassing the SQLAlchemy identity map cache.
+        user = (
+            db.query(User)
+            .populate_existing()
+            .filter(User.id == student_id)
+            .first()
+        )
         if not user:
             return False
-        return user.current_streak >= threshold
+        return user.current_streak == threshold
 
     def _eval_multi_tool_same_day(
         self, db: Session, student_id: int, rule: dict
@@ -289,7 +315,14 @@ class BadgeEvaluator:
         self._cache_ts = None
 
     def _get_definitions(self, db: Session) -> List[BadgeDefinition]:
-        """Get all active badge definitions (cached)."""
+        """Get all active badge definitions (cached, session-detached).
+
+        ORM instances are expunged from the originating session immediately
+        after loading so that their column attributes remain accessible after
+        the session is committed/closed.  Without expunge(), SQLAlchemy
+        expires all attributes on commit and later access raises
+        DetachedInstanceError.
+        """
         now = datetime.utcnow()
         if (
             self._cache is not None
@@ -298,12 +331,18 @@ class BadgeEvaluator:
         ):
             return self._cache
 
-        self._cache = (
+        rows = (
             db.query(BadgeDefinition)
             .filter(BadgeDefinition.is_active == True)
             .order_by(BadgeDefinition.display_order)
             .all()
         )
+        # Detach from session while data is still loaded (not expired).
+        # This prevents DetachedInstanceError on subsequent requests that use
+        # a different session.
+        for r in rows:
+            db.expunge(r)
+        self._cache = rows
         self._cache_ts = now
         return self._cache
 
