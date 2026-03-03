@@ -138,23 +138,24 @@ class StreakService:
         """
         Check if the student has crossed the daily threshold and update streak.
 
-        Called after every qualifying correct answer.
+        Called after every session completion (mental math, burst, paper).
 
         Returns (streak_was_incremented, milestone_badges_unlocked).
 
-        IMPORTANT: Uses with_for_update() to acquire an exclusive row-level lock
-        so that two concurrent requests (e.g. two rapid practice-session submits)
-        cannot both pass the idempotency guard before either commits — the second
-        request blocks at this SELECT until the first transaction commits, then
-        re-reads the already-updated last_practice_date and exits early.
-        populate_existing() is kept in addition: it ensures SQLAlchemy's identity
-        map does not serve a stale cached copy when a previous Core sa_update()
-        was issued in the same session (e.g. from _award_milestone → record_event).
+        CONCURRENCY SAFETY
+        ──────────────────
+        Uses an atomic UPDATE … WHERE guard instead of SELECT-then-UPDATE.
+        The WHERE clause includes `last_practice_date != <today_midnight>` so
+        only ONE request per IST day can successfully update the row.
+        If rowcount == 0 the guard prevented a double-increment.
+
+        This is database-agnostic: works on both SQLite (single-writer lock)
+        and PostgreSQL (row-level MVCC).  No SELECT FOR UPDATE needed.
         """
+        # ── 1. Read current user state ──────────────────────────────────────
         user = (
             db.query(User)
-            .populate_existing()          # bypass ORM identity-map cache
-            .with_for_update()            # exclusive row lock — prevents race condition
+            .populate_existing()
             .filter(User.id == student_id)
             .first()
         )
@@ -162,41 +163,45 @@ class StreakService:
             return False, []
 
         today_ist = get_ist_now().date()
-
         last_date = _to_ist_date(user.last_practice_date)
 
-        # If already incremented today, skip (idempotency guard)
+        # Fast exit: already incremented today (covers 99% of repeat calls)
         if last_date == today_ist:
             return False, []
 
-        # Count qualifying questions today
+        # ── 2. Check qualifying question count ──────────────────────────────
         count = self.count_qualifying_today(db, student_id)
         if count < STREAK_THRESHOLD:
             return False, []
 
-        # Determine if streak should continue or reset
+        # ── 3. Compute new streak ───────────────────────────────────────────
         yesterday = today_ist - timedelta(days=1)
 
         if last_date == yesterday:
-            # Consecutive day → increment
             new_streak = user.current_streak + 1
-        elif last_date == today_ist:
-            # Already counted — shouldn't reach here but safety
-            return False, []
         else:
-            # Gap or first time → restart from 1
+            # Gap of ≥2 days, or very first streak → restart
             new_streak = 1
 
-        new_longest = max(user.longest_streak, new_streak)
+        new_longest = max(user.longest_streak or 0, new_streak)
 
-        # Store midnight of the IST calendar day as a naive datetime.
-        # This ensures .date() always returns the correct IST date regardless
-        # of how psycopg2 handles timezone stripping on read-back.
+        # Naive midnight-IST datetime — what we'll store.
         ist_midnight_naive = datetime.combine(today_ist, time.min)
 
-        db.execute(
+        # ── 4. Atomic conditional UPDATE ────────────────────────────────────
+        #    The WHERE clause ensures exactly ONE thread/request per day wins.
+        #    On concurrent requests, both may read the old last_practice_date
+        #    from step 1, but only the first UPDATE to commit will match the
+        #    WHERE guard; the second will find rowcount == 0 and bail out.
+        #    Works on SQLite (single-writer serialization) and PostgreSQL (MVCC).
+        result = db.execute(
             sa_update(User)
             .where(User.id == student_id)
+            .where(
+                # Guard: only succeed if last_practice_date is NOT already today
+                (User.last_practice_date == None) |  # noqa: E711 — NULL check
+                (User.last_practice_date != ist_midnight_naive)
+            )
             .values(
                 current_streak=new_streak,
                 longest_streak=new_longest,
@@ -205,12 +210,20 @@ class StreakService:
         )
         db.flush()
 
+        if result.rowcount == 0:
+            # Another request already incremented — idempotent exit
+            logger.debug(
+                "[STREAK] SKIP duplicate increment student_id=%s (rowcount=0)",
+                student_id,
+            )
+            return False, []
+
         logger.info(
-            "[STREAK] student_id=%s streak=%s longest=%s today_count=%s",
-            student_id, new_streak, new_longest, count,
+            "[STREAK] student_id=%s streak=%s→%s longest=%s today_count=%s",
+            student_id, user.current_streak, new_streak, new_longest, count,
         )
 
-        # Record streak event + check milestones
+        # ── 5. Record event + check milestones ──────────────────────────────
         self._record_streak_event(db, student_id, new_streak)
 
         milestone_badges: List[Dict] = []
