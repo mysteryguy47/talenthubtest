@@ -444,10 +444,19 @@ def get_super_journey(
     prev_points = 0
 
     for m in _SUPER_MILESTONES:
-        unlocked = m["badge_key"] in awarded_keys
+        # Unlock is driven purely by the student's point total, NOT by whether
+        # the badge was formally inserted into StudentBadgeAward.  The badge
+        # award row may be missing (e.g. if the evaluator was never triggered
+        # or the badge_definition row has wrong evaluation_rule), but the user
+        # has legitimately crossed the threshold, so we show it as unlocked.
+        unlocked = total_points >= m["points"]
+        # separately track whether the physical badge object was awarded (used
+        # by the frontend to render the badge art vs a generic icon).
+        badge_awarded = m["badge_key"] in awarded_keys
         milestones.append({
             **m,
             "unlocked": unlocked,
+            "badge_awarded": badge_awarded,
         })
         if not unlocked and next_milestone is None:
             next_milestone = {

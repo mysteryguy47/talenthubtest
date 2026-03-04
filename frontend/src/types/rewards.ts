@@ -150,6 +150,8 @@ export interface SuperMilestone {
   emoji: string;
   letter?: string;
   unlocked: boolean;
+  /** True if the badge row was formally inserted in StudentBadgeAward (independent of points threshold) */
+  badge_awarded?: boolean;
 }
 
 export interface SuperNextMilestone {

@@ -77,11 +77,17 @@ function EventRow({ event, index }: { event: RewardEvent; index: number }) {
               : ""}
           </p>
         )}
+        {/* Badge detail */}
+        {event.event_type === "badge_earned" && event.event_metadata?.badge_name && (
+          <p className="text-[10px] text-violet-400/80 mt-0.5 truncate">
+            🏅 {String(event.event_metadata.badge_name)}
+          </p>
+        )}
         {/* Streak detail */}
         {(event.event_type === "streak_incremented" || event.event_type === "streak_milestone_reached") &&
-          event.event_metadata?.streak_days !== undefined && (
+          (event.event_metadata?.streak_days ?? event.event_metadata?.streak) !== undefined && (
           <p className="text-[10px] text-amber-500/80 mt-0.5">
-            🔥 {String(event.event_metadata.streak_days)} day streak
+            🔥 {String(event.event_metadata?.streak_days ?? event.event_metadata?.streak)} day streak
           </p>
         )}
       </div>

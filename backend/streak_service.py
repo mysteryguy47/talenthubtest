@@ -307,7 +307,7 @@ class StreakService:
             source_tool="system",
             rule_key=None,
             points_delta=0,
-            event_metadata={"streak": new_streak},
+            event_metadata={"streak_days": new_streak, "streak": new_streak},
         )
         db.add(event)
 
