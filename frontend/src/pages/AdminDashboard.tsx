@@ -226,8 +226,8 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-2xl font-bold text-red-600 mb-4">Access Denied</div>
-          <div className="text-slate-600 dark:text-slate-400 mb-4">You do not have admin permissions to access this page.</div>
-          <a href="/dashboard" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 underline">
+          <div className=" text-slate-400 mb-4">You do not have admin permissions to access this page.</div>
+          <a href="/dashboard" className=" text-indigo-400  hover:text-indigo-300 underline">
             Go to Dashboard
           </a>
         </div>
@@ -237,8 +237,8 @@ export default function AdminDashboard() {
 
   if (!stats) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center">
-        <div className="text-xl text-red-400 dark:text-red-400">Failed to load dashboard</div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+        <div className="text-xl  text-red-400">Failed to load dashboard</div>
       </div>
     );
   }
@@ -259,7 +259,7 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <div className="bg-card border border-border rounded-[2.5rem] p-8 shadow-xl hover:border-primary transition-all group">
             <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-all">
-              <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              <Users className="w-6 h-6  text-blue-400" />
             </div>
             <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Total Students</div>
             <div className="text-3xl font-black italic text-card-foreground">{stats.total_students}</div>
@@ -267,7 +267,7 @@ export default function AdminDashboard() {
 
           <div className="bg-card border border-border rounded-[2.5rem] p-8 shadow-xl hover:border-primary transition-all group">
             <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-all">
-              <BarChart3 className="w-6 h-6 text-green-600 dark:text-green-400" />
+              <BarChart3 className="w-6 h-6  text-green-400" />
             </div>
             <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Total Sessions</div>
             <div className="text-3xl font-black italic text-card-foreground">{stats.total_sessions}</div>
@@ -275,7 +275,7 @@ export default function AdminDashboard() {
 
           <div className="bg-card border border-border rounded-[2.5rem] p-8 shadow-xl hover:border-primary transition-all group">
             <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-all">
-              <Target className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              <Target className="w-6 h-6  text-purple-400" />
             </div>
             <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Avg Accuracy</div>
             <div className="text-3xl font-black italic text-card-foreground">{stats?.average_accuracy?.toFixed(1) || '0.0'}%</div>
@@ -283,7 +283,7 @@ export default function AdminDashboard() {
 
           <div className="bg-card border border-border rounded-[2.5rem] p-8 shadow-xl hover:border-primary transition-all group">
             <div className="w-12 h-12 bg-orange-500/10 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-all">
-              <TrendingUp className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+              <TrendingUp className="w-6 h-6  text-orange-400" />
             </div>
             <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Active Today</div>
             <div className="text-3xl font-black italic text-card-foreground">{stats.active_students_today}</div>
@@ -404,17 +404,17 @@ export default function AdminDashboard() {
                           </div>
                           <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                             {entry.level && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 bg-violet-500/10 text-violet-600 dark:text-violet-400 rounded-md">
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 bg-violet-500/10  text-violet-400 rounded-md">
                                 {entry.level}
                               </span>
                             )}
                             {entry.course && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 bg-sky-500/10 text-sky-600 dark:text-sky-400 rounded-md">
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 bg-sky-500/10  text-sky-400 rounded-md">
                                 {entry.course}
                               </span>
                             )}
                             {entry.branch && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-md">
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 bg-emerald-500/10  text-emerald-400 rounded-md">
                                 {entry.branch}
                               </span>
                             )}
@@ -490,7 +490,7 @@ export default function AdminDashboard() {
                   </button>
                   <button
                     onClick={() => setLocation("/admin/student-ids")}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-xl text-sm font-bold transition-colors"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20  text-blue-400 rounded-xl text-sm font-bold transition-colors"
                   >
                     <IdCard className="w-4 h-4" />
                     Student IDs
@@ -498,7 +498,7 @@ export default function AdminDashboard() {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as "id" | "name" | "points")}
-                    className="px-3 py-2 bg-background dark:bg-slate-800 border border-border rounded-xl text-sm font-medium text-card-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className="px-3 py-2  bg-slate-800 border border-border rounded-xl text-sm font-medium text-card-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="id">Sort by ID</option>
                     <option value="name">Sort by Name</option>
@@ -602,7 +602,7 @@ export default function AdminDashboard() {
                         type="number"
                         value={pointsInput}
                         onChange={(e) => setPointsInput(e.target.value)}
-                        className="w-full px-3 py-2 bg-background dark:bg-slate-800 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-foreground"
+                        className="w-full px-3 py-2  bg-slate-800 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-foreground"
                         placeholder="Enter points"
                       />
                     ) : (
@@ -627,11 +627,11 @@ export default function AdminDashboard() {
                       </div>
                       <div className="bg-background/50 border border-border rounded-xl p-3 text-center">
                         <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Correct</div>
-                        <div className="text-lg font-black italic text-green-600 dark:text-green-400">{studentStats.total_correct}</div>
+                        <div className="text-lg font-black italic  text-green-400">{studentStats.total_correct}</div>
                       </div>
                       <div className="bg-background/50 border border-border rounded-xl p-3 text-center">
                         <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Wrong</div>
-                        <div className="text-lg font-black italic text-red-600 dark:text-red-400">{studentStats.total_wrong}</div>
+                        <div className="text-lg font-black italic  text-red-400">{studentStats.total_wrong}</div>
                       </div>
                     </div>
                     <div className="bg-background/50 border border-border rounded-xl p-3 text-center">
@@ -659,11 +659,11 @@ export default function AdminDashboard() {
                       </div>
                       <div className="bg-background/50 border border-border rounded-xl p-3 text-center">
                         <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Correct</div>
-                        <div className="text-lg font-black italic text-green-600 dark:text-green-400">{studentStats.paper_total_correct || 0}</div>
+                        <div className="text-lg font-black italic  text-green-400">{studentStats.paper_total_correct || 0}</div>
                       </div>
                       <div className="bg-background/50 border border-border rounded-xl p-3 text-center">
                         <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Wrong</div>
-                        <div className="text-lg font-black italic text-red-600 dark:text-red-400">{studentStats.paper_total_wrong || 0}</div>
+                        <div className="text-lg font-black italic  text-red-400">{studentStats.paper_total_wrong || 0}</div>
                       </div>
                     </div>
                     <div className="bg-background/50 border border-border rounded-xl p-3 text-center">
@@ -708,7 +708,7 @@ export default function AdminDashboard() {
                             <div className="grid grid-cols-3 gap-2 text-xs items-center">
                               <div>
                                 <span className="text-muted-foreground">Score: </span>
-                                <span className="font-bold text-green-600 dark:text-green-400">{session.correct_answers}/{session.total_questions}</span>
+                                <span className="font-bold  text-green-400">{session.correct_answers}/{session.total_questions}</span>
                               </div>
                               <div>
                                 <span className="text-muted-foreground">Accuracy: </span>
@@ -717,7 +717,7 @@ export default function AdminDashboard() {
                               <div className="flex items-center justify-between gap-2">
                                 <div>
                                   <span className="text-muted-foreground">Points: </span>
-                                  <span className="font-bold text-yellow-600 dark:text-yellow-400">{session.points_earned}</span>
+                                  <span className="font-bold  text-yellow-400">{session.points_earned}</span>
                                 </div>
                                 <Eye className="w-3 h-3 text-muted-foreground" />
                               </div>
@@ -773,7 +773,7 @@ export default function AdminDashboard() {
                             <div className="grid grid-cols-3 gap-2 text-xs items-center">
                               <div>
                                 <span className="text-muted-foreground">Score: </span>
-                                <span className="font-bold text-green-600 dark:text-green-400">{attempt.correct_answers}/{attempt.total_questions}</span>
+                                <span className="font-bold  text-green-400">{attempt.correct_answers}/{attempt.total_questions}</span>
                               </div>
                               <div>
                                 <span className="text-muted-foreground">Accuracy: </span>
@@ -782,7 +782,7 @@ export default function AdminDashboard() {
                               <div className="flex items-center justify-between gap-2">
                                 <div>
                                   <span className="text-muted-foreground">Points: </span>
-                                  <span className="font-bold text-yellow-600 dark:text-yellow-400">{attempt.points_earned}</span>
+                                  <span className="font-bold  text-yellow-400">{attempt.points_earned}</span>
                                 </div>
                                 <Eye className="w-3 h-3 text-muted-foreground" />
                               </div>
@@ -900,7 +900,7 @@ export default function AdminDashboard() {
                               </span>
                             </div>
                             <div className="flex items-center gap-6 text-sm">
-                              <span className={attempt.is_correct ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}>
+                              <span className={attempt.is_correct ? " text-green-400" : " text-red-400"}>
                                 Student answer: <span className="font-bold">{attempt.user_answer !== null ? attempt.user_answer : "—"}</span>
                               </span>
                               <span className="text-muted-foreground">
@@ -913,9 +913,9 @@ export default function AdminDashboard() {
                           </div>
                           <div className="ml-4">
                             {attempt.is_correct ? (
-                              <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" />
+                              <CheckCircle2 className="w-6 h-6  text-green-400" />
                             ) : (
-                              <XCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                              <XCircle className="w-6 h-6  text-red-400" />
                             )}
                           </div>
                         </div>
@@ -969,23 +969,23 @@ export default function AdminDashboard() {
                       {selectedPaperAttempt.correct_answers}/{selectedPaperAttempt.total_questions}
                     </div>
                   </div>
-                <div className="bg-green-50 dark:bg-green-900/30 rounded-lg p-4 border border-green-200 dark:border-green-700 transition-all duration-300">
-                  <div className="text-sm text-green-600 dark:text-green-300 font-semibold">Accuracy</div>
-                  <div className="text-2xl font-bold text-green-900 dark:text-green-200">
+                <div className=" bg-green-900/30 rounded-lg p-4 border  border-green-700 transition-all duration-300">
+                  <div className="text-sm  text-green-300 font-semibold">Accuracy</div>
+                  <div className="text-2xl font-bold  text-green-200">
                     {selectedPaperAttempt.accuracy.toFixed(1)}%
                   </div>
                 </div>
-                <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 border border-blue-200 dark:border-blue-700 transition-all duration-300">
-                  <div className="text-sm text-blue-600 dark:text-blue-300 font-semibold">Time</div>
-                  <div className="text-2xl font-bold text-blue-900 dark:text-blue-200">
+                <div className=" bg-blue-900/30 rounded-lg p-4 border  border-blue-700 transition-all duration-300">
+                  <div className="text-sm  text-blue-300 font-semibold">Time</div>
+                  <div className="text-2xl font-bold  text-blue-200">
                     {selectedPaperAttempt.time_taken != null
                       ? `${Math.floor(selectedPaperAttempt.time_taken / 60)}m ${Math.floor(selectedPaperAttempt.time_taken % 60)}s`
                       : "—"}
                   </div>
                 </div>
-                <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-4 border border-purple-200 dark:border-purple-700 transition-all duration-300">
-                  <div className="text-sm text-purple-600 dark:text-purple-300 font-semibold">Points</div>
-                  <div className="text-2xl font-bold text-purple-900 dark:text-purple-200">
+                <div className=" bg-purple-900/30 rounded-lg p-4 border  border-purple-700 transition-all duration-300">
+                  <div className="text-sm  text-purple-300 font-semibold">Points</div>
+                  <div className="text-2xl font-bold  text-purple-200">
                     +{selectedPaperAttempt.points_earned}
                   </div>
                 </div>
@@ -993,7 +993,7 @@ export default function AdminDashboard() {
 
               {/* Questions List */}
               <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+                <h3 className="text-lg font-bold  text-white mb-4">
                   Questions &amp; Answers
                 </h3>
                 <div className="space-y-3">
@@ -1005,37 +1005,37 @@ export default function AdminDashboard() {
                         key={q.id ?? idx}
                         className={`rounded-lg p-4 border-2 transition-all duration-300 ${
                           isCorrect
-                            ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700"
-                            : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700"
+                            ? " bg-green-900/20  border-green-700"
+                            : " bg-red-900/20  border-red-700"
                         }`}
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
-                              <span className="font-semibold text-slate-700 dark:text-white">
+                              <span className="font-semibold  text-white">
                                 Q{idx + 1}:
                               </span>
-                              <span className="text-slate-900 dark:text-white font-mono text-lg">
+                              <span className=" text-white font-mono text-lg">
                                 {q.text}
                               </span>
                             </div>
                             <div className="flex flex-wrap items-center gap-4 text-sm">
-                              <span className={isCorrect ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300"}>
+                              <span className={isCorrect ? " text-green-300" : " text-red-300"}>
                                 Student answer:{" "}
                                 <span className="font-semibold">
                                   {studentAnswer != null ? String(studentAnswer) : "—"}
                                 </span>
                               </span>
-                              <span className="text-slate-600 dark:text-slate-300">
+                              <span className=" text-slate-300">
                                 Correct: <span className="font-semibold">{String(q.answer)}</span>
                               </span>
                             </div>
                           </div>
                           <div className="ml-4">
                             {isCorrect ? (
-                              <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" />
+                              <CheckCircle2 className="w-6 h-6  text-green-400" />
                             ) : (
-                              <XCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                              <XCircle className="w-6 h-6  text-red-400" />
                             )}
                           </div>
                         </div>
@@ -1051,11 +1051,11 @@ export default function AdminDashboard() {
 
         {/* Database Stats */}
         {dbStats && (
-          <div className="mt-8 bg-white/90 dark:bg-slate-800 backdrop-blur-sm rounded-2xl p-6 shadow-lg dark:shadow-xl border border-slate-200/50 dark:border-slate-700 transition-all duration-300">
+          <div className="mt-8  bg-slate-800 backdrop-blur-sm rounded-2xl p-6  shadow-xl border  border-slate-700 transition-all duration-300">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <Database className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Database Statistics</h2>
+                <Database className="w-6 h-6  text-indigo-400" />
+                <h2 className="text-2xl font-bold  text-white">Database Statistics</h2>
               </div>
               <button
                 onClick={async () => {
@@ -1074,29 +1074,29 @@ export default function AdminDashboard() {
               </button>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-              <div className="p-4 bg-slate-50 dark:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-600 transition-all duration-300">
-                <div className="text-xs text-slate-600 dark:text-slate-300 mb-1">Total Users</div>
-                <div className="text-xl font-bold text-slate-900 dark:text-white">{dbStats.total_users}</div>
+              <div className="p-4  bg-slate-700 rounded-xl border  border-slate-600 transition-all duration-300">
+                <div className="text-xs  text-slate-300 mb-1">Total Users</div>
+                <div className="text-xl font-bold  text-white">{dbStats.total_users}</div>
               </div>
-              <div className="p-4 bg-slate-50 dark:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-600 transition-all duration-300">
-                <div className="text-xs text-slate-600 dark:text-slate-300 mb-1">Students</div>
-                <div className="text-xl font-bold text-indigo-600 dark:text-indigo-400">{dbStats.total_students}</div>
+              <div className="p-4  bg-slate-700 rounded-xl border  border-slate-600 transition-all duration-300">
+                <div className="text-xs  text-slate-300 mb-1">Students</div>
+                <div className="text-xl font-bold  text-indigo-400">{dbStats.total_students}</div>
               </div>
-              <div className="p-4 bg-slate-50 dark:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-600 transition-all duration-300">
-                <div className="text-xs text-slate-600 dark:text-slate-300 mb-1">Admins</div>
-                <div className="text-xl font-bold text-purple-600 dark:text-purple-400">{dbStats.total_admins}</div>
+              <div className="p-4  bg-slate-700 rounded-xl border  border-slate-600 transition-all duration-300">
+                <div className="text-xs  text-slate-300 mb-1">Admins</div>
+                <div className="text-xl font-bold  text-purple-400">{dbStats.total_admins}</div>
               </div>
-              <div className="p-4 bg-slate-50 dark:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-600 transition-all duration-300">
-                <div className="text-xs text-slate-600 dark:text-slate-300 mb-1">Sessions</div>
-                <div className="text-xl font-bold text-green-600 dark:text-green-400">{dbStats.total_sessions}</div>
+              <div className="p-4  bg-slate-700 rounded-xl border  border-slate-600 transition-all duration-300">
+                <div className="text-xs  text-slate-300 mb-1">Sessions</div>
+                <div className="text-xl font-bold  text-green-400">{dbStats.total_sessions}</div>
               </div>
-              <div className="p-4 bg-slate-50 dark:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-600 transition-all duration-300">
-                <div className="text-xs text-slate-600 dark:text-slate-300 mb-1">Paper Attempts</div>
-                <div className="text-xl font-bold text-blue-600 dark:text-blue-400">{dbStats.total_paper_attempts}</div>
+              <div className="p-4  bg-slate-700 rounded-xl border  border-slate-600 transition-all duration-300">
+                <div className="text-xs  text-slate-300 mb-1">Paper Attempts</div>
+                <div className="text-xl font-bold  text-blue-400">{dbStats.total_paper_attempts}</div>
               </div>
-              <div className="p-4 bg-slate-50 dark:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-600 transition-all duration-300">
-                <div className="text-xs text-slate-600 dark:text-slate-300 mb-1">DB Size</div>
-                <div className="text-xl font-bold text-slate-900 dark:text-white">{dbStats.database_size_mb} MB</div>
+              <div className="p-4  bg-slate-700 rounded-xl border  border-slate-600 transition-all duration-300">
+                <div className="text-xs  text-slate-300 mb-1">DB Size</div>
+                <div className="text-xl font-bold  text-white">{dbStats.database_size_mb} MB</div>
               </div>
             </div>
           </div>

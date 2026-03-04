@@ -85,7 +85,7 @@ export default function OptimizedImage({
     <div ref={imgRef} className={`relative overflow-hidden ${wrapperClasses}`}>
       {/* Blur placeholder - shows while loading */}
       {!isLoaded && (
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 animate-pulse" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-300 from-slate-800 to-slate-900 animate-pulse" />
       )}
 
       {/* Actual image - loads when in viewport */}
@@ -106,8 +106,8 @@ export default function OptimizedImage({
 
       {/* Error fallback */}
       {error && (
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center">
-          <p className="text-slate-600 dark:text-slate-400 text-sm">Image unavailable</p>
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-300 to-slate-400 from-slate-700 to-slate-800 flex items-center justify-center">
+          <p className=" text-slate-400 text-sm">Image unavailable</p>
         </div>
       )}
     </div>

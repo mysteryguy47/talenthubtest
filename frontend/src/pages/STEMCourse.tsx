@@ -298,7 +298,7 @@ function Hero() {
         <div key={i} style={{ position:"absolute", width:p.w, height:p.h, borderRadius:"50%", background:p.c, top:p.top, left:(p as any).left||"auto", right:(p as any).right||"auto", animation:`st-float ${p.dur} ease-in-out infinite ${p.d}`, pointerEvents:"none" }} />
       ))}
 
-      <div className="rsp-hero-grid" style={{ maxWidth:1200, margin:"0 auto", padding:"80px 24px", width:"100%", display:"grid", gridTemplateColumns:"55% 45%", gap:56, alignItems:"center" }}>
+      <div className="rsp-hero-grid" style={{ maxWidth:1200, margin:"0 auto", padding:"80px 56px 80px 24px", width:"100%", display:"grid", gridTemplateColumns:"55% 45%", gap:56, alignItems:"center" }}>
         {/* ── LEFT ── */}
         <div>
           {/* Terminal boot block */}

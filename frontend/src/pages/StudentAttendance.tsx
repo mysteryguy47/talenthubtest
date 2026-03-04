@@ -85,7 +85,7 @@ function ProgressRing({ percentage, size = 96, strokeWidth = 8 }: ProgressRingPr
         cx={size / 2} cy={size / 2} r={radius}
         fill="none"
         stroke="currentColor"
-        className="text-slate-200 dark:text-slate-700"
+        className=" text-slate-700"
         strokeWidth={strokeWidth}
       />
       {/* Progress arc */}
@@ -115,11 +115,11 @@ function SummaryCard({ data, monthName, year }: SummaryCardProps) {
   const s = data.summary;
   const pct = s.attendance_percentage;
   const pctColor =
-    pct >= 75 ? "text-emerald-600 dark:text-emerald-400" :
-    pct >= 60 ? "text-amber-600 dark:text-amber-400"     : "text-rose-600 dark:text-rose-400";
+    pct >= 75 ? " text-emerald-400" :
+    pct >= 60 ? " text-amber-400"     : " text-rose-400";
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5">
+    <div className=" bg-slate-900 rounded-2xl border  border-slate-800 shadow-sm p-5">
       <div className="flex items-start gap-5">
         {/* Ring */}
         <div className="relative flex-shrink-0 flex items-center justify-center">
@@ -133,7 +133,7 @@ function SummaryCard({ data, monthName, year }: SummaryCardProps) {
         {/* Stats grid */}
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline justify-between mb-3">
-            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+            <h3 className="text-sm font-semibold  text-slate-200">
               {monthName} {year}
             </h3>
             {data.student.name && (
@@ -149,10 +149,10 @@ function SummaryCard({ data, monthName, year }: SummaryCardProps) {
           </div>
 
           {s.present > 0 && (
-            <div className="flex items-center gap-2 mt-3 text-xs text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-2 mt-3 text-xs  text-slate-400">
               <Shirt className="w-3.5 h-3.5 text-indigo-500" />
               <span>
-                T-Shirt: <span className="font-semibold text-indigo-600 dark:text-indigo-400">{s.tshirt_worn}</span> / {s.present} days
+                T-Shirt: <span className="font-semibold  text-indigo-400">{s.tshirt_worn}</span> / {s.present} days
                 {s.tshirt_percentage > 0 && <span className="text-slate-400"> ({s.tshirt_percentage.toFixed(0)}%)</span>}
               </span>
             </div>
@@ -165,10 +165,10 @@ function SummaryCard({ data, monthName, year }: SummaryCardProps) {
 
 function StatPill({ label, value, color }: { label: string; value: number; color: "emerald" | "rose" | "amber" | "blue" }) {
   const classes: Record<string, string> = {
-    emerald: "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300",
-    rose:    "bg-rose-50    dark:bg-rose-950/30    text-rose-700    dark:text-rose-300",
-    amber:   "bg-amber-50   dark:bg-amber-950/30   text-amber-700   dark:text-amber-300",
-    blue:    "bg-blue-50    dark:bg-blue-950/30    text-blue-700    dark:text-blue-300",
+    emerald: " bg-emerald-950/30  text-emerald-300",
+    rose:    "    bg-rose-950/30        text-rose-300",
+    amber:   "   bg-amber-950/30      text-amber-300",
+    blue:    "    bg-blue-950/30        text-blue-300",
   };
   return (
     <div className={`rounded-xl px-3 py-2 ${classes[color]}`}>
@@ -198,10 +198,10 @@ const STATUS_DOT: Record<AttendanceStatus, string> = {
 };
 
 const STATUS_CELL_BG: Record<AttendanceStatus, string> = {
-  present:  "bg-emerald-50  dark:bg-emerald-950/25",
-  absent:   "bg-rose-50     dark:bg-rose-950/25",
-  on_break: "bg-amber-50    dark:bg-amber-950/25",
-  leave:    "bg-blue-50     dark:bg-blue-950/25",
+  present:  "  bg-emerald-950/25",
+  absent:   "     bg-rose-950/25",
+  on_break: "    bg-amber-950/25",
+  leave:    "     bg-blue-950/25",
 };
 
 function DayCell({ day, isToday, isPadding, session, isExpanded, onClick }: DayCellProps) {
@@ -217,14 +217,14 @@ function DayCell({ day, isToday, isPadding, session, isExpanded, onClick }: DayC
         relative aspect-square rounded-xl flex flex-col items-center justify-center transition-all duration-150
         ${isPadding ? "opacity-20 cursor-default" : ""}
         ${!isPadding && session ? "cursor-pointer hover:scale-105" : "cursor-default"}
-        ${isExpanded ? "ring-2 ring-blue-500 ring-offset-1 dark:ring-offset-slate-900" : ""}
-        ${isToday ? "ring-2 ring-blue-400 ring-offset-1 dark:ring-offset-slate-900" : ""}
+        ${isExpanded ? "ring-2 ring-blue-500  ring-offset-slate-900" : ""}
+        ${isToday ? "ring-2 ring-blue-400  ring-offset-slate-900" : ""}
         ${cellBg}
-        ${!status && !isPadding ? "bg-white dark:bg-slate-900" : ""}
+        ${!status && !isPadding ? " bg-slate-900" : ""}
       `}
       aria-label={`Day ${day}${status ? ", " + STATUS_LABELS[status] : ""}`}
     >
-      <span className={`text-sm font-semibold ${isToday ? "text-blue-600 dark:text-blue-400" : "text-slate-700 dark:text-slate-300"}`}>
+      <span className={`text-sm font-semibold ${isToday ? " text-blue-400" : " text-slate-300"}`}>
         {day}
       </span>
       {status && (
@@ -250,22 +250,22 @@ function ExpandedDetail({ session, day, monthName }: ExpandedDetailProps) {
   const sc = status ? STATUS_COLORS[status] : null;
 
   return (
-    <div className="col-span-7 mx-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
-      <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+    <div className="col-span-7 mx-1 rounded-xl border  border-slate-700  bg-slate-900 shadow-sm overflow-hidden">
+      <div className="px-4 py-3 border-b  border-slate-800 flex items-center justify-between">
         <div>
-          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+          <p className="text-sm font-semibold  text-slate-200">
             {day} {monthName}
           </p>
-          {session.topic && <p className="text-xs text-slate-500 dark:text-slate-400">{session.topic}</p>}
+          {session.topic && <p className="text-xs  text-slate-400">{session.topic}</p>}
         </div>
         <div className="flex items-center gap-2">
           {session.course && (
-            <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2.5 py-1 rounded-full">
+            <span className="text-xs font-medium  text-blue-400  bg-blue-950/40 px-2.5 py-1 rounded-full">
               {session.course}
             </span>
           )}
           {session.level && (
-            <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full">
+            <span className="text-xs  text-slate-400  bg-slate-800 px-2.5 py-1 rounded-full">
               {session.level}
             </span>
           )}
@@ -280,7 +280,7 @@ function ExpandedDetail({ session, day, monthName }: ExpandedDetailProps) {
             {STATUS_LABELS[status]}
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium  bg-slate-800  text-slate-400">
             Not marked
           </span>
         )}
@@ -288,12 +288,12 @@ function ExpandedDetail({ session, day, monthName }: ExpandedDetailProps) {
         {/* T-shirt badge */}
         {status === "present" && (
           session.t_shirt_worn ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium  bg-indigo-900/40  text-indigo-300">
               <Shirt className="w-3.5 h-3.5" />
               T-Shirt Worn ✓
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium  bg-slate-800  text-slate-400">
               <Shirt className="w-3.5 h-3.5" />
               T-Shirt Not Worn
             </span>
@@ -301,14 +301,14 @@ function ExpandedDetail({ session, day, monthName }: ExpandedDetailProps) {
         )}
 
         {/* Branch */}
-        <span className="text-xs text-slate-400 dark:text-slate-500">
+        <span className="text-xs  text-slate-500">
           {session.branch}
           {session.batch_name ? ` · ${session.batch_name}` : ""}
         </span>
 
         {/* Marked at */}
         {session.marked_at && (
-          <span className="ml-auto text-[11px] text-slate-400 dark:text-slate-500">
+          <span className="ml-auto text-[11px]  text-slate-500">
             Marked: {new Date(session.marked_at).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
           </span>
         )}
@@ -316,7 +316,7 @@ function ExpandedDetail({ session, day, monthName }: ExpandedDetailProps) {
 
       {session.teacher_remarks && (
         <div className="px-4 pb-3">
-          <p className="text-xs text-slate-500 dark:text-slate-400 italic">"{session.teacher_remarks}"</p>
+          <p className="text-xs  text-slate-400 italic">"{session.teacher_remarks}"</p>
         </div>
       )}
     </div>
@@ -386,15 +386,15 @@ export default function StudentAttendance() {
   for (let i = 0; i < calendarCells.length; i += 7) rows.push(calendarCells.slice(i, i + 7));
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen  bg-slate-950">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4">
+      <div className=" bg-slate-900 border-b  border-slate-800 px-6 py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">My Attendance</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Track your class attendance</p>
+            <h1 className="text-xl font-semibold  text-slate-100">My Attendance</h1>
+            <p className="text-sm  text-slate-400 mt-0.5">Track your class attendance</p>
           </div>
-          <button onClick={() => refetch()} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500" aria-label="Refresh">
+          <button onClick={() => refetch()} className="p-2 rounded-lg  hover:bg-slate-800 transition-colors text-slate-500" aria-label="Refresh">
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
@@ -403,19 +403,19 @@ export default function StudentAttendance() {
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
         {/* Summary Card */}
         {isLoading ? (
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
+          <div className=" bg-slate-900 rounded-2xl border  border-slate-800 p-5">
             <div className="flex items-start gap-5">
-              <div className="w-24 h-24 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse flex-shrink-0" />
+              <div className="w-24 h-24 rounded-full  bg-slate-700 animate-pulse flex-shrink-0" />
               <div className="flex-1 space-y-3">
-                <div className="h-4 w-36 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                <div className="h-4 w-36  bg-slate-700 rounded animate-pulse" />
                 <div className="grid grid-cols-4 gap-3">
-                  {[0,1,2,3].map(i => <div key={i} className="h-14 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />)}
+                  {[0,1,2,3].map(i => <div key={i} className="h-14  bg-slate-800 rounded-xl animate-pulse" />)}
                 </div>
               </div>
             </div>
           </div>
         ) : isError ? (
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-rose-100 dark:border-rose-900 p-5 flex items-center gap-3 text-rose-600 dark:text-rose-400">
+          <div className=" bg-slate-900 rounded-2xl border  border-rose-900 p-5 flex items-center gap-3  text-rose-400">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
             <span className="text-sm">Failed to load attendance. <button onClick={() => refetch()} className="underline">Retry</button></span>
           </div>
@@ -424,25 +424,25 @@ export default function StudentAttendance() {
         ) : null}
 
         {/* Calendar */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div className=" bg-slate-900 rounded-2xl border  border-slate-800 shadow-sm overflow-hidden">
           {/* Calendar header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
-            <button onClick={prevMonth} className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500 dark:text-slate-400" aria-label="Previous month">
+          <div className="flex items-center justify-between px-5 py-4 border-b  border-slate-800">
+            <button onClick={prevMonth} className="p-2 rounded-xl  hover:bg-slate-800 transition-colors  text-slate-400" aria-label="Previous month">
               <ChevronLeft className="w-4 h-4" />
             </button>
 
             <div className="flex items-center gap-3">
-              <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              <h2 className="text-base font-semibold  text-slate-100">
                 {monthName} {year}
               </h2>
               {(month !== now.getMonth() + 1 || year !== now.getFullYear()) && (
-                <button onClick={jumpToToday} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">
+                <button onClick={jumpToToday} className="text-xs  text-blue-400 hover:underline">
                   Today
                 </button>
               )}
             </div>
 
-            <button onClick={nextMonth} className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500 dark:text-slate-400" aria-label="Next month">
+            <button onClick={nextMonth} className="p-2 rounded-xl  hover:bg-slate-800 transition-colors  text-slate-400" aria-label="Next month">
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -450,7 +450,7 @@ export default function StudentAttendance() {
           {/* Day headers */}
           <div className="grid grid-cols-7 px-4 pt-3 pb-1">
             {DAY_NAMES_SHORT.map(d => (
-              <div key={d} className="text-center text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+              <div key={d} className="text-center text-[11px] font-semibold  text-slate-500 uppercase tracking-wider">
                 {d}
               </div>
             ))}
@@ -506,19 +506,19 @@ export default function StudentAttendance() {
           </div>
 
           {/* Legend */}
-          <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 flex items-center gap-5 flex-wrap bg-slate-50/60 dark:bg-slate-900/60">
+          <div className="px-5 py-3 border-t  border-slate-800 flex items-center gap-5 flex-wrap  bg-slate-900/60">
             {([
               { label: "Present",  dot: "bg-emerald-500" },
               { label: "Absent",   dot: "bg-rose-500"    },
               { label: "On Break", dot: "bg-amber-500"   },
               { label: "Leave",    dot: "bg-blue-500"    },
             ] as const).map(l => (
-              <span key={l.label} className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+              <span key={l.label} className="flex items-center gap-1.5 text-xs  text-slate-400">
                 <span className={`w-2 h-2 rounded-full ${l.dot}`} />
                 {l.label}
               </span>
             ))}
-            <span className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+            <span className="flex items-center gap-1.5 text-xs  text-slate-400">
               <Shirt className="w-3 h-3 text-indigo-500" />T-Shirt
             </span>
           </div>
@@ -526,20 +526,20 @@ export default function StudentAttendance() {
 
         {/* Empty state for no sessions */}
         {!isLoading && data && data.sessions.length === 0 && (
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 text-center">
-            <Calendar className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">No classes found for {monthName} {year}</p>
+          <div className=" bg-slate-900 rounded-2xl border  border-slate-800 p-8 text-center">
+            <Calendar className="w-8 h-8  text-slate-600 mx-auto mb-2" />
+            <p className="text-sm  text-slate-400 font-medium">No classes found for {monthName} {year}</p>
             <p className="text-xs text-slate-400 mt-1">Try navigating to a different month</p>
           </div>
         )}
 
         {/* No profile warning */}
         {isError && (
-          <div className="bg-amber-50 dark:bg-amber-950/30 rounded-2xl border border-amber-100 dark:border-amber-800 p-4 flex items-start gap-3">
+          <div className=" bg-amber-950/30 rounded-2xl border  border-amber-800 p-4 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Attendance data unavailable</p>
-              <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+              <p className="text-sm font-medium  text-amber-300">Attendance data unavailable</p>
+              <p className="text-xs  text-amber-400 mt-0.5">
                 Your student profile may not be set up yet, or you may not be assigned to a branch.
                 Contact your administrator for help.
               </p>

@@ -60,7 +60,7 @@ function formatNumber(num: number): string {
 export default function MathQuestion({ question, showAnswer = false, hideSerialNumber = false, largeFont = false, smallHorizontalFont = false }: Props) {
   // Premium serial number styling
   const serialNumber = (
-    <span className="font-bold text-sm text-blue-400 dark:text-blue-400 mr-2">{question.id}.</span>
+    <span className="font-bold text-sm  text-blue-400 mr-2">{question.id}.</span>
   );
   
   // Memoize decimal conversion to prevent log spam on every render
@@ -107,26 +107,26 @@ export default function MathQuestion({ question, showAnswer = false, hideSerialN
     const lines = processedDecimalLines;
     
     return (
-      <table className="w-full border-collapse bg-slate-800/50 dark:bg-slate-800/50 rounded border border-slate-600 dark:border-slate-600 hover:border-blue-500 dark:hover:border-blue-500 transition-colors shadow-sm">
+      <table className="w-full border-collapse  bg-slate-800/50 rounded border  border-slate-600  hover:border-blue-500 transition-colors shadow-sm">
         <tbody>
           <tr>
             {!hideSerialNumber && (
-              <td className="p-1.5 align-center w-8 border-r border-slate-600 dark:border-slate-600 text-center">
-                <span className="font-bold text-sm text-blue-400 dark:text-blue-400">{question.id}.</span>
+              <td className="p-1.5 align-center w-8 border-r  border-slate-600 text-center">
+                <span className="font-bold text-sm  text-blue-400">{question.id}.</span>
               </td>
             )}
             <td className="p-1.5">
               <div className="flex flex-col items-end space-y-0.5">
                 {lines.map((line, idx) => (
-                  <div key={idx} className={`text-right font-mono ${largeFont ? 'text-xl' : 'text-base'} font-semibold text-white dark:text-white leading-tight`}>
+                  <div key={idx} className={`text-right font-mono ${largeFont ? 'text-xl' : 'text-base'} font-semibold  text-white leading-tight`}>
                     {line}
                   </div>
                 ))}
-                <div className="border-t border-slate-500 dark:border-slate-500 w-full my-0.5"></div>
+                <div className="border-t  border-slate-500 w-full my-0.5"></div>
                 {/* Always show answer space (blank if answer not shown) */}
                 <div className="min-h-[1.2rem] text-right w-full">
                   {showAnswer && (
-                    <div className={`text-slate-300 dark:text-slate-300 font-mono ${largeFont ? 'text-xl' : 'text-base'} font-bold`}>
+                    <div className={` text-slate-300 font-mono ${largeFont ? 'text-xl' : 'text-base'} font-bold`}>
                       {typeof question.answer === 'number' && question.answer % 1 !== 0 
                         ? question.answer.toFixed(1) 
                         : formatNumber(question.answer)}
@@ -148,13 +148,13 @@ export default function MathQuestion({ question, showAnswer = false, hideSerialN
     
     // Use table structure for Excel compatibility - serial number in separate column
     return (
-      <table className="w-full border-collapse bg-slate-800/50 dark:bg-slate-800/50 rounded border border-slate-600 dark:border-slate-600 hover:border-blue-500 dark:hover:border-blue-500 transition-colors shadow-sm">
+      <table className="w-full border-collapse  bg-slate-800/50 rounded border  border-slate-600  hover:border-blue-500 transition-colors shadow-sm">
         <tbody>
           {/* Serial number row */}
           <tr>
             {!hideSerialNumber && (
-              <td className="p-1.5 align-center w-8 border-r border-slate-600 dark:border-slate-600 text-center">
-                <span className="font-bold text-sm text-blue-400 dark:text-blue-400">{question.id}.</span>
+              <td className="p-1.5 align-center w-8 border-r  border-slate-600 text-center">
+                <span className="font-bold text-sm  text-blue-400">{question.id}.</span>
               </td>
             )}
             <td className="p-1.5">
@@ -162,7 +162,7 @@ export default function MathQuestion({ question, showAnswer = false, hideSerialN
                 {isDecimalFormatVertical ? (
                   // Use backend-formatted text field directly.
                   String(question.text).split('\n').filter(line => line.trim() !== '').map((line, idx) => (
-                    <div key={idx} className={`text-right font-mono ${largeFont ? 'text-xl' : 'text-base'} font-semibold text-white dark:text-white leading-tight`}>
+                    <div key={idx} className={`text-right font-mono ${largeFont ? 'text-xl' : 'text-base'} font-semibold  text-white leading-tight`}>
                       {line}
                     </div>
                   ))
@@ -177,7 +177,7 @@ export default function MathQuestion({ question, showAnswer = false, hideSerialN
                       if (idx === 0) {
                         // First operand has no operator
                         return (
-                          <div key={idx} className={`text-right font-mono ${largeFont ? 'text-xl' : 'text-base'} font-semibold text-white dark:text-white leading-tight`}>
+                          <div key={idx} className={`text-right font-mono ${largeFont ? 'text-xl' : 'text-base'} font-semibold  text-white leading-tight`}>
                             {displayValue}
                           </div>
                         );
@@ -185,8 +185,8 @@ export default function MathQuestion({ question, showAnswer = false, hideSerialN
                         // Subsequent operands have their operators
                         const operator = question.operators[idx - 1];
                         return (
-                          <div key={idx} className={`text-right font-mono ${largeFont ? 'text-xl' : 'text-base'} font-semibold text-white dark:text-white leading-tight`}>
-                            <span className="mr-1 text-blue-400 dark:text-blue-400">{operator}</span>
+                          <div key={idx} className={`text-right font-mono ${largeFont ? 'text-xl' : 'text-base'} font-semibold  text-white leading-tight`}>
+                            <span className="mr-1  text-blue-400">{operator}</span>
                             {displayValue}
                           </div>
                         );
@@ -199,20 +199,20 @@ export default function MathQuestion({ question, showAnswer = false, hideSerialN
                       (question.operator !== "-" && idx === question.operands.length - 1);
                     
                     return (
-                      <div key={idx} className={`text-right font-mono ${largeFont ? 'text-xl' : 'text-base'} font-semibold text-white dark:text-white leading-tight`}>
+                      <div key={idx} className={`text-right font-mono ${largeFont ? 'text-xl' : 'text-base'} font-semibold  text-white leading-tight`}>
                         {showOperator && (
-                          <span className="mr-1 text-blue-400 dark:text-blue-400">{question.operator}</span>
+                          <span className="mr-1  text-blue-400">{question.operator}</span>
                         )}
                         {displayValue}
                       </div>
                     );
                   })
                 )}
-                <div className="border-t border-slate-500 dark:border-slate-500 w-full my-0.5"></div>
+                <div className="border-t  border-slate-500 w-full my-0.5"></div>
                 {/* Always show answer space (blank if answer not shown) */}
                 <div className="min-h-[1.2rem] text-right w-full">
                   {showAnswer && (
-                    <div className={`text-slate-300 dark:text-slate-300 font-mono ${largeFont ? 'text-xl' : 'text-base'} font-bold`}>
+                    <div className={` text-slate-300 font-mono ${largeFont ? 'text-xl' : 'text-base'} font-bold`}>
                       {typeof question.answer === 'number' && question.answer % 1 !== 0 
                         ? question.answer.toFixed(1) 
                         : formatNumber(question.answer)}
@@ -238,22 +238,22 @@ export default function MathQuestion({ question, showAnswer = false, hideSerialN
   if (question.operator === "√" || question.operator === "∛" || question.operator === "LCM" || question.operator === "GCD" || question.operator === "%" || question.operator === "²" || question.operator === "C" || isDecimalDivision || hasCustomText || usesSingleOperand || (question.operands && question.operands.length === 1)) {
     // Use table structure for Excel compatibility - answers in separate column
     return (
-      <table className="w-full border-collapse bg-slate-800/50 dark:bg-slate-800/50 rounded border border-slate-600 dark:border-slate-600 hover:border-blue-500 dark:hover:border-blue-500 transition-colors shadow-sm">
+      <table className="w-full border-collapse  bg-slate-800/50 rounded border  border-slate-600  hover:border-blue-500 transition-colors shadow-sm">
         <tbody>
           <tr>
             {!hideSerialNumber && (
-              <td className="p-1.5 align-center w-8 border-r border-slate-600 dark:border-slate-600 text-center">
-                <span className="font-bold text-sm text-blue-400 dark:text-blue-400">{question.id}.</span>
+              <td className="p-1.5 align-center w-8 border-r  border-slate-600 text-center">
+                <span className="font-bold text-sm  text-blue-400">{question.id}.</span>
               </td>
             )}
-              <td className={`p-1.5 ${showAnswer ? 'border-r border-slate-600 dark:border-slate-600' : ''}`}>
-                <div className={`font-mono ${smallHorizontalFont ? 'text-sm' : (largeFont ? 'text-xl' : 'text-base')} font-semibold text-white dark:text-white break-all`} style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }}>
+              <td className={`p-1.5 ${showAnswer ? 'border-r  border-slate-600' : ''}`}>
+                <div className={`font-mono ${smallHorizontalFont ? 'text-sm' : (largeFont ? 'text-xl' : 'text-base')} font-semibold  text-white break-all`} style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }}>
                 {question.text}
               </div>
             </td>
             {showAnswer && (
               <td className="p-1.5 w-32 text-right align-top">
-                <div className={`text-slate-300 dark:text-slate-300 font-mono ${largeFont ? 'text-xl' : 'text-base'} font-bold text-right whitespace-nowrap`}>
+                <div className={` text-slate-300 font-mono ${largeFont ? 'text-xl' : 'text-base'} font-bold text-right whitespace-nowrap`}>
                   {typeof question.answer === 'number' && question.answer % 1 !== 0 
                     ? question.answer.toFixed(2).replace(/\.?0+$/, '') 
                     : formatNumber(question.answer)}
@@ -270,22 +270,22 @@ export default function MathQuestion({ question, showAnswer = false, hideSerialN
   if (question.operator === "×" && question.text && question.text.includes(".")) {
     // Use table structure for Excel compatibility - answers in separate column
     return (
-      <table className="w-full border-collapse bg-slate-800/50 dark:bg-slate-800/50 rounded border border-slate-600 dark:border-slate-600 hover:border-blue-500 dark:hover:border-blue-500 transition-colors shadow-sm">
+      <table className="w-full border-collapse  bg-slate-800/50 rounded border  border-slate-600  hover:border-blue-500 transition-colors shadow-sm">
         <tbody>
           <tr>
             {!hideSerialNumber && (
-              <td className="p-1.5 align-center w-8 border-r border-slate-600 dark:border-slate-600 text-center">
-                <span className="font-bold text-sm text-blue-400 dark:text-blue-400">{question.id}.</span>
+              <td className="p-1.5 align-center w-8 border-r  border-slate-600 text-center">
+                <span className="font-bold text-sm  text-blue-400">{question.id}.</span>
               </td>
             )}
-              <td className={`p-1.5 ${showAnswer ? 'border-r border-slate-600 dark:border-slate-600' : ''}`}>
-                <div className={`font-mono ${smallHorizontalFont ? 'text-sm' : (largeFont ? 'text-xl' : 'text-base')} font-semibold text-white dark:text-white break-all`} style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }}>
+              <td className={`p-1.5 ${showAnswer ? 'border-r  border-slate-600' : ''}`}>
+                <div className={`font-mono ${smallHorizontalFont ? 'text-sm' : (largeFont ? 'text-xl' : 'text-base')} font-semibold  text-white break-all`} style={{ wordBreak: 'break-all', overflowWrap: 'break-word' }}>
                 {question.text}
               </div>
             </td>
             {showAnswer && (
               <td className="p-1.5 w-32 text-right align-top">
-                <div className={`text-slate-300 dark:text-slate-300 font-mono ${largeFont ? 'text-xl' : 'text-base'} font-bold text-right whitespace-nowrap`}>
+                <div className={` text-slate-300 font-mono ${largeFont ? 'text-xl' : 'text-base'} font-bold text-right whitespace-nowrap`}>
                   {typeof question.answer === 'number' && question.answer % 1 !== 0 
                     ? question.answer.toFixed(2) 
                     : formatNumber(question.answer)}
@@ -316,22 +316,22 @@ export default function MathQuestion({ question, showAnswer = false, hideSerialN
   }
   
   return (
-    <table className="w-full border-collapse bg-slate-800/50 dark:bg-slate-800/50 rounded border border-slate-600 dark:border-slate-600 hover:border-blue-500 dark:hover:border-blue-500 transition-colors shadow-sm">
+    <table className="w-full border-collapse  bg-slate-800/50 rounded border  border-slate-600  hover:border-blue-500 transition-colors shadow-sm">
       <tbody>
         <tr>
           {!hideSerialNumber && (
-            <td className="p-1.5 align-center w-8 border-r border-slate-600 dark:border-slate-600 text-center">
-              <span className="font-bold text-sm text-blue-400 dark:text-blue-400">{question.id}.</span>
+            <td className="p-1.5 align-center w-8 border-r  border-slate-600 text-center">
+              <span className="font-bold text-sm  text-blue-400">{question.id}.</span>
             </td>
           )}
-          <td className={`p-1.5 ${showAnswer ? 'border-r border-slate-600 dark:border-slate-600' : ''}`}>
-            <div className={`font-mono ${smallHorizontalFont ? 'text-sm' : (largeFont ? 'text-xl' : 'text-base')} font-semibold text-white dark:text-white break-all`}>
+          <td className={`p-1.5 ${showAnswer ? 'border-r  border-slate-600' : ''}`}>
+            <div className={`font-mono ${smallHorizontalFont ? 'text-sm' : (largeFont ? 'text-xl' : 'text-base')} font-semibold  text-white break-all`}>
               {questionText}
             </div>
           </td>
           {showAnswer && (
             <td className="p-1.5 w-32 text-right align-top">
-              <div className={`text-slate-300 dark:text-slate-300 font-mono ${largeFont ? 'text-xl' : 'text-base'} font-bold text-right whitespace-nowrap`}>
+              <div className={` text-slate-300 font-mono ${largeFont ? 'text-xl' : 'text-base'} font-bold text-right whitespace-nowrap`}>
                 {typeof question.answer === 'number' && question.answer % 1 !== 0 
                   ? question.answer.toFixed(2) 
                   : formatNumber(question.answer)}

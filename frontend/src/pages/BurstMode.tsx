@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Zap, ArrowLeft, CheckCircle2, XCircle, Clock, Trophy, Flame, RotateCcw, Play, ChevronRight, AlertTriangle } from "lucide-react";
+import { Zap, ArrowLeft, CheckCircle2, XCircle, Clock, Trophy, Flame, RotateCcw, Play, AlertTriangle } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "../contexts/AuthContext";
 import { savePracticeSession, PracticeSessionData } from "../lib/userApi";
@@ -506,6 +506,10 @@ export default function BurstMode() {
       @keyframes bm-scale-pop { 0%{transform:scale(1)} 45%{transform:scale(1.1)} 100%{transform:scale(1)} }
       @keyframes bm-number-slam { 0%{opacity:0;transform:scale(.55) translateY(20px)} 55%{transform:scale(1.07) translateY(-3px)} 100%{opacity:1;transform:scale(1) translateY(0)} }
       @keyframes bm-burst-pulse { 0%,100%{box-shadow:0 0 0 0 var(--bm-burstglow)} 60%{box-shadow:0 0 0 14px transparent} }
+      @keyframes bm-pulse-ring { 0%{box-shadow:0 0 0 0 rgba(249,115,22,.22)} 70%{box-shadow:0 0 0 12px transparent} 100%{box-shadow:0 0 0 0 transparent} }
+      @keyframes bm-countdown-in { 0%{opacity:0;transform:scale(2.5)} 30%{opacity:1;transform:scale(1)} 80%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(.8)} }
+      .bm-pulse-ring{animation:bm-pulse-ring 2s ease infinite}
+      .bm-countdown-num{animation:bm-countdown-in 1s cubic-bezier(.4,0,.2,1) both}
       @keyframes bm-timer-shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-3px)} 40%{transform:translateX(3px)} 60%{transform:translateX(-2px)} 80%{transform:translateX(2px)} }
       @keyframes bm-correct-ring { 0%{outline-color:rgba(16,185,129,0)} 40%{outline-color:rgba(16,185,129,.5)} 100%{outline-color:rgba(16,185,129,0)} }
       @keyframes bm-wrong-ring { 0%{outline-color:rgba(239,68,68,0)} 40%{outline-color:rgba(239,68,68,.6)} 100%{outline-color:rgba(239,68,68,0)} }
@@ -531,6 +535,14 @@ export default function BurstMode() {
       .bm-skip-btn { background: var(--bm-surf2); border: 1px solid var(--bm-bdr2); border-radius: 14px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 22px; color: var(--bm-muted); transition: all .2s ease; flex-shrink: 0; }
       .bm-skip-btn:hover { background: rgba(249,115,22,.08); border-color: rgba(249,115,22,.3); color: var(--bm-burst2); }
       .bm-skip-btn:active { transform: scale(.92); }
+      .bm-stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+      .bm-modes-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+      .bm-action-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+      @media(max-width:640px){
+        .bm-stats-grid{grid-template-columns:repeat(3,1fr)!important}
+        .bm-modes-grid{grid-template-columns:repeat(2,1fr)!important}
+        .bm-action-grid{grid-template-columns:1fr 1fr!important}
+      }
     `;
     document.head.appendChild(style);
   }, []);
@@ -786,44 +798,38 @@ export default function BurstMode() {
   if (phase === "select") {
     return (
       <div style={{ minHeight: "100vh", background: "var(--bm-bg)", position: "relative", overflowX: "hidden" }}>
-        {/* Atmospheric glow */}
-        <div style={{
-          position: "absolute", top: -100, left: "50%", transform: "translateX(-50%)",
-          width: 700, height: 500, borderRadius: "50%", pointerEvents: "none",
-          background: "radial-gradient(ellipse, rgba(249,115,22,.07) 0%, rgba(123,92,229,.05) 50%, transparent 70%)",
-          animation: "bm-bg-breathe 6s ease-in-out infinite"
-        }} />
-        {/* Grid pattern */}
-        <div style={{
-          position: "absolute", inset: 0, opacity: .3, pointerEvents: "none",
-          backgroundImage: "linear-gradient(rgba(249,115,22,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(249,115,22,.04) 1px, transparent 1px)",
-          backgroundSize: "56px 56px",
-          WebkitMaskImage: "radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 75%)",
-          maskImage: "radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 75%)"
-        }} />
 
-        <div style={{ position: "relative", zIndex: 1 }}>
-          {/* Hero header */}
-          <div style={{ textAlign: "center", padding: "72px 24px 48px", position: "relative" }}>
-            <div style={{ animation: "bm-lightning-in .5s cubic-bezier(.34,1.56,.64,1) both", marginBottom: 16 }}>
-              <Zap style={{ width: 48, height: 48, color: "var(--bm-burst2)", display: "block", margin: "0 auto" }} />
+        {/* Hero banner — Glow Crown */}
+        <div style={{ position: "relative", overflow: "hidden", borderRadius: "0 0 28px 28px", padding: "52px 32px 56px", background: "linear-gradient(145deg, #1A1008 0%, #1F1510 40%, #0E0B08 100%)", borderBottom: "1px solid rgba(249,115,22,.2)" }}>
+          {/* Atmospheric glow */}
+          <div style={{ position: "absolute", top: "-20%", left: "50%", transform: "translateX(-50%)", width: 500, height: 400, background: "radial-gradient(ellipse at center, rgba(249,115,22,.12) 0%, rgba(249,115,22,.04) 50%, transparent 70%)", pointerEvents: "none", animation: "bm-bg-breathe 6s ease-in-out infinite" }} />
+          {/* Grid pattern */}
+          <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(249,115,22,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(249,115,22,.05) 1px, transparent 1px)", backgroundSize: "48px 48px", WebkitMaskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)" }} />
+          {/* Bottom fade */}
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 40, background: "linear-gradient(to bottom, transparent, var(--bm-bg))" }} />
+          <div style={{ position: "relative", zIndex: 1, textAlign: "center" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 60, height: 60, borderRadius: 18, background: "rgba(249,115,22,.2)", marginBottom: 20, boxShadow: "0 8px 32px rgba(249,115,22,.15)", animation: "bm-lightning-in .5s cubic-bezier(.34,1.56,.64,1) both" }}>
+              <Zap style={{ width: 28, height: 28, color: "var(--bm-burst2)" }} />
             </div>
             <h1 style={{
-              fontFamily: "var(--bm-fd)", fontSize: "clamp(36px, 6vw, 72px)", fontWeight: 800,
-              letterSpacing: "-.04em", lineHeight: 1, margin: "0 0 12px",
+              fontFamily: "var(--bm-fd)", fontSize: "clamp(28px,4vw,44px)", fontWeight: 800,
+              letterSpacing: "-.03em", lineHeight: 1, margin: "0 0 10px",
               background: "linear-gradient(135deg, var(--bm-burst3) 0%, var(--bm-burst2) 35%, var(--bm-burst) 70%, #C2410C 100%)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text"
             }}>Burst Mode</h1>
-            <p style={{ fontFamily: "var(--bm-fb)", fontSize: 17, fontWeight: 300, color: "var(--bm-white2)", maxWidth: 460, margin: "0 auto 16px", lineHeight: 1.65 }}>
+            <p style={{ fontFamily: "var(--bm-fb)", fontSize: 16, fontWeight: 300, color: "rgba(255,255,255,.5)", margin: "0 0 16px" }}>
               60 seconds. Unlimited questions. Push your speed to the limit.
             </p>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--bm-burstdim)", border: "1px solid rgba(249,115,22,.22)", borderRadius: 100, padding: "6px 16px", fontFamily: "var(--bm-fm)", fontSize: 12, color: "var(--bm-burst2)" }}>
               ⚡ 10 modes available · 60s each
             </div>
           </div>
+        </div>
+
+        <div style={{ position: "relative", zIndex: 1 }}>
 
           {/* Mode cards grid */}
-          <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 16px", display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 14 }}>
+          <div className="bm-modes-grid" style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px 16px" }}>
             {(Object.entries(BURST_OPERATIONS) as [BurstOperationType, BurstConfig][]).map(
               ([key, config], index) => {
                 const range = getPointsRange(key);
@@ -978,16 +984,27 @@ export default function BurstMode() {
   // Countdown phase
   if (phase === "countdown") {
     return (
-      <div style={{ minHeight: "100vh", background: "var(--bm-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-        <div
-          key={countdownNum}
-          style={{ fontFamily: "var(--bm-fm)", fontSize: "clamp(120px,20vw,200px)", fontWeight: 800, lineHeight: 1, color: "var(--bm-burst2)", animation: "bm-scale-in .35s cubic-bezier(.34,1.56,.64,1) both", letterSpacing: "-.04em" }}
-        >
-          {countdownNum}
+      <div style={{ minHeight: "100vh", background: "var(--bm-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", position: "relative", overflowX: "hidden" }}>
+        {/* Background glow */}
+        <div style={{ position: "absolute", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle, rgba(249,115,22,.15) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div className="bm-pulse-ring" style={{ position: "absolute", width: 300, height: 300, borderRadius: "50%", border: "1px solid rgba(249,115,22,.12)", pointerEvents: "none" }} />
+        <div style={{ textAlign: "center", position: "relative", zIndex: 1 }}>
+          <div
+            key={countdownNum}
+            className="bm-countdown-num"
+            style={{ fontFamily: "var(--bm-fm)", fontSize: "clamp(120px,20vw,200px)", fontWeight: 800, lineHeight: 1, background: "linear-gradient(135deg, var(--bm-burst2) 0%, #FDBA74 40%, var(--bm-burst) 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" as any, letterSpacing: "-.04em" }}
+          >
+            {countdownNum}
+          </div>
+          <p style={{ fontFamily: "var(--bm-fd)", fontSize: 20, fontWeight: 700, color: "var(--bm-white2)", marginTop: 24, opacity: .7, letterSpacing: "-.01em", animation: "bm-fade-in .5s ease .2s both" }}>
+            Get Ready!
+          </p>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--bm-surf)", border: "1px solid var(--bm-bdr2)", borderRadius: 100, padding: "7px 16px", marginTop: 16, animation: "bm-fade-in .5s ease .4s both" }}>
+            <span style={{ fontFamily: "var(--bm-fm)", fontSize: 12, color: "var(--bm-muted)" }}>
+              {selectedOp ? BURST_OPERATIONS[selectedOp].label : ""} · {BURST_OPERATIONS[selectedOp!]?.options.find(o => o.value === selectedOption)?.label} · 60s
+            </span>
+          </div>
         </div>
-        <p style={{ fontFamily: "var(--bm-fb)", fontSize: 18, fontWeight: 500, color: "var(--bm-muted)", letterSpacing: ".16em", textTransform: "uppercase", marginTop: 24, animation: "bm-fade-up .4s ease .1s both" }}>
-          Get Ready
-        </p>
       </div>
     );
   }
@@ -1122,14 +1139,13 @@ export default function BurstMode() {
               />
               <button
                 onClick={handleSubmit}
-                className="bm-skip-btn"
-                style={{ all: "unset", width: 52, height: 52, borderRadius: 14, background: "var(--bm-surf2)", border: "1px solid var(--bm-bdr2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 22, color: "var(--bm-muted)", transition: "all .2s ease", flexShrink: 0, boxSizing: "border-box" } as React.CSSProperties}
-                onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "rgba(249,115,22,.08)"; b.style.borderColor = "rgba(249,115,22,.3)"; b.style.color = "var(--bm-burst2)"; }}
-                onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "var(--bm-surf2)"; b.style.borderColor = "var(--bm-bdr2)"; b.style.color = "var(--bm-muted)"; }}
-                onMouseDown={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = "scale(.92)"; }}
+                style={{ all: "unset", padding: "14px 24px", borderRadius: 14, background: "linear-gradient(135deg, var(--bm-green), #059669)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer", fontFamily: "var(--bm-fd)", fontSize: 15, fontWeight: 800, color: "#fff", transition: "all .2s ease", flexShrink: 0, boxSizing: "border-box", boxShadow: "0 4px 16px rgba(16,185,129,.2)", letterSpacing: "-.01em" } as React.CSSProperties}
+                onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = "translateY(-2px)"; b.style.boxShadow = "0 8px 28px rgba(16,185,129,.35)"; }}
+                onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = ""; b.style.boxShadow = "0 4px 16px rgba(16,185,129,.2)"; }}
+                onMouseDown={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = "scale(.96)"; }}
                 onMouseUp={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = ""; }}
               >
-                ›
+                Submit
               </button>
             </div>
           </div>
@@ -1162,29 +1178,31 @@ export default function BurstMode() {
         <div style={{ maxWidth: 700, margin: "0 auto", padding: "40px 24px 60px", position: "relative", zIndex: 1 }}>
           {/* Completion header */}
           <div style={{ textAlign: "center", marginBottom: 32 }}>
-            <div className="bm-scale-in" style={{ width: 68, height: 68, borderRadius: 20, margin: "0 auto 20px", background: "linear-gradient(135deg, var(--bm-burst), #C2410C)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 12px 40px rgba(249,115,22,.35), 0 0 0 1px rgba(249,115,22,.2)" }}>
-              <Trophy style={{ width: 32, height: 32, color: "white" }} />
+            <div className="bm-scale-in" style={{ width: 64, height: 64, borderRadius: 20, margin: "0 auto 20px", background: "linear-gradient(135deg, var(--bm-burst), #C2410C)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 12px 40px rgba(249,115,22,.35), 0 0 0 1px rgba(249,115,22,.2)" }}>
+              <Trophy style={{ width: 28, height: 28, color: "white" }} />
             </div>
             <h1 style={{ fontFamily: "var(--bm-fd)", fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, letterSpacing: "-.03em", color: "var(--bm-white)", margin: "0 0 6px" }}>Burst Complete!</h1>
             <p style={{ fontFamily: "var(--bm-fm)", fontSize: 13, color: "var(--bm-muted)", letterSpacing: ".04em", margin: 0 }}>
               <span style={{ color: "var(--bm-burst2)" }}>{config?.label}</span>
               <span style={{ color: "var(--bm-muted)" }}> · </span>
               <span style={{ color: "var(--bm-white2)" }}>{BURST_OPERATIONS[selectedOp!]?.options.find(o => o.value === selectedOption)?.label}</span>
+              <span style={{ color: "var(--bm-muted)" }}> · </span>
+              <span style={{ color: "var(--bm-white2)" }}>You answered {results.length} question{results.length !== 1 ? "s" : ""}</span>
             </p>
           </div>
 
           {/* Primary stats grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10, marginBottom: 14 }}>
+          <div className="bm-stats-grid" style={{ marginBottom: 14 }}>
             {[
-              { value: results.length, label: "Attempted", bg: "rgba(123,92,229,.08)", border: "rgba(123,92,229,.2)", color: "var(--bm-white)", delay: 0 },
-              { value: correctCount, label: "Correct", bg: "rgba(16,185,129,.08)", border: "rgba(16,185,129,.2)", color: "var(--bm-green)", delay: 0.07 },
-              { value: wrongCount, label: "Wrong", bg: "rgba(239,68,68,.08)", border: "rgba(239,68,68,.2)", color: "var(--bm-red)", delay: 0.14 },
+              { value: correctCount, label: "Correct", bg: "rgba(16,185,129,.08)", border: "rgba(16,185,129,.2)", color: "var(--bm-green)", delay: 0 },
+              { value: wrongCount, label: "Wrong", bg: "rgba(239,68,68,.08)", border: "rgba(239,68,68,.2)", color: "var(--bm-red)", delay: 0.07 },
+              { value: results.length - correctCount - wrongCount, label: "Missed", bg: "rgba(245,158,11,.08)", border: "rgba(245,158,11,.22)", color: "var(--bm-gold)", delay: 0.14 },
               { value: `${accuracy}%`, label: "Accuracy", bg: "rgba(249,115,22,.08)", border: "rgba(249,115,22,.22)", color: "var(--bm-burst2)", delay: 0.21 },
-              { value: `+${totalPtsEarned}`, label: "Points", bg: "rgba(245,158,11,.08)", border: "rgba(245,158,11,.22)", color: "var(--bm-gold)", delay: 0.28 },
+              { value: `+${totalPtsEarned}`, label: "Points", bg: "rgba(123,92,229,.08)", border: "rgba(123,92,229,.2)", color: "var(--bm-purple2)", delay: 0.28 },
             ].map(({ value, label, bg, border, color, delay }) => (
-              <div key={label} className="bm-count-up" style={{ borderRadius: 18, padding: "22px 12px", textAlign: "center", background: bg, border: `1px solid ${border}`, animationDelay: `${delay}s` }}>
-                <div style={{ fontFamily: "var(--bm-fm)", fontSize: "clamp(26px,3vw,36px)", fontWeight: 800, color }}>{value}</div>
-                <div style={{ fontFamily: "var(--bm-fm)", fontSize: 10, fontWeight: 600, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--bm-muted)", marginTop: 8 }}>{label}</div>
+              <div key={label} className="bm-count-up" style={{ borderRadius: 14, padding: "14px 8px", textAlign: "center", background: bg, border: `1px solid ${border}`, animationDelay: `${delay}s` }}>
+                <div style={{ fontFamily: "var(--bm-fm)", fontSize: "clamp(18px,2.5vw,26px)", fontWeight: 700, color }}>{value}</div>
+                <div style={{ fontFamily: "var(--bm-fm)", fontSize: 9, fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--bm-muted)", marginTop: 5 }}>{label}</div>
               </div>
             ))}
           </div>
@@ -1217,16 +1235,16 @@ export default function BurstMode() {
               <span style={{ fontFamily: "var(--bm-fm)", fontSize: 10, textTransform: "uppercase", letterSpacing: ".12em", color: "var(--bm-muted)" }}>ACCURACY</span>
               <span style={{ fontFamily: "var(--bm-fm)", fontSize: 13, fontWeight: 700, color: "var(--bm-white2)" }}>{accuracy}%</span>
             </div>
-            <div style={{ height: 6, borderRadius: 3, background: "var(--bm-bdr2)", overflow: "hidden" }}>
-              <div style={{ borderRadius: 3, height: "100%", background: "linear-gradient(90deg, var(--bm-red) 0%, var(--bm-gold) 45%, var(--bm-green) 100%)", width: `${accuracy}%`, transition: "width 1.4s cubic-bezier(.4,0,.2,1) .4s", boxShadow: accuracy > 70 ? "0 0 12px rgba(16,185,129,.2)" : undefined }} />
+            <div style={{ height: 6, borderRadius: 99, background: "var(--bm-bdr2)", overflow: "hidden" }}>
+              <div style={{ borderRadius: 99, height: "100%", background: "linear-gradient(90deg, var(--bm-red) 0%, var(--bm-gold) 45%, var(--bm-green) 100%)", width: `${accuracy}%`, transition: "width 1.4s cubic-bezier(.4,0,.2,1) .4s", boxShadow: accuracy > 70 ? "0 0 12px rgba(16,185,129,.2)" : undefined }} />
             </div>
           </div>
 
           {/* Action buttons */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 24 }}>
+          <div className="bm-action-grid" style={{ marginBottom: 24 }}>
             <button
               onClick={() => { setResults([]); setTimeLeft(BURST_DURATION); setSessionSaved(false); startCountdown(); }}
-              style={{ background: "linear-gradient(135deg, var(--bm-burst), #C2410C)", border: "none", borderRadius: 12, padding: "14px 10px", color: "white", fontFamily: "var(--bm-fd)", fontSize: 14, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 6px 20px rgba(249,115,22,.22)", cursor: "pointer", transition: "all .25s ease" }}
+              style={{ background: "linear-gradient(135deg, var(--bm-burst), #C2410C)", border: "none", borderRadius: 14, padding: "14px 10px", color: "white", fontFamily: "var(--bm-fd)", fontSize: 14, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 6px 20px rgba(249,115,22,.22)", cursor: "pointer", transition: "all .25s ease" }}
               onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = "translateY(-2px)"; b.style.boxShadow = "0 12px 36px rgba(249,115,22,.35)"; }}
               onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = ""; b.style.boxShadow = "0 6px 20px rgba(249,115,22,.22)"; }}
             >
@@ -1234,15 +1252,15 @@ export default function BurstMode() {
             </button>
             <button
               onClick={() => { /* navigate to dashboard */ window.location.href = "/dashboard"; }}
-              style={{ background: "linear-gradient(135deg, var(--bm-purple), #5535C0)", border: "none", borderRadius: 12, padding: "14px 10px", color: "white", fontFamily: "var(--bm-fd)", fontSize: 14, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 6px 20px rgba(123,92,229,.2)", cursor: "pointer", transition: "all .25s ease" }}
-              onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = "translateY(-2px)"; b.style.boxShadow = "0 12px 32px rgba(123,92,229,.32)"; }}
-              onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = ""; b.style.boxShadow = "0 6px 20px rgba(123,92,229,.2)"; }}
+              style={{ background: "linear-gradient(135deg, var(--bm-green), #059669)", border: "none", borderRadius: 14, padding: "14px 10px", color: "white", fontFamily: "var(--bm-fd)", fontSize: 14, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 6px 20px rgba(16,185,129,.2)", cursor: "pointer", transition: "all .25s ease" }}
+              onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = "translateY(-2px)"; b.style.boxShadow = "0 12px 32px rgba(16,185,129,.32)"; }}
+              onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = ""; b.style.boxShadow = "0 6px 20px rgba(16,185,129,.2)"; }}
             >
               <Trophy style={{ width: 15, height: 15 }} />Dashboard
             </button>
             <button
               onClick={resetToSelect}
-              style={{ background: "var(--bm-surf2)", border: "1px solid var(--bm-bdr2)", borderRadius: 12, padding: "14px 10px", color: "var(--bm-white2)", fontFamily: "var(--bm-fb)", fontSize: 14, fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer", transition: "all .2s" }}
+              style={{ background: "var(--bm-surf2)", border: "1px solid var(--bm-bdr2)", borderRadius: 14, padding: "14px 10px", color: "var(--bm-white2)", fontFamily: "var(--bm-fd)", fontSize: 14, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer", transition: "all .2s" }}
               onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor = "rgba(249,115,22,.3)"; b.style.color = "var(--bm-white)"; }}
               onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor = "var(--bm-bdr2)"; b.style.color = "var(--bm-white2)"; }}
             >

@@ -27,7 +27,7 @@ export default function SubscriptionGate({ softOnly = false, children }: Subscri
   // Still loading auth or subscription
   if (loading || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center dark:bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
         <div className="text-slate-500">Loading...</div>
       </div>
     );

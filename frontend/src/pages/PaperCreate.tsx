@@ -1277,99 +1277,77 @@ export default function PaperCreate() {
       `}</style>
 
       {/* Sticky header */}
-      <header style={{position:'sticky',top:0,zIndex:40,height:72,background:'rgba(6,7,15,0.88)',backdropFilter:'blur(20px)',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',alignItems:'center',padding:'0 28px'}}>
-        <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',alignItems:'center',width:'100%',maxWidth:1100,margin:'0 auto',gap:16}}>
-          <div>
-            <Link href="/">
-              <button style={{display:'flex',alignItems:'center',gap:8,padding:'8px 16px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:10,color:'#B8BDD8',cursor:'pointer',fontFamily:'DM Sans, sans-serif',fontWeight:500,fontSize:13}}>
-                <ArrowLeft style={{width:15,height:15}} />
-                Back
-              </button>
-            </Link>
+      {/* Hero banner */}
+      <div style={{ position:"relative", overflow:"hidden", padding:"52px 32px 56px", background:"linear-gradient(145deg,#0E0C2A 0%,#130F38 40%,#0A0820 100%)", borderBottom:"1px solid rgba(123,92,229,.2)" }}>
+        {/* Atmospheric glow */}
+        <div style={{ position:"absolute", top:"-20%", left:"50%", transform:"translateX(-50%)", width:500, height:400, background:"radial-gradient(ellipse at center, rgba(123,92,229,.15) 0%, rgba(123,92,229,.04) 50%, transparent 70%)", pointerEvents:"none" }} />
+        {/* Grid pattern */}
+        <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(123,92,229,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(123,92,229,.05) 1px, transparent 1px)", backgroundSize:"48px 48px", WebkitMaskImage:"radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)" } as React.CSSProperties} />
+        {/* Bottom fade */}
+        <div style={{ position:"absolute", bottom:0, left:0, right:0, height:44, background:"linear-gradient(to bottom, transparent, #06070F)" }} />
+        <div style={{ position:"relative", zIndex:1, textAlign:"center" }}>
+          <div style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", width:60, height:60, borderRadius:18, background:"rgba(123,92,229,.2)", marginBottom:20, boxShadow:"0 8px 32px rgba(123,92,229,.15)" }}>
+            <FileDown style={{ width:28, height:28, color:"#9D7FF0" }} />
           </div>
-          <div style={{display:'flex',alignItems:'center',gap:10}}>
-            <FileDown style={{width:20,height:20,color:'#7B5CE5',flexShrink:0}} />
-            <h1 style={{fontSize:20,fontWeight:800,color:'#F0F2FF',fontFamily:"'Playfair Display', Georgia, serif",margin:0,letterSpacing:'-0.01em'}}>Create Paper</h1>
-          </div>
-          <div style={{display:'flex',justifyContent:'flex-end'}}>
-            {blocks.length > 0 && (
-              <div style={{padding:'6px 12px',background:'rgba(123,92,229,0.1)',border:'1px solid rgba(123,92,229,0.25)',borderRadius:20,fontSize:12,color:'#9D7FF0',fontFamily:'JetBrains Mono, monospace',fontWeight:600}}>
-                {blocks.length} block{blocks.length!==1?'s':''} · {blocks.reduce((s,b)=>s+b.count,0)} Qs
-              </div>
-            )}
-          </div>
+          <h1 style={{ fontFamily:"'Playfair Display', Georgia, serif", fontSize:"clamp(28px,4vw,44px)", fontWeight:800, color:"#F0F2FF", margin:"0 0 10px", letterSpacing:"-.03em" }}>Abacus Paper Generator</h1>
+          <p style={{ fontFamily:"'DM Sans', sans-serif", fontSize:16, fontWeight:300, color:"rgba(255,255,255,.5)", margin:0 }}>Build custom practice papers · Print-ready PDF</p>
         </div>
-      </header>
-      {/* ── Mode Toggle Bar ─────────────────────────────────────────────── */}
+      </div>
+
+      {/* ── Sticky nav bar: back + mode toggles + block count ── */}
       <div style={{
-        position:'sticky',top:72,zIndex:35,
-        background:'rgba(8,9,20,0.96)',
-        backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',
+        position:'sticky', top:0, zIndex:40,
+        background:'rgba(6,7,15,0.92)',
+        backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)',
         borderBottom:'1px solid rgba(255,255,255,0.06)',
         padding:'0 28px',
       }}>
-        <div style={{maxWidth:1100,margin:'0 auto',display:'flex',alignItems:'center',gap:6,padding:'10px 0',flexWrap:'wrap'}}>
-          {/* Abacus group label */}
+        <div style={{maxWidth:1100,margin:'0 auto',display:'flex',alignItems:'center',gap:8,padding:'10px 0',flexWrap:'wrap'}}>
+          {/* Back */}
+          <Link href="/">
+            <button style={{display:'flex',alignItems:'center',gap:6,padding:'6px 14px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:8,color:'#B8BDD8',cursor:'pointer',fontFamily:'DM Sans, sans-serif',fontWeight:500,fontSize:13,flexShrink:0,marginRight:8}}>
+              <ArrowLeft style={{width:14,height:14}} />
+              Back
+            </button>
+          </Link>
+
+          <div style={{width:1,height:18,background:'rgba(255,255,255,0.1)',flexShrink:0,marginRight:8}} />
+
+          {/* Abacus group */}
           <span style={{fontSize:10,fontWeight:700,color:'#7B5CE5',fontFamily:"'JetBrains Mono',monospace",letterSpacing:'0.12em',textTransform:'uppercase',marginRight:2,flexShrink:0}}>Abacus</span>
-          {/* Junior — locked */}
           <div
             title="Coming Soon"
-            style={{
-              display:'flex',alignItems:'center',gap:5,
-              padding:'5px 13px',borderRadius:999,
-              fontSize:13,fontWeight:600,fontFamily:"'DM Sans',sans-serif",
-              background:'rgba(255,255,255,0.02)',
-              border:'1.5px solid rgba(255,255,255,0.05)',
-              color:'#3D4260',cursor:'not-allowed',userSelect:'none',
-            }}
+            style={{display:'flex',alignItems:'center',gap:5,padding:'5px 13px',borderRadius:999,fontSize:13,fontWeight:600,fontFamily:"'DM Sans',sans-serif",background:'rgba(255,255,255,0.02)',border:'1.5px solid rgba(255,255,255,0.05)',color:'#3D4260',cursor:'not-allowed',userSelect:'none'}}
           >
             <Lock style={{width:11,height:11,flexShrink:0}} />
             Junior
           </div>
-          {/* Basic */}
           <button
             onClick={() => setLocation('/create/basic')}
-            style={{
-              display:'flex',alignItems:'center',gap:5,
-              padding:'5px 13px',borderRadius:999,
-              fontSize:13,fontWeight:600,fontFamily:"'DM Sans',sans-serif",
-              background:isBasicPage?'rgba(123,92,229,0.22)':'rgba(255,255,255,0.04)',
-              border:isBasicPage?'1.5px solid rgba(123,92,229,0.55)':'1.5px solid rgba(255,255,255,0.07)',
-              color:isBasicPage?'#C4A8FF':'#9DA3BC',
-              cursor:'pointer',transition:'all 0.18s',outline:'none',
-            }}
+            style={{display:'flex',alignItems:'center',gap:5,padding:'5px 13px',borderRadius:999,fontSize:13,fontWeight:600,fontFamily:"'DM Sans',sans-serif",background:isBasicPage?'rgba(123,92,229,0.22)':'rgba(255,255,255,0.04)',border:isBasicPage?'1.5px solid rgba(123,92,229,0.55)':'1.5px solid rgba(255,255,255,0.07)',color:isBasicPage?'#C4A8FF':'#9DA3BC',cursor:'pointer',transition:'all 0.18s',outline:'none'}}
           >Basic</button>
-          {/* Advanced */}
           <button
             onClick={() => setLocation('/create/advanced')}
-            style={{
-              display:'flex',alignItems:'center',gap:5,
-              padding:'5px 13px',borderRadius:999,
-              fontSize:13,fontWeight:600,fontFamily:"'DM Sans',sans-serif",
-              background:isAdvancedPage?'rgba(123,92,229,0.22)':'rgba(255,255,255,0.04)',
-              border:isAdvancedPage?'1.5px solid rgba(123,92,229,0.55)':'1.5px solid rgba(255,255,255,0.07)',
-              color:isAdvancedPage?'#C4A8FF':'#9DA3BC',
-              cursor:'pointer',transition:'all 0.18s',outline:'none',
-            }}
+            style={{display:'flex',alignItems:'center',gap:5,padding:'5px 13px',borderRadius:999,fontSize:13,fontWeight:600,fontFamily:"'DM Sans',sans-serif",background:isAdvancedPage?'rgba(123,92,229,0.22)':'rgba(255,255,255,0.04)',border:isAdvancedPage?'1.5px solid rgba(123,92,229,0.55)':'1.5px solid rgba(255,255,255,0.07)',color:isAdvancedPage?'#C4A8FF':'#9DA3BC',cursor:'pointer',transition:'all 0.18s',outline:'none'}}
           >Advanced</button>
 
-          {/* Divider */}
-          <div style={{width:1,height:18,background:'rgba(255,255,255,0.10)',margin:'0 6px',flexShrink:0}} />
+          <div style={{width:1,height:18,background:'rgba(255,255,255,0.10)',margin:'0 4px',flexShrink:0}} />
 
-          {/* Vedic Maths group label */}
+          {/* Vedic Maths group */}
           <span style={{fontSize:10,fontWeight:700,color:'#7B5CE5',fontFamily:"'JetBrains Mono',monospace",letterSpacing:'0.12em',textTransform:'uppercase',marginRight:2,flexShrink:0}}>Vedic Maths</span>
           <button
             onClick={() => setLocation('/vedic-maths/level-1')}
-            style={{
-              display:'flex',alignItems:'center',
-              padding:'5px 13px',borderRadius:999,
-              fontSize:13,fontWeight:600,fontFamily:"'DM Sans',sans-serif",
-              background:isVedicPage?'rgba(123,92,229,0.22)':'rgba(255,255,255,0.04)',
-              border:isVedicPage?'1.5px solid rgba(123,92,229,0.55)':'1.5px solid rgba(255,255,255,0.07)',
-              color:isVedicPage?'#C4A8FF':'#9DA3BC',
-              cursor:'pointer',transition:'all 0.18s',outline:'none',
-            }}
+            style={{display:'flex',alignItems:'center',padding:'5px 13px',borderRadius:999,fontSize:13,fontWeight:600,fontFamily:"'DM Sans',sans-serif",background:isVedicPage?'rgba(123,92,229,0.22)':'rgba(255,255,255,0.04)',border:isVedicPage?'1.5px solid rgba(123,92,229,0.55)':'1.5px solid rgba(255,255,255,0.07)',color:isVedicPage?'#C4A8FF':'#9DA3BC',cursor:'pointer',transition:'all 0.18s',outline:'none'}}
           >Vedic Maths</button>
+
+          {/* Block count — pushed to right */}
+          <div style={{marginLeft:'auto',flexShrink:0}}>
+            {blocks.length > 0 && (
+              <div style={{padding:'5px 12px',background:'rgba(123,92,229,0.1)',border:'1px solid rgba(123,92,229,0.25)',borderRadius:20,fontSize:12,color:'#9D7FF0',fontFamily:'JetBrains Mono, monospace',fontWeight:600}}>
+                {blocks.length} block{blocks.length!==1?'s':''} · {blocks.reduce((s,b)=>s+b.count,0)} Qs
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -1942,7 +1920,7 @@ export default function PaperCreate() {
 
                       <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 mt-2" style={{gap:12}}>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                        <label className="block text-sm font-medium  text-white mb-1">
                           {block.type === "vedic_tables" || block.type === "vedic_tables_large" ? "Rows" : "Questions (1-200)"}
                         </label>
                         <input
@@ -2004,7 +1982,7 @@ export default function PaperCreate() {
                               }
                             }
                           }}
-                          className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white ${
+                          className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white ${
                             getFieldError(index, block.type === "vedic_tables" || block.type === "vedic_tables_large" ? "rows" : "count")
                               ? "focus:ring-red-200"
                               : "focus:ring-blue-200"
@@ -2018,7 +1996,7 @@ export default function PaperCreate() {
                       {(block.type === "addition" || block.type === "subtraction" || block.type === "add_sub" || block.type === "integer_add_sub" || block.type === "decimal_add_sub" || block.type === "direct_add_sub" || block.type === "small_friends_add_sub" || block.type === "big_friends_add_sub") && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               {block.type === "decimal_add_sub" ? "Digits (Before Decimal) (1-10)" : "Digits (1-10)"}
                             </label>
                             <input
@@ -2051,7 +2029,7 @@ export default function PaperCreate() {
                                   }
                                 // If input contains non-numeric characters, don't update (prevent typing letters/symbols)
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "digits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2062,7 +2040,7 @@ export default function PaperCreate() {
                             )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Rows (3-30)</label>
+                            <label className="block text-sm font-medium  text-white mb-1">Rows (3-30)</label>
                             <input
                               type="text"
                               maxLength={10}
@@ -2093,7 +2071,7 @@ export default function PaperCreate() {
                                   }
                                 // If input contains non-numeric characters, don't update (prevent typing letters/symbols)
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "rows")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2109,7 +2087,7 @@ export default function PaperCreate() {
                       {(block.type === "multiplication" || block.type === "division" || block.type === "vedic_multiplication_level4" || block.type === "vedic_multiply_by_111_999_level4") && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               {(block.type === "multiplication" || block.type === "vedic_multiplication_level4" || block.type === "vedic_multiply_by_111_999_level4") ? "Multiplicand Digits (1-20)" : "Dividend Digits (1-20)"}
                             </label>
                             <input
@@ -2165,7 +2143,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, (block.type === "multiplication" || block.type === "vedic_multiplication_level4" || block.type === "vedic_multiply_by_111_999_level4") ? "multiplicandDigits" : "dividendDigits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2176,7 +2154,7 @@ export default function PaperCreate() {
                             )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               {(block.type === "multiplication" || block.type === "vedic_multiplication_level4" || block.type === "vedic_multiply_by_111_999_level4") ? "Multiplier Digits (1-20)" : "Divisor Digits (1-20)"}
                             </label>
                             <input
@@ -2231,7 +2209,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, (block.type === "multiplication" || block.type === "vedic_multiplication_level4" || block.type === "vedic_multiply_by_111_999_level4") ? "multiplierDigits" : "divisorDigits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2246,7 +2224,7 @@ export default function PaperCreate() {
 
                       {(block.type === "square_root" || block.type === "cube_root") && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               Root Digits (1-30)
                             </label>
                             <input
@@ -2280,7 +2258,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white ${
+                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white ${
                               getFieldError(index, "rootDigits")
                                 ? "focus:ring-red-200"
                                 : "focus:ring-blue-200"
@@ -2295,7 +2273,7 @@ export default function PaperCreate() {
                       {block.type === "decimal_multiplication" && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               Multiplicand Digits (Before Decimal) (2-20)
                             </label>
                             <input
@@ -2328,7 +2306,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "multiplicandDigits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2339,7 +2317,7 @@ export default function PaperCreate() {
                             )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               Multiplier Digits (0 = Whole, 1-20 = Before Decimal)
                             </label>
                             <input
@@ -2372,7 +2350,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "multiplierDigits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2388,7 +2366,7 @@ export default function PaperCreate() {
                       {block.type === "decimal_division" && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               Dividend Digits (2-20)
                             </label>
                             <input
@@ -2421,7 +2399,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "dividendDigits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2432,7 +2410,7 @@ export default function PaperCreate() {
                             )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               Divisor Digits (1-20)
                             </label>
                             <input
@@ -2465,7 +2443,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "divisorDigits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2481,7 +2459,7 @@ export default function PaperCreate() {
                       {(block.type === "percentage") && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               Percentage Min (1-100)
                               {block.constraints.percentageMin !== undefined && block.constraints.percentageMax !== undefined && block.constraints.percentageMin > block.constraints.percentageMax && (
                                 <span className="text-red-500 text-xs ml-2">⚠ Min &gt; Max</span>
@@ -2520,7 +2498,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "percentageMin") || (block.constraints.percentageMin !== undefined && block.constraints.percentageMax !== undefined && block.constraints.percentageMin > block.constraints.percentageMax)
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2531,7 +2509,7 @@ export default function PaperCreate() {
                             )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               Percentage Max (1-100)
                               {block.constraints.percentageMin !== undefined && block.constraints.percentageMax !== undefined && block.constraints.percentageMin > block.constraints.percentageMax && (
                                 <span className="text-red-500 text-xs ml-2">⚠ Min &gt; Max</span>
@@ -2570,7 +2548,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "percentageMax") || (block.constraints.percentageMin !== undefined && block.constraints.percentageMax !== undefined && block.constraints.percentageMin > block.constraints.percentageMax)
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2581,7 +2559,7 @@ export default function PaperCreate() {
                             )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               Number Digits (1-10)
                             </label>
                             <input
@@ -2615,7 +2593,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "numberDigits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2631,7 +2609,7 @@ export default function PaperCreate() {
                       {/* Vedic Maths Level 1 Constraints */}
                       {(block.type.startsWith("vedic_") && (block.type === "vedic_multiply_by_11" || block.type === "vedic_multiply_by_101" || block.type === "vedic_multiply_by_2" || block.type === "vedic_multiply_by_4" || block.type === "vedic_multiply_by_6" || block.type === "vedic_divide_by_2" || block.type === "vedic_divide_by_4" || block.type === "vedic_divide_by_11")) && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Digits (2-30)</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Digits (2-30)</label>
                           <input
                             type="text"
                             maxLength={10}
@@ -2658,7 +2636,7 @@ export default function PaperCreate() {
                                 }
                               // If input contains non-numeric characters, don't update (prevent typing letters/symbols)
                             }}
-                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white ${
+                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white ${
                               getFieldError(index, "digits")
                                 ? "focus:ring-red-200"
                                 : "focus:ring-blue-200"
@@ -2672,7 +2650,7 @@ export default function PaperCreate() {
 
                       {(block.type === "vedic_subtraction_complement" || block.type === "vedic_subtraction_normal") && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Base (100, 1000, etc)</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Base (100, 1000, etc)</label>
                           <input
                             type="text"
                             maxLength={10}
@@ -2696,7 +2674,7 @@ export default function PaperCreate() {
                               }
                               // If input contains non-numeric characters, don't update (prevent typing letters/symbols)
                             }}
-                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900/30 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2  focus:ring-blue-900/30 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500"
                           />
                         </div>
                       )}
@@ -2704,7 +2682,7 @@ export default function PaperCreate() {
                       {(block.type === "vedic_multiply_by_12_19" || block.type === "vedic_multiply_by_21_91") && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Digits (2-30)</label>
+                            <label className="block text-sm font-medium  text-white mb-1">Digits (2-30)</label>
                             <input
                               type="text"
                               value={block.constraints.digits === -1 || block.constraints.digits === undefined ? "" : String(block.constraints.digits)}
@@ -2731,7 +2709,7 @@ export default function PaperCreate() {
                                   }
                                 // If input contains non-numeric characters, don't update (prevent typing letters/symbols)
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "digits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2743,7 +2721,7 @@ export default function PaperCreate() {
                           </div>
                           {block.type === "vedic_multiply_by_12_19" && (
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Multiplier (12-19, optional)</label>
+                              <label className="block text-sm font-medium  text-white mb-1">Multiplier (12-19, optional)</label>
                               <input
                                 type="text"
                                 maxLength={10}
@@ -2770,7 +2748,7 @@ export default function PaperCreate() {
                                     }
                                   // If input contains non-numeric characters, don't update (prevent typing letters/symbols)
                                 }}
-                                className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                                className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                   getFieldError(index, "multiplier")
                                     ? "focus:ring-red-200"
                                     : "focus:ring-blue-200"
@@ -2783,7 +2761,7 @@ export default function PaperCreate() {
                           )}
                           {block.type === "vedic_multiply_by_21_91" && (
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Multiplier (21-91, optional)</label>
+                              <label className="block text-sm font-medium  text-white mb-1">Multiplier (21-91, optional)</label>
                               <input
                                 type="text"
                                 value={block.constraints.multiplierRange === undefined ? "" : String(block.constraints.multiplierRange)}
@@ -2810,7 +2788,7 @@ export default function PaperCreate() {
                                     }
                                   // If input contains non-numeric characters, don't update (prevent typing letters/symbols)
                                 }}
-                                className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                                className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                   getFieldError(index, "multiplierRange")
                                     ? "focus:ring-red-200"
                                     : "focus:ring-blue-200"
@@ -2827,7 +2805,7 @@ export default function PaperCreate() {
                       {block.type === "vedic_addition" && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">First Number Digits (1-30)</label>
+                            <label className="block text-sm font-medium  text-white mb-1">First Number Digits (1-30)</label>
                             <input
                               type="text"
                               value={block.constraints.firstDigits === undefined ? "" : String(block.constraints.firstDigits)}
@@ -2854,7 +2832,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "firstDigits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2865,7 +2843,7 @@ export default function PaperCreate() {
                             )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Second Number Digits (1-30)</label>
+                            <label className="block text-sm font-medium  text-white mb-1">Second Number Digits (1-30)</label>
                             <input
                               type="text"
                               maxLength={10}
@@ -2892,7 +2870,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "secondDigits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2908,7 +2886,7 @@ export default function PaperCreate() {
                       {block.type === "vedic_divide_single_digit" && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Digits (2-30)</label>
+                            <label className="block text-sm font-medium  text-white mb-1">Digits (2-30)</label>
                             <input
                               type="text"
                               value={block.constraints.digits === -1 || block.constraints.digits === undefined ? "" : String(block.constraints.digits)}
@@ -2935,7 +2913,7 @@ export default function PaperCreate() {
                                   }
                                 // If input contains non-numeric characters, don't update (prevent typing letters/symbols)
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "digits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2946,7 +2924,7 @@ export default function PaperCreate() {
                             )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Divisor (2-9, optional)</label>
+                            <label className="block text-sm font-medium  text-white mb-1">Divisor (2-9, optional)</label>
                             <input
                               type="text"
                               maxLength={10}
@@ -2972,7 +2950,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "divisor")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -2987,7 +2965,7 @@ export default function PaperCreate() {
 
                       {block.type === "vedic_tables" && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Table Number (111-999, optional)</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Table Number (111-999, optional)</label>
                           <input
                             type="text"
                             value={block.constraints.tableNumber === undefined ? "" : String(block.constraints.tableNumber)}
@@ -3013,7 +2991,7 @@ export default function PaperCreate() {
                                 }
                               }
                             }}
-                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white ${
+                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white ${
                               getFieldError(index, "tableNumber")
                                 ? "focus:ring-red-200"
                                 : "focus:ring-blue-200"
@@ -3027,7 +3005,7 @@ export default function PaperCreate() {
 
                       {block.type === "vedic_tables_large" && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Table Number (1111-9999, optional)</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Table Number (1111-9999, optional)</label>
                           <input
                             type="text"
                             value={block.constraints.tableNumberLarge === undefined ? "" : String(block.constraints.tableNumberLarge)}
@@ -3053,7 +3031,7 @@ export default function PaperCreate() {
                                 }
                               }
                             }}
-                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white ${
+                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white ${
                               getFieldError(index, "tableNumberLarge")
                                 ? "focus:ring-red-200"
                                 : "focus:ring-blue-200"
@@ -3073,7 +3051,7 @@ export default function PaperCreate() {
                         block.type === "vedic_divide_by_7" || 
                         block.type === "vedic_squares_duplex") && (
                           <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Digits (1-10, optional)</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Digits (1-10, optional)</label>
                             <input
                               type="text"
                               value={block.constraints.digits === undefined || block.constraints.digits === -1 ? "" : String(block.constraints.digits)}
@@ -3100,7 +3078,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                               getFieldError(index, "digits")
                                 ? "focus:ring-red-200"
                                 : "focus:ring-blue-200"
@@ -3114,7 +3092,7 @@ export default function PaperCreate() {
 
                       {block.type === "vedic_duplex" && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Digits (2-10, optional)</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Digits (2-10, optional)</label>
                           <input
                             type="text"
                             maxLength={10}
@@ -3141,7 +3119,7 @@ export default function PaperCreate() {
                                 }
                               }
                             }}
-                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                               getFieldError(index, "digits")
                                 ? "focus:ring-red-200"
                                 : "focus:ring-blue-200"
@@ -3155,7 +3133,7 @@ export default function PaperCreate() {
 
                       {block.type === "vedic_subtraction_powers_of_10" && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Power of 10 (2-6, optional)</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Power of 10 (2-6, optional)</label>
                           <input
                             type="text"
                             value={block.constraints.powerOf10 === undefined ? "" : String(block.constraints.powerOf10)}
@@ -3182,7 +3160,7 @@ export default function PaperCreate() {
                                 }
                               }
                             }}
-                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                               getFieldError(index, "powerOf10")
                                 ? "focus:ring-red-200"
                                 : "focus:ring-blue-200"
@@ -3196,7 +3174,7 @@ export default function PaperCreate() {
 
                       {block.type === "vedic_special_products_cross_multiply" && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Base (100, 1000, etc, optional)</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Base (100, 1000, etc, optional)</label>
                           <input
                             type="text"
                             value={block.constraints.base === undefined ? "" : String(block.constraints.base)}
@@ -3220,7 +3198,7 @@ export default function PaperCreate() {
                                 }
                               // If input contains non-numeric characters, don't update (prevent typing letters/symbols)
                               }}
-                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900/30 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2  focus:ring-blue-900/30 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500"
                             />
                           </div>
                       )}
@@ -3228,7 +3206,7 @@ export default function PaperCreate() {
                       {(block.type === "vedic_divide_by_9s_repetition_equal" || block.type === "vedic_divide_by_9s_repetition_less_than" ||
                         block.type === "vedic_divide_by_11s_repetition_equal" || block.type === "vedic_divide_by_11s_repetition_less_than") && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Digits (1-10, optional)</label>
+                            <label className="block text-sm font-medium  text-white mb-1">Digits (1-10, optional)</label>
                             <input
                               type="text"
                               value={block.constraints.digits === undefined || block.constraints.digits === -1 ? "" : String(block.constraints.digits)}
@@ -3255,7 +3233,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                               getFieldError(index, "digits")
                                 ? "focus:ring-red-200"
                                 : "focus:ring-blue-200"
@@ -3270,7 +3248,7 @@ export default function PaperCreate() {
                       {block.type === "vedic_dropping_10_method" && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Digits (1-5)</label>
+                            <label className="block text-sm font-medium  text-white mb-1">Digits (1-5)</label>
                             <input
                               type="text"
                               value={block.constraints.digits === -1 || block.constraints.digits === undefined ? "" : String(block.constraints.digits)}
@@ -3295,7 +3273,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "digits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -3306,7 +3284,7 @@ export default function PaperCreate() {
                             )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Rows (3-30)</label>
+                            <label className="block text-sm font-medium  text-white mb-1">Rows (3-30)</label>
                             <input
                               type="text"
                               value={block.constraints.rows === -1 || block.constraints.rows === undefined ? "" : String(block.constraints.rows)}
@@ -3331,7 +3309,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "rows")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -3351,7 +3329,7 @@ export default function PaperCreate() {
                         block.type === "vedic_squares_addition" || block.type === "vedic_squares_subtraction" ||
                         block.type === "vedic_squares_large" || block.type === "vedic_duplex_level3") && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Digits (1-10, optional)</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Digits (1-10, optional)</label>
                           <input
                             type="text"
                             value={block.constraints.digits === undefined || block.constraints.digits === -1 ? "" : String(block.constraints.digits)}
@@ -3378,7 +3356,7 @@ export default function PaperCreate() {
                                 }
                               }
                             }}
-                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                               getFieldError(index, "digits")
                                 ? "focus:ring-red-200"
                                 : "focus:ring-blue-200"
@@ -3392,13 +3370,13 @@ export default function PaperCreate() {
 
                       {block.type === "vedic_multiplication" && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Case</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Case</label>
                           <select
                             value={block.constraints.multiplicationCase || "mix"}
                             onChange={(e) => {
                               updateBlock(index, { constraints: { ...block.constraints, multiplicationCase: e.target.value as any } });
                             }}
-                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900/30 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2  focus:ring-blue-900/30 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500"
                           >
                             <option value="2x2">2×2</option>
                             <option value="3x2">3×2</option>
@@ -3413,13 +3391,13 @@ export default function PaperCreate() {
 
                       {(block.type === "vedic_fraction_addition" || block.type === "vedic_fraction_subtraction") && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Case</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Case</label>
                           <select
                             value={block.constraints.fractionCase || "mix"}
                             onChange={(e) => {
                               updateBlock(index, { constraints: { ...block.constraints, fractionCase: e.target.value as any } });
                             }}
-                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900/30 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2  focus:ring-blue-900/30 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500"
                           >
                             <option value="direct">Direct</option>
                             <option value="different_denominator">Different Denominator</option>
@@ -3432,7 +3410,7 @@ export default function PaperCreate() {
                       {block.type === "vedic_check_divisibility" && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Digits (1-10, optional)</label>
+                            <label className="block text-sm font-medium  text-white mb-1">Digits (1-10, optional)</label>
                             <input
                               type="text"
                               value={block.constraints.digits === undefined || block.constraints.digits === -1 ? "" : String(block.constraints.digits)}
@@ -3459,7 +3437,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "digits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -3470,14 +3448,14 @@ export default function PaperCreate() {
                             )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Divisor (2,3,4,5,6,8,9,10, optional)</label>
+                            <label className="block text-sm font-medium  text-white mb-1">Divisor (2,3,4,5,6,8,9,10, optional)</label>
                             <select
                               value={block.constraints.divisorCheck === undefined ? "" : String(block.constraints.divisorCheck)}
                               onChange={(e) => {
                                 const val = e.target.value;
                                 updateBlock(index, { constraints: { ...block.constraints, divisorCheck: val === "" ? undefined : parseInt(val) } });
                               }}
-                              className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900/30 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                              className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2  focus:ring-blue-900/30 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500"
                             >
                               <option value="">Random</option>
                               <option value="2">2</option>
@@ -3496,7 +3474,7 @@ export default function PaperCreate() {
                       {(block.type === "lcm" || block.type === "gcd") && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               First Number Digits (1-10)
                             </label>
                             <input
@@ -3530,7 +3508,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "multiplicandDigits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -3541,7 +3519,7 @@ export default function PaperCreate() {
                             )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               Second Number Digits (1-10)
                             </label>
                             <input
@@ -3575,7 +3553,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "multiplierDigits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -3591,7 +3569,7 @@ export default function PaperCreate() {
                       {/* Vedic Maths Level 4 Constraints */}
                       {(block.type === "vedic_fun_with_5_level4" || block.type === "vedic_fun_with_10_level4") && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Case</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Case</label>
                           <select
                             value={block.constraints.funWith5Case || block.constraints.funWith10Case || "mix"}
                             onChange={(e) => {
@@ -3601,7 +3579,7 @@ export default function PaperCreate() {
                                 updateBlock(index, { constraints: { ...block.constraints, funWith10Case: e.target.value as any } });
                               }
                             }}
-                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900/30 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2  focus:ring-blue-900/30 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500"
                           >
                             <option value="decimal">Decimal</option>
                             <option value="triple">Triple</option>
@@ -3613,7 +3591,7 @@ export default function PaperCreate() {
                       {(block.type === "vedic_hcf" || block.type === "vedic_lcm_level4") && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               First Number Digits (1-20)
                             </label>
                             <input
@@ -3646,7 +3624,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "multiplicandDigits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -3657,7 +3635,7 @@ export default function PaperCreate() {
                             )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               Second Number Digits (1-20)
                             </label>
                             <input
@@ -3690,7 +3668,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "multiplierDigits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -3705,13 +3683,13 @@ export default function PaperCreate() {
 
                       {block.type === "vedic_check_divisibility_level4" && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Case</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Case</label>
                           <select
                             value={block.constraints.divisibilityCase || "random"}
                             onChange={(e) => {
                               updateBlock(index, { constraints: { ...block.constraints, divisibilityCase: e.target.value as any } });
                             }}
-                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900/30 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2  focus:ring-blue-900/30 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500"
                           >
                             <option value="by_7">By 7</option>
                             <option value="by_11">By 11</option>
@@ -3723,7 +3701,7 @@ export default function PaperCreate() {
                       {(block.type === "vedic_division_without_remainder" || block.type === "vedic_division_with_remainder" || block.type === "vedic_divide_by_11_99") && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               {block.type === "vedic_divide_by_11_99" ? "Dividend Digits (1-20)" : "Dividend Digits (1-20)"}
                             </label>
                             <input
@@ -3756,7 +3734,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "dividendDigits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -3768,7 +3746,7 @@ export default function PaperCreate() {
                           </div>
                           {(block.type === "vedic_division_without_remainder" || block.type === "vedic_division_with_remainder") && (
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Divisor Digits (1-20)</label>
+                              <label className="block text-sm font-medium  text-white mb-1">Divisor Digits (1-20)</label>
                               <input
                                 type="text"
                                 maxLength={10}
@@ -3799,7 +3777,7 @@ export default function PaperCreate() {
                                     }
                                   }
                                 }}
-                                className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                                className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                   getFieldError(index, "divisorDigits")
                                     ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                                     : "border-gray-200 focus:border-blue-500 focus:ring-blue-200"
@@ -3815,7 +3793,7 @@ export default function PaperCreate() {
 
                       {(block.type === "vedic_division_9_8_7_6" || block.type === "vedic_division_91_121") && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Case</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Case</label>
                           <select
                             value={block.constraints.division9_8_7_6Case || block.constraints.division91_121Case || "mix"}
                             onChange={(e) => {
@@ -3825,7 +3803,7 @@ export default function PaperCreate() {
                                 updateBlock(index, { constraints: { ...block.constraints, division91_121Case: e.target.value as any } });
                               }
                             }}
-                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900/30 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2  focus:ring-blue-900/30 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500"
                           >
                             {block.type === "vedic_division_9_8_7_6" ? (
                               <>
@@ -3848,7 +3826,7 @@ export default function PaperCreate() {
 
                       {block.type === "vedic_digital_sum" && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Digits (1-30)</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Digits (1-30)</label>
                           <input
                             type="text"
                             value={block.constraints.digits === -1 || block.constraints.digits === undefined ? "" : String(block.constraints.digits)}
@@ -3873,7 +3851,7 @@ export default function PaperCreate() {
                                 }
                               }
                             }}
-                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white ${
+                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white ${
                               getFieldError(index, "digits")
                                 ? "focus:ring-red-200"
                                 : "focus:ring-blue-200"
@@ -3887,7 +3865,7 @@ export default function PaperCreate() {
 
                       {block.type === "vedic_cube_root_level4" && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Cube Root Digits (4-10)</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Cube Root Digits (4-10)</label>
                           <input
                             type="text"
                             maxLength={10}
@@ -3912,7 +3890,7 @@ export default function PaperCreate() {
                                 }
                               }
                             }}
-                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white ${
+                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white ${
                               getFieldError(index, "cubeRootDigits")
                                 ? "focus:ring-red-200"
                                 : "focus:ring-blue-200"
@@ -3926,13 +3904,13 @@ export default function PaperCreate() {
 
                       {block.type === "vedic_bodmas" && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Difficulty</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Difficulty</label>
                           <select
                             value={block.constraints.bodmasDifficulty || "medium"}
                             onChange={(e) => {
                               updateBlock(index, { constraints: { ...block.constraints, bodmasDifficulty: e.target.value as any } });
                             }}
-                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900/30 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                            className="w-full px-3 py-2 border-0 rounded-lg focus:ring-2  focus:ring-blue-900/30 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500"
                           >
                             <option value="easy">Easy</option>
                             <option value="medium">Medium</option>
@@ -3943,7 +3921,7 @@ export default function PaperCreate() {
 
                       {block.type === "vedic_square_root_level4" && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Root Digits (1-30)</label>
+                          <label className="block text-sm font-medium  text-white mb-1">Root Digits (1-30)</label>
                           <input
                             type="text"
                             maxLength={10}
@@ -3968,7 +3946,7 @@ export default function PaperCreate() {
                                 }
                               }
                             }}
-                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white ${
+                            className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white ${
                               getFieldError(index, "rootDigits")
                                 ? "focus:ring-red-200"
                                 : "focus:ring-blue-200"
@@ -3983,7 +3961,7 @@ export default function PaperCreate() {
                       {block.type === "vedic_percentage_level3" && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               Percentage Min (1-100)
                             </label>
                             <input
@@ -4016,7 +3994,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "percentageMin") || (block.constraints.percentageMin !== undefined && block.constraints.percentageMax !== undefined && block.constraints.percentageMin > block.constraints.percentageMax)
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -4027,7 +4005,7 @@ export default function PaperCreate() {
                             )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               Percentage Max (1-100)
                             </label>
                             <input
@@ -4060,7 +4038,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "percentageMax") || (block.constraints.percentageMin !== undefined && block.constraints.percentageMax !== undefined && block.constraints.percentageMin > block.constraints.percentageMax)
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -4071,7 +4049,7 @@ export default function PaperCreate() {
                             )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                            <label className="block text-sm font-medium  text-white mb-1">
                               Number Digits (1-10)
                             </label>
                             <input
@@ -4102,7 +4080,7 @@ export default function PaperCreate() {
                                   }
                                 }
                               }}
-                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 ${
+                              className={`w-full px-3 py-2 border-0 rounded-lg focus:ring-2 transition-all outline-none  bg-slate-700  text-white placeholder:text-slate-400 placeholder:text-slate-500 ${
                                 getFieldError(index, "numberDigits")
                                   ? "focus:ring-red-200"
                                   : "focus:ring-blue-200"
@@ -4389,9 +4367,9 @@ export default function PaperCreate() {
                                         }
                                         
                                         return (
-                                          <td key={`${q.id}-${rowIdx}`} className="p-1 border border-slate-600 dark:border-slate-600 bg-slate-700/50 dark:bg-slate-700/50 text-center" style={{ width: '10%' }}>
-                                            <div className="font-mono text-sm font-semibold text-white dark:text-white leading-tight text-center">
-                                              {operator && <span className="mr-1 text-blue-400 dark:text-blue-400">{operator}</span>}
+                                          <td key={`${q.id}-${rowIdx}`} className="p-1 border  border-slate-600  bg-slate-700/50 text-center" style={{ width: '10%' }}>
+                                            <div className="font-mono text-sm font-semibold  text-white leading-tight text-center">
+                                              {operator && <span className="mr-1  text-blue-400">{operator}</span>}
                                               {op}
                                             </div>
                                           </td>
@@ -4462,7 +4440,7 @@ export default function PaperCreate() {
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,paddingTop:24,borderTop:'1px solid rgba(255,255,255,0.08)',marginTop:24}}>
               {(() => {
                 const totalQ = blocks.reduce((s, b) => s + b.count, 0);
-                const tooFew = totalQ < 30;
+                const tooFew = totalQ < 15;
                 return (
                   <div style={{display:'flex',flexDirection:'column',gap:6}}>
                     <button
@@ -4475,7 +4453,7 @@ export default function PaperCreate() {
                     </button>
                     {tooFew && (
                       <p style={{margin:0,fontSize:11,fontFamily:'DM Sans, sans-serif',color:'#F87171',textAlign:'center'}}>
-                        Minimum 30 questions required ({totalQ} added)
+                        Minimum 15 questions required ({totalQ} added)
                       </p>
                     )}
                   </div>

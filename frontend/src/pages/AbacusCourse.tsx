@@ -671,7 +671,7 @@ function Hero() {
         <div key={i} style={{ position:"absolute", width:p.w, height:p.h, borderRadius:"50%", background:p.color, top:p.top, left:(p as any).left||"auto", right:(p as any).right||"auto", animation:`ab-glow-orb ${p.dur} ease-in-out infinite ${p.delay}`, pointerEvents:"none" }} />
       ))}
 
-      <div className="rsp-hero-grid" style={{ maxWidth:1200, margin:"0 auto", padding:"80px 24px", width:"100%", display:"grid", gridTemplateColumns:"55% 45%", gap:64, alignItems:"center" }}>
+      <div className="rsp-hero-grid" style={{ maxWidth:1200, margin:"0 auto", padding:"80px 56px 80px 24px", width:"100%", display:"grid", gridTemplateColumns:"55% 45%", gap:64, alignItems:"center" }}>
         {/* ── LEFT ── */}
         <div>
           {/* Tag pill */}

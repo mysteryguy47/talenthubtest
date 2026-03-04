@@ -97,7 +97,7 @@ export default function Footer() {
             </div>
 
             <p style={{ fontSize: 13.5, color: D.white2, lineHeight: 1.72, maxWidth: 260, marginBottom: 18 }}>
-              Transforming how children learn and think through proven, structured, and genuinely engaging programs since 2006.
+              Transforming how children learn and think through proven, structured, and genuinely engaging programs since 2008.
             </p>
 
             {/* Contact buttons */}

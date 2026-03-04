@@ -312,28 +312,28 @@ export const STATUS_LABELS: Record<AttendanceStatus, string> = {
 
 export const STATUS_COLORS: Record<AttendanceStatus, { bg: string; text: string; dot: string; row: string }> = {
   present:  {
-    bg:   "bg-emerald-100 dark:bg-emerald-900/40",
-    text: "text-emerald-700 dark:text-emerald-300",
+    bg:   " bg-emerald-900/40",
+    text: " text-emerald-300",
     dot:  "bg-emerald-500",
-    row:  "bg-emerald-50/60 dark:bg-emerald-950/25",
+    row:  " bg-emerald-950/25",
   },
   absent:   {
-    bg:   "bg-rose-100 dark:bg-rose-900/40",
-    text: "text-rose-700 dark:text-rose-300",
+    bg:   " bg-rose-900/40",
+    text: " text-rose-300",
     dot:  "bg-rose-500",
-    row:  "bg-rose-50/60 dark:bg-rose-950/25",
+    row:  " bg-rose-950/25",
   },
   on_break: {
-    bg:   "bg-amber-100 dark:bg-amber-900/40",
-    text: "text-amber-700 dark:text-amber-300",
+    bg:   " bg-amber-900/40",
+    text: " text-amber-300",
     dot:  "bg-amber-500",
-    row:  "bg-amber-50/60 dark:bg-amber-950/25",
+    row:  " bg-amber-950/25",
   },
   leave:    {
-    bg:   "bg-blue-100 dark:bg-blue-900/40",
-    text: "text-blue-700 dark:text-blue-300",
+    bg:   " bg-blue-900/40",
+    text: " text-blue-300",
     dot:  "bg-blue-500",
-    row:  "bg-blue-50/60 dark:bg-blue-950/25",
+    row:  " bg-blue-950/25",
   },
 };
 

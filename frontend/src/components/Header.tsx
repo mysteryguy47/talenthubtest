@@ -372,22 +372,22 @@ export default function Header() {
                               <>
                                 <div className="mx-4 my-1 border-t border-border/50" />
                                 <Link href="/admin">
-                                  <div className="px-4 py-3 text-sm font-medium text-card-foreground hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:shadow-sm flex items-center gap-2 cursor-pointer transition-all rounded-xl">
+                                  <div className="px-4 py-3 text-sm font-medium text-card-foreground  hover:bg-purple-900/30 hover:shadow-sm flex items-center gap-2 cursor-pointer transition-all rounded-xl">
                                     <Shield className="w-4 h-4" />Admin Dashboard
                                   </div>
                                 </Link>
                                 <Link href="/admin/attendance">
-                                  <div className="px-4 py-3 text-sm font-medium text-card-foreground hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:shadow-sm flex items-center gap-2 cursor-pointer transition-all rounded-xl">
+                                  <div className="px-4 py-3 text-sm font-medium text-card-foreground  hover:bg-purple-900/30 hover:shadow-sm flex items-center gap-2 cursor-pointer transition-all rounded-xl">
                                     <Calendar className="w-4 h-4" />Attendance
                                   </div>
                                 </Link>
                                 <Link href="/admin/access-control">
-                                  <div className="px-4 py-3 text-sm font-medium text-card-foreground hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:shadow-sm flex items-center gap-2 cursor-pointer transition-all rounded-xl">
+                                  <div className="px-4 py-3 text-sm font-medium text-card-foreground  hover:bg-purple-900/30 hover:shadow-sm flex items-center gap-2 cursor-pointer transition-all rounded-xl">
                                     <Lock className="w-4 h-4" />Access Control
                                   </div>
                                 </Link>
                                 <Link href="/admin/rewards">
-                                  <div className="px-4 py-3 text-sm font-medium text-card-foreground hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:shadow-sm flex items-center gap-2 cursor-pointer transition-all rounded-xl">
+                                  <div className="px-4 py-3 text-sm font-medium text-card-foreground  hover:bg-purple-900/30 hover:shadow-sm flex items-center gap-2 cursor-pointer transition-all rounded-xl">
                                     <Award className="w-4 h-4" />Rewards Admin
                                   </div>
                                 </Link>

@@ -28,7 +28,7 @@ export default function GraceBanner() {
       role="alert"
       className="w-full z-50 relative flex items-center justify-between gap-3 px-4 py-2.5
         bg-amber-950/80 border-b border-amber-800
-        dark:bg-amber-950/80 dark:border-amber-800
+        bg-amber-950/80 border-amber-800
         light:bg-amber-50 light:border-amber-200"
       style={{
         background: "var(--grace-bg, rgba(69, 26, 3, 0.85))",

@@ -58,25 +58,25 @@ function HandwritingStyles() {
       @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700;1,800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
       .hw-page {
-        --hw-bg:      #F7F4EF;
-        --hw-bg2:     #EDEAE2;
-        --hw-bg3:     #E5E0D5;
+        --hw-bg:      #0D0C0A;
+        --hw-bg2:     #111009;
+        --hw-bg3:     #181613;
         --hw-dark:    #0C0B09;
-        --hw-dark2:   #171612;
-        --hw-dark3:   #221F1A;
-        --hw-surface: #FFFFFF;
+        --hw-dark2:   #111009;
+        --hw-dark3:   #1A1916;
+        --hw-surface: #1C1B16;
         --hw-surfaced:#1C1B17;
-        --hw-border:  rgba(12,11,9,0.1);
+        --hw-border:  rgba(255,255,255,0.07);
         --hw-bdark:   rgba(255,255,255,0.07);
-        --hw-ink:     #28261F;
-        --hw-ink2:    #58564F;
+        --hw-ink:     #EAE4D8;
+        --hw-ink2:    rgba(220,213,198,0.52);
         --hw-teal:    #0A7A6A;
         --hw-teal2:   #0C9A80;
         --hw-teal3:   #3EBBA6;
         --hw-tealfade:rgba(10,122,106,0.1);
         --hw-tealfade2:rgba(10,122,106,0.2);
-        --hw-red-rule:rgba(210,48,48,0.07);
-        --hw-cream:   #FDF9F2;
+        --hw-red-rule:rgba(210,60,60,0.1);
+        --hw-cream:   #161411;
         --hw-font-s:  'Cormorant Garamond', Georgia, serif;
         --hw-font-d:  'Playfair Display', Georgia, serif;
         --hw-font-b:  'DM Sans', sans-serif;
@@ -163,7 +163,7 @@ function HandwritingStyles() {
         background: var(--hw-surface); border: 1px solid var(--hw-border); border-radius: 18px;
         transition: all .35s cubic-bezier(.4,0,.2,1);
       }
-      .hw-card-l:hover { border-color: rgba(10,122,106,.26); transform: translateY(-5px); box-shadow: 0 20px 56px rgba(0,0,0,.09), 0 0 28px rgba(10,122,106,.04); }
+      .hw-card-l:hover { border-color: rgba(10,122,106,.32); transform: translateY(-5px); box-shadow: 0 20px 56px rgba(0,0,0,.5), 0 0 32px rgba(10,122,106,.09); }
       .hw-card-d {
         background: var(--hw-surfaced); border: 1px solid rgba(255,255,255,.06); border-radius: 18px;
         transition: all .35s cubic-bezier(.4,0,.2,1);
@@ -176,8 +176,8 @@ function HandwritingStyles() {
       .hw-paper {
         background: var(--hw-cream);
         background-image:
-          radial-gradient(ellipse at 20% 30%, rgba(10,122,106,.03) 0%, transparent 55%),
-          radial-gradient(ellipse at 80% 70%, rgba(28,46,74,.03) 0%, transparent 55%);
+          radial-gradient(ellipse at 20% 30%, rgba(10,122,106,.09) 0%, transparent 55%),
+          radial-gradient(ellipse at 80% 70%, rgba(10,100,180,.05) 0%, transparent 55%);
       }
     `}</style>
   );
@@ -308,7 +308,7 @@ function Hero() {
         <div key={i} style={{ position:"absolute", width:p.w, height:p.h, borderRadius:"50%", background:p.c, top:p.top, left:(p as any).left||"auto", right:(p as any).right||"auto", animation:`hw-float ${p.dur} ease-in-out infinite ${p.d}`, pointerEvents:"none" }} />
       ))}
 
-      <div className="rsp-hero-grid" style={{ maxWidth:1200, margin:"0 auto", padding:"80px 24px", width:"100%", display:"grid", gridTemplateColumns:"52% 48%", gap:56, alignItems:"center" }}>
+      <div className="rsp-hero-grid" style={{ maxWidth:1200, margin:"0 auto", padding:"80px 56px 80px 24px", width:"100%", display:"grid", gridTemplateColumns:"52% 48%", gap:56, alignItems:"center" }}>
 
         {/* ── LEFT ── */}
         <div>
@@ -333,7 +333,7 @@ function Hero() {
             <button className="hw-btn-outline">Book Free Trial</button>
           </div>
 
-          <div style={{ display:"flex", gap:30, marginTop:40, paddingTop:30, borderTop:"1px solid rgba(12,11,9,.1)", opacity:loaded?1:0, transition:"opacity .8s ease .55s" }}>
+          <div style={{ display:"flex", gap:30, marginTop:40, paddingTop:30, borderTop:"1px solid rgba(255,255,255,.1)", opacity:loaded?1:0, transition:"opacity .8s ease .55s" }}>
             {[["12","Weeks"],["2","Languages"],["3","Weeks to Visible Change"],["All","Ages, Class 1+"]].map(([v,l]) => (
               <div key={l}>
                 <div style={{ fontFamily:"var(--hw-font-s)", fontSize:26, fontWeight:700, color:"var(--hw-ink)" }}>{v}</div>
@@ -345,11 +345,11 @@ function Hero() {
 
         {/* ── RIGHT — writing showcase card ── */}
         <div className="rsp-hero-right" style={{ opacity:loaded?1:0, transform:loaded?"none":"translateX(32px)", transition:"all .9s cubic-bezier(.4,0,.2,1) .28s", position:"relative" }}>
-          <div className="hw-paper hw-ruled" style={{ borderRadius:26, padding:"36px", position:"relative", overflow:"hidden", border:"1px solid rgba(12,11,9,.1)", boxShadow:"0 28px 80px rgba(0,0,0,.1), 0 2px 8px rgba(0,0,0,.06)" }}>
+          <div className="hw-paper hw-ruled" style={{ borderRadius:26, padding:"36px", position:"relative", overflow:"hidden", border:"1px solid rgba(255,255,255,.08)", boxShadow:"0 28px 80px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.3)" }}>
             {/* Paper corner fold decoration */}
             <div style={{ position:"absolute", top:14, right:14, fontFamily:"var(--hw-font-m)", fontSize:9, color:"rgba(10,122,106,.35)", letterSpacing:".1em" }}>TALENT HUB · HANDWRITING</div>
             {/* Subtle left binding shadow */}
-            <div style={{ position:"absolute", top:0, left:0, bottom:0, width:28, background:"linear-gradient(90deg,rgba(0,0,0,.04),transparent)", borderRight:"1px solid rgba(12,11,9,.06)", pointerEvents:"none" }} />
+            <div style={{ position:"absolute", top:0, left:0, bottom:0, width:28, background:"linear-gradient(90deg,rgba(0,0,0,.22),transparent)", borderRight:"1px solid rgba(255,255,255,.04)", pointerEvents:"none" }} />
             {/* Scan line */}
             <div style={{ position:"absolute", left:0, right:0, height:2, background:"linear-gradient(90deg,transparent,rgba(10,122,106,.25),transparent)", animation:"hw-scan 4s ease-in-out infinite", pointerEvents:"none" }} />
 
@@ -357,8 +357,8 @@ function Hero() {
 
             {/* Before */}
             <div style={{ marginBottom:26 }}>
-              <div style={{ fontFamily:"var(--hw-font-m)", fontSize:9, color:"rgba(12,11,9,.3)", letterSpacing:".14em", textTransform:"uppercase", marginBottom:9 }}>Before — Week 1</div>
-              <div style={{ fontFamily:"'Courier New',monospace", fontSize:"clamp(22px,2.8vw,32px)", color:"rgba(12,11,9,.22)", letterSpacing:".1em", lineHeight:2.2, paddingBottom:2, borderBottom:"1px solid rgba(10,122,106,.1)", filter:"blur(.4px)" }}>
+              <div style={{ fontFamily:"var(--hw-font-m)", fontSize:9, color:"rgba(220,214,200,.32)", letterSpacing:".14em", textTransform:"uppercase", marginBottom:9 }}>Before — Week 1</div>
+              <div style={{ fontFamily:"'Courier New',monospace", fontSize:"clamp(22px,2.8vw,32px)", color:"rgba(200,193,178,.18)", letterSpacing:".1em", lineHeight:2.2, paddingBottom:2, borderBottom:"1px solid rgba(10,122,106,.15)", filter:"blur(.4px)" }}>
                 {WORD_SAMPLES_EN[wordIdx]}
               </div>
             </div>
@@ -509,11 +509,11 @@ function BeforeAfter() {
 
         <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
           {/* Header row */}
-          <div className="rsp-hw-table-hdr" style={{ display:"grid", gridTemplateColumns:"190px 1fr 1fr 90px", gap:20, padding:"0 20px 12px", borderBottom:"2px solid rgba(12,11,9,.1)" }}>
+          <div className="rsp-hw-table-hdr" style={{ display:"grid", gridTemplateColumns:"190px 1fr 1fr 90px", gap:20, padding:"0 20px 12px", borderBottom:"2px solid rgba(255,255,255,.07)" }}>
             <span style={{ fontFamily:"var(--hw-font-m)", fontSize:10, color:"var(--hw-ink2)", letterSpacing:".12em", textTransform:"uppercase" }}>Aspect</span>
-            <span style={{ fontFamily:"var(--hw-font-m)", fontSize:10, color:"rgba(12,11,9,.3)", letterSpacing:".12em", textTransform:"uppercase" }}>Before</span>
+            <span style={{ fontFamily:"var(--hw-font-m)", fontSize:10, color:"rgba(220,214,200,.3)", letterSpacing:".12em", textTransform:"uppercase" }}>Before</span>
             <span style={{ fontFamily:"var(--hw-font-m)", fontSize:10, color:"var(--hw-teal)", letterSpacing:".12em", textTransform:"uppercase" }}>After 12 Weeks</span>
-            <span style={{ fontFamily:"var(--hw-font-m)", fontSize:10, color:"rgba(12,11,9,.3)", letterSpacing:".12em", textTransform:"uppercase", textAlign:"right" }}>Match</span>
+            <span style={{ fontFamily:"var(--hw-font-m)", fontSize:10, color:"rgba(220,214,200,.3)", letterSpacing:".12em", textTransform:"uppercase", textAlign:"right" }}>Match</span>
           </div>
 
           {BEFORE_AFTER.map((row, i) => (
@@ -522,7 +522,7 @@ function BeforeAfter() {
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor="rgba(10,122,106,.22)"; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor="var(--hw-border)"; }}>
                 <div style={{ fontFamily:"var(--hw-font-d)", fontSize:14, fontWeight:700, color:"var(--hw-ink)" }}>{row.label}</div>
-                <div style={{ fontSize:14, color:"rgba(12,11,9,.4)", lineHeight:1.6, fontStyle:"italic" }}>{row.before}</div>
+                <div style={{ fontSize:14, color:"rgba(220,214,200,.3)", lineHeight:1.6, fontStyle:"italic" }}>{row.before}</div>
                 <div style={{ display:"flex", alignItems:"flex-start", gap:8, fontSize:14, color:"var(--hw-ink)", lineHeight:1.6 }}>
                   <span style={{ color:"var(--hw-teal)", fontSize:11, marginTop:3, flexShrink:0 }}>✓</span>{row.after}
                 </div>

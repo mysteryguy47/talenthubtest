@@ -2,7 +2,7 @@ import { Switch, Route } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { SubscriptionProvider } from "./contexts/SubscriptionContext";
-import { ThemeProvider } from "./contexts/ThemeContext";
+
 import MaintenancePage from "./pages/MaintenancePage";
 import { useEffect, useState } from "react";
 import Header from "./components/Header";
@@ -54,8 +54,8 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   if (loading) {
     console.log("🟡 [PROTECTED] Still loading, showing loading screen");
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        <div className="text-xl text-slate-900 dark:text-slate-100">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 from-slate-900 via-slate-800 to-slate-900">
+        <div className="text-xl  text-slate-100">Loading...</div>
       </div>
     );
   }
@@ -74,8 +74,8 @@ function AdminRoute({ children }: { children: ReactNode }) {
   
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        <div className="text-xl text-slate-900 dark:text-slate-100">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 from-slate-900 via-slate-800 to-slate-900">
+        <div className="text-xl  text-slate-100">Loading...</div>
       </div>
     );
   }
@@ -88,9 +88,9 @@ function AdminRoute({ children }: { children: ReactNode }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
         <div className="text-center">
-          <div className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">Access Denied</div>
-          <div className="text-slate-600 dark:text-slate-300 mb-4">You do not have permission to access this page.</div>
-          <a href="/dashboard" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 underline">
+          <div className="text-2xl font-bold  text-red-400 mb-4">Access Denied</div>
+          <div className=" text-slate-300 mb-4">You do not have permission to access this page.</div>
+          <a href="/dashboard" className=" text-indigo-400  hover:text-indigo-300 underline">
             Go to Dashboard
           </a>
         </div>
@@ -130,7 +130,7 @@ function AppContent() {
         isOpen={showInactivityWarning} 
         onDismiss={dismissWarning} 
       />
-      <div className="flex flex-col min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
+      <div className="flex flex-col min-h-screen  bg-slate-950 transition-colors duration-300">
         <Header />        <GraceBanner />        <main className="flex-grow">
           <ErrorBoundary>
             <Switch>
@@ -240,16 +240,14 @@ function StudentRewardsWithUser() {
 
 function App() {
   return (
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <SubscriptionProvider>
-            <AppContent />
-            <SpeedInsights />
-          </SubscriptionProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <SubscriptionProvider>
+          <AppContent />
+          <SpeedInsights />
+        </SubscriptionProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

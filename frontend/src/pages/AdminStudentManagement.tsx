@@ -42,9 +42,9 @@ const BRANCHES = ["Rohini-16", "Rohini-11", "Gurgaon", "Online"];
 const STATUSES = ["active", "inactive", "closed"];
 
 const STATUS_STYLES: Record<string, string> = {
-  active: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
-  inactive: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300",
-  closed: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
+  active: "bg-green-100 text-green-800 bg-green-900/40 text-green-300",
+  inactive: "bg-yellow-100 text-yellow-800 bg-yellow-900/40 text-yellow-300",
+  closed: "bg-red-100 text-red-800 bg-red-900/40 text-red-300",
 };
 
 // ─── Blank form state ──────────────────────────────────────────────────────────
@@ -188,9 +188,9 @@ function StudentFormModal({
   isEdit: boolean;
 }) {
   const inputCls =
-    "w-full px-3 py-2 bg-background dark:bg-slate-800 border border-border dark:border-slate-600 rounded-lg text-foreground dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all";
+    "w-full px-3 py-2  bg-slate-800 border  border-slate-600 rounded-lg  text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all";
   const selectCls =
-    "w-full px-3 py-2 bg-background dark:bg-slate-800 border border-border dark:border-slate-600 rounded-lg text-foreground dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all";
+    "w-full px-3 py-2  bg-slate-800 border  border-slate-600 rounded-lg  text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all";
   const labelCls = "block text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1";
 
   return (
@@ -425,7 +425,7 @@ function CertificateManagerModal({
   onClose: () => void;
 }) {
   const inputCls =
-    "w-full px-3 py-2 bg-background dark:bg-slate-800 border border-border dark:border-slate-600 rounded-lg text-foreground dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all";
+    "w-full px-3 py-2  bg-slate-800 border  border-slate-600 rounded-lg  text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all";
 
   const [certs, setCerts] = useState<CertificateRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -575,7 +575,7 @@ function CertificateManagerModal({
               </div>
             )}
             {success && (
-              <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-xl p-3 text-sm text-green-700 dark:text-green-400 mb-4">
+              <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-xl p-3 text-sm  text-green-400 mb-4">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 {success}
               </div>
@@ -697,7 +697,7 @@ function CertificateManagerModal({
                       )}
                       <div className="flex items-center gap-3 mt-2 flex-wrap">
                         {cert.marks !== null && cert.marks !== undefined ? (
-                          <span className="px-2 py-0.5 text-xs font-black rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                          <span className="px-2 py-0.5 text-xs font-black rounded-full bg-amber-500/10  text-amber-400 border border-amber-500/20">
                             {cert.marks} marks
                           </span>
                         ) : (
@@ -1057,7 +1057,7 @@ export default function AdminStudentManagement() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   const selectCls =
-    "px-3 py-2 bg-background dark:bg-slate-800 border border-border dark:border-slate-600 rounded-lg text-foreground dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all";
+    "px-3 py-2  bg-slate-800 border  border-slate-600 rounded-lg  text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all";
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
@@ -1103,7 +1103,7 @@ export default function AdminStudentManagement() {
 
         {/* ── Success Flash ───────────────────────────────────────────────── */}
         {successMsg && (
-          <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-xl p-4 text-green-700 dark:text-green-400 text-sm font-medium">
+          <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-xl p-4  text-green-400 text-sm font-medium">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             {successMsg}
           </div>
@@ -1113,9 +1113,9 @@ export default function AdminStudentManagement() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { label: "Total", value: stats.total, color: "text-primary" },
-            { label: "Active", value: stats.active, color: "text-green-600 dark:text-green-400" },
-            { label: "Inactive", value: stats.inactive, color: "text-yellow-600 dark:text-yellow-400" },
-            { label: "Closed", value: stats.closed, color: "text-red-500 dark:text-red-400" },
+            { label: "Active", value: stats.active, color: " text-green-400" },
+            { label: "Inactive", value: stats.inactive, color: " text-yellow-400" },
+            { label: "Closed", value: stats.closed, color: " text-red-400" },
           ].map(({ label, value, color }) => (
             <div
               key={label}
@@ -1136,7 +1136,7 @@ export default function AdminStudentManagement() {
             <div className="relative flex-1 min-w-[220px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <input
-                className="w-full pl-9 pr-4 py-2 bg-background dark:bg-slate-800 border border-border dark:border-slate-600 rounded-lg text-foreground dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                className="w-full pl-9 pr-4 py-2  bg-slate-800 border  border-slate-600 rounded-lg  text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
                 placeholder="Search by name, email, or ID…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}

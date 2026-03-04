@@ -317,7 +317,7 @@ export default function AdminStudentIDManagement() {
               placeholder="Search students by name, email, or ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-slate-700 dark:bg-slate-700 text-white dark:text-white border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              className="w-full pl-10 pr-4 py-3  bg-slate-700  text-white border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
             />
           </div>
 
@@ -344,14 +344,14 @@ export default function AdminStudentIDManagement() {
 
         {/* Messages */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-2xl flex items-center gap-3 text-red-700 dark:text-red-400">
+          <div className="mb-6 p-4  bg-red-900/30 border  border-red-800 rounded-2xl flex items-center gap-3  text-red-400">
             <AlertCircle className="w-6 h-6" />
             <span className="font-medium">{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-2xl flex items-center gap-3 text-green-700 dark:text-green-400">
+          <div className="mb-6 p-4  bg-green-900/30 border  border-green-800 rounded-2xl flex items-center gap-3  text-green-400">
             <CheckCircle2 className="w-6 h-6" />
             <span className="font-medium">{success}</span>
           </div>
@@ -448,7 +448,7 @@ export default function AdminStudentIDManagement() {
                                 onFocus={() => {
                                   setShowVacantIds(true);
                                 }}
-                                className="w-full px-3 py-2 bg-background dark:bg-slate-800 border border-border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-mono"
+                                className="w-full px-3 py-2  bg-slate-800 border border-border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-mono"
                                 placeholder="0001"
                                 maxLength={4}
                               />
@@ -504,8 +504,8 @@ export default function AdminStudentIDManagement() {
                         <div className="flex items-center gap-2">
                           <span className={`font-mono text-sm px-2 py-1 rounded ${
                             student.public_id
-                              ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
-                              : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
+                              ? ' bg-green-900/30  text-green-300'
+                              : ' bg-yellow-900/30  text-yellow-300'
                           }`}>
                             {student.public_id || "Not Assigned"}
                           </span>
@@ -609,7 +609,7 @@ export default function AdminStudentIDManagement() {
                       <button
                         onClick={() => handleDeleteVacantId(vacant.id)}
                         disabled={deletingVacantId === vacant.id}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20  text-red-400 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
                       >
                         {deletingVacantId === vacant.id ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />

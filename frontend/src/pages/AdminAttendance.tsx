@@ -87,10 +87,10 @@ function CreateSessionModal({ onClose, onCreate, saving, defaultBranch, defaultC
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 border border-slate-200 dark:border-slate-700">
+      <div className="relative  bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 border  border-slate-700">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">New Class Session</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <h2 className="text-lg font-semibold  text-slate-100">New Class Session</h2>
+          <button onClick={onClose} className="p-1.5 rounded-lg  hover:bg-slate-800 transition-colors">
             <X className="w-4 h-4 text-slate-500" />
           </button>
         </div>
@@ -98,7 +98,7 @@ function CreateSessionModal({ onClose, onCreate, saving, defaultBranch, defaultC
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Date */}
           <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+            <label className="block text-xs font-medium  text-slate-400 mb-1">
               Date <span className="text-rose-500">*</span>
             </label>
             <input
@@ -106,20 +106,20 @@ function CreateSessionModal({ onClose, onCreate, saving, defaultBranch, defaultC
               value={date}
               onChange={e => setDate(e.target.value)}
               required
-              className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100"
+              className="w-full px-3 py-2 text-sm  bg-slate-800 border  border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500  text-slate-100"
             />
           </div>
 
           {/* Branch */}
           <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+            <label className="block text-xs font-medium  text-slate-400 mb-1">
               Branch <span className="text-rose-500">*</span>
             </label>
             <select
               value={branch}
               onChange={e => setBranch(e.target.value)}
               required
-              className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100"
+              className="w-full px-3 py-2 text-sm  bg-slate-800 border  border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500  text-slate-100"
             >
               {BRANCHES.map(b => <option key={b} value={b}>{b}</option>)}
             </select>
@@ -127,11 +127,11 @@ function CreateSessionModal({ onClose, onCreate, saving, defaultBranch, defaultC
 
           {/* Course */}
           <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Course</label>
+            <label className="block text-xs font-medium  text-slate-400 mb-1">Course</label>
             <select
               value={course}
               onChange={e => setCourse(e.target.value)}
-              className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100"
+              className="w-full px-3 py-2 text-sm  bg-slate-800 border  border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500  text-slate-100"
             >
               <option value="">All Courses</option>
               {COURSES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -140,42 +140,42 @@ function CreateSessionModal({ onClose, onCreate, saving, defaultBranch, defaultC
 
           {/* Level */}
           <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Level</label>
+            <label className="block text-xs font-medium  text-slate-400 mb-1">Level</label>
             <input
               type="text"
               value={level}
               onChange={e => setLevel(e.target.value)}
               placeholder="e.g. Level 3, Junior…"
-              className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
+              className="w-full px-3 py-2 text-sm  bg-slate-800 border  border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500  text-slate-100 placeholder:text-slate-400"
             />
           </div>
 
           {/* Topic */}
           <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Topic</label>
+            <label className="block text-xs font-medium  text-slate-400 mb-1">Topic</label>
             <input
               type="text"
               value={topic}
               onChange={e => setTopic(e.target.value)}
               placeholder="Optional lesson topic"
-              className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
+              className="w-full px-3 py-2 text-sm  bg-slate-800 border  border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500  text-slate-100 placeholder:text-slate-400"
             />
           </div>
 
           {/* Remarks */}
           <div>
-            <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Teacher Remarks</label>
+            <label className="block text-xs font-medium  text-slate-400 mb-1">Teacher Remarks</label>
             <textarea
               value={remarks}
               onChange={e => setRemarks(e.target.value)}
               rows={2}
               placeholder="Any notes for this session"
-              className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 resize-none"
+              className="w-full px-3 py-2 text-sm  bg-slate-800 border  border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500  text-slate-100 placeholder:text-slate-400 resize-none"
             />
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400 text-xs">
+            <div className="flex items-center gap-2  text-rose-400 text-xs">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               {error}
             </div>
@@ -183,7 +183,7 @@ function CreateSessionModal({ onClose, onCreate, saving, defaultBranch, defaultC
 
           <div className="flex gap-3 pt-1">
             <button type="button" onClick={onClose}
-              className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+              className="flex-1 px-4 py-2.5 text-sm font-medium  text-slate-300 border  border-slate-700 rounded-xl  hover:bg-slate-800 transition-colors">
               Cancel
             </button>
             <button type="submit" disabled={saving}
@@ -211,10 +211,10 @@ function ConfirmDialog({ message, onConfirm, onCancel, danger }: ConfirmDialogPr
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onCancel} />
-      <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6 border border-slate-200 dark:border-slate-700">
-        <p className="text-sm text-slate-700 dark:text-slate-300 mb-5 leading-relaxed">{message}</p>
+      <div className="relative  bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6 border  border-slate-700">
+        <p className="text-sm  text-slate-300 mb-5 leading-relaxed">{message}</p>
         <div className="flex gap-3">
-          <button onClick={onCancel} className="flex-1 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+          <button onClick={onCancel} className="flex-1 px-4 py-2 text-sm font-medium  text-slate-300 border  border-slate-700 rounded-xl  hover:bg-slate-800 transition-colors">
             Cancel
           </button>
           <button onClick={onConfirm} className={`flex-1 px-4 py-2 text-sm font-medium text-white rounded-xl transition-colors ${danger ? "bg-rose-600 hover:bg-rose-700" : "bg-blue-600 hover:bg-blue-700"}`}>
@@ -230,10 +230,10 @@ function ConfirmDialog({ message, onConfirm, onCancel, danger }: ConfirmDialogPr
 // Status Toggle Pills
 // ─────────────────────────────────────────────────────────────────────────────
 const STATUS_PILL_CONFIG: { status: AttendanceStatus; label: string; active: string; inactive: string }[] = [
-  { status: "present",  label: "P",  active: "bg-emerald-600 text-white",             inactive: "bg-transparent text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-emerald-400 hover:text-emerald-600" },
-  { status: "absent",   label: "A",  active: "bg-rose-600 text-white",                inactive: "bg-transparent text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-rose-400 hover:text-rose-600" },
-  { status: "on_break", label: "OB", active: "bg-amber-500 text-white",               inactive: "bg-transparent text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-amber-400 hover:text-amber-600" },
-  { status: "leave",    label: "L",  active: "bg-blue-600 text-white",                inactive: "bg-transparent text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-blue-400 hover:text-blue-600" },
+  { status: "present",  label: "P",  active: "bg-emerald-600 text-white",             inactive: "bg-transparent  text-slate-400 border  border-slate-700 hover:border-emerald-400 hover:text-emerald-600" },
+  { status: "absent",   label: "A",  active: "bg-rose-600 text-white",                inactive: "bg-transparent  text-slate-400 border  border-slate-700 hover:border-rose-400 hover:text-rose-600" },
+  { status: "on_break", label: "OB", active: "bg-amber-500 text-white",               inactive: "bg-transparent  text-slate-400 border  border-slate-700 hover:border-amber-400 hover:text-amber-600" },
+  { status: "leave",    label: "L",  active: "bg-blue-600 text-white",                inactive: "bg-transparent  text-slate-400 border  border-slate-700 hover:border-blue-400 hover:text-blue-600" },
 ];
 
 interface StatusToggleProps {
@@ -278,8 +278,8 @@ function TShirtToggle({ value, onChange, disabled }: TShirtToggleProps) {
       aria-label={disabled ? "Not applicable" : value ? "T-shirt worn" : "T-shirt not worn"}
       title={disabled ? "Only trackable when Present" : value ? "T-Shirt Worn ✓" : "T-Shirt Not Worn"}
       className={`h-7 w-7 rounded-md flex items-center justify-center transition-all duration-150
-        ${disabled ? "opacity-25 cursor-not-allowed bg-slate-100 dark:bg-slate-800" :
-          value ? "bg-indigo-600 text-white shadow-sm" : "border border-slate-200 dark:border-slate-700 text-slate-400 hover:border-indigo-400 hover:text-indigo-500"
+        ${disabled ? "opacity-25 cursor-not-allowed  bg-slate-800" :
+          value ? "bg-indigo-600 text-white shadow-sm" : "border  border-slate-700 text-slate-400 hover:border-indigo-400 hover:text-indigo-500"
         }`}
     >
       <Shirt className="w-3.5 h-3.5" />
@@ -304,7 +304,7 @@ function StudentRow({ student, localStatus, localTshirt, saveState, onStatusChan
   const rowBg = localStatus ? STATUS_COLORS[localStatus].row : "";
 
   return (
-    <div className={`flex items-center gap-3 px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors ${rowBg}`}>
+    <div className={`flex items-center gap-3 px-4 py-2.5 border-b  border-slate-800  hover:bg-slate-800/40 transition-colors ${rowBg}`}>
       {/* Avatar */}
       <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white ${avatarColor(student.name)}`}
         aria-hidden="true">
@@ -313,8 +313,8 @@ function StudentRow({ student, localStatus, localTshirt, saveState, onStatusChan
 
       {/* Name + ID */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate leading-tight">{student.name}</p>
-        <p className="text-[11px] text-slate-400 dark:text-slate-500 font-mono leading-tight">
+        <p className="text-sm font-medium  text-slate-100 truncate leading-tight">{student.name}</p>
+        <p className="text-[11px]  text-slate-500 font-mono leading-tight">
           {student.public_id || `#${student.student_profile_id}`}
           {student.class_name ? <span className="ml-1.5 not-italic font-sans">· {student.class_name}</span> : null}
         </p>
@@ -502,20 +502,20 @@ function SheetPanel({ session }: SheetPanelProps) {
   if (isLoading) return (
     <div className="flex-1 flex flex-col">
       {/* skeleton header */}
-      <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800">
-        <div className="h-5 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-2" />
-        <div className="h-3.5 w-32 bg-slate-100 dark:bg-slate-800 rounded animate-pulse" />
+      <div className="px-5 py-4 border-b  border-slate-800">
+        <div className="h-5 w-48  bg-slate-700 rounded animate-pulse mb-2" />
+        <div className="h-3.5 w-32  bg-slate-800 rounded animate-pulse" />
       </div>
       <div className="flex-1 overflow-y-auto">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="flex items-center gap-3 px-5 py-3 border-b border-slate-100 dark:border-slate-800">
-            <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse" />
+          <div key={i} className="flex items-center gap-3 px-5 py-3 border-b  border-slate-800">
+            <div className="w-8 h-8 rounded-full  bg-slate-700 animate-pulse" />
             <div className="flex-1">
-              <div className="h-3.5 w-36 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-1.5" />
-              <div className="h-2.5 w-20 bg-slate-100 dark:bg-slate-800 rounded animate-pulse" />
+              <div className="h-3.5 w-36  bg-slate-700 rounded animate-pulse mb-1.5" />
+              <div className="h-2.5 w-20  bg-slate-800 rounded animate-pulse" />
             </div>
             <div className="flex gap-1">
-              {[0,1,2,3].map(j => <div key={j} className="h-7 w-8 bg-slate-200 dark:bg-slate-700 rounded-md animate-pulse" />)}
+              {[0,1,2,3].map(j => <div key={j} className="h-7 w-8  bg-slate-700 rounded-md animate-pulse" />)}
             </div>
           </div>
         ))}
@@ -524,10 +524,10 @@ function SheetPanel({ session }: SheetPanelProps) {
   );
 
   if (isError) return (
-    <div className="flex-1 flex items-center justify-center flex-col gap-3 text-slate-500 dark:text-slate-400 p-8">
+    <div className="flex-1 flex items-center justify-center flex-col gap-3  text-slate-400 p-8">
       <AlertCircle className="w-10 h-10 text-rose-400" />
       <p className="text-sm font-medium">Failed to load attendance sheet</p>
-      <button onClick={() => refetch()} className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+      <button onClick={() => refetch()} className="text-xs  text-blue-400 hover:underline flex items-center gap-1">
         <RefreshCw className="w-3.5 h-3.5" /> Retry
       </button>
     </div>
@@ -536,7 +536,7 @@ function SheetPanel({ session }: SheetPanelProps) {
   if (!sheet || sheet.students.length === 0) return (
     <div className="flex-1 flex items-center justify-center flex-col gap-3 text-slate-400 p-8">
       <Users className="w-10 h-10" />
-      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">No active students found for this session's branch
+      <p className="text-sm font-medium  text-slate-400">No active students found for this session's branch
         {session.course ? ` / ${session.course}` : ""}
       </p>
       <p className="text-xs text-slate-400">Students must be active and assigned to <strong>{session.branch}</strong></p>
@@ -546,24 +546,24 @@ function SheetPanel({ session }: SheetPanelProps) {
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* Sheet header */}
-      <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+      <div className="px-5 py-3 border-b  border-slate-800  bg-slate-900">
         <div className="flex items-start justify-between gap-4 mb-3">
           <div>
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-tight">
+            <h3 className="text-sm font-semibold  text-slate-100 leading-tight">
               {session.topic || formatDay(session.session_date)}
               {session.course && <span className="ml-2 text-xs font-normal text-slate-400">· {session.course}</span>}
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs  text-slate-400 mt-0.5">
               {formatDateShort(session.session_date)} · {session.branch}
             </p>
           </div>
           <div className="flex gap-1.5 flex-wrap justify-end">
-            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">{pCount} P</span>
-            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300">{aCount} A</span>
-            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300">{obCount} OB</span>
-            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">{lCount} L</span>
-            {uCount > 0 && <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">{uCount} unmarked</span>}
-            {tCount > 0 && <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300">
+            <span className="text-xs font-medium px-2.5 py-1 rounded-full  bg-emerald-900/40  text-emerald-300">{pCount} P</span>
+            <span className="text-xs font-medium px-2.5 py-1 rounded-full  bg-rose-900/40  text-rose-300">{aCount} A</span>
+            <span className="text-xs font-medium px-2.5 py-1 rounded-full  bg-amber-900/40  text-amber-300">{obCount} OB</span>
+            <span className="text-xs font-medium px-2.5 py-1 rounded-full  bg-blue-900/40  text-blue-300">{lCount} L</span>
+            {uCount > 0 && <span className="text-xs font-medium px-2.5 py-1 rounded-full  bg-slate-800  text-slate-400">{uCount} unmarked</span>}
+            {tCount > 0 && <span className="text-xs font-medium px-2.5 py-1 rounded-full  bg-indigo-900/40  text-indigo-300">
               <Shirt className="w-3 h-3 inline mr-0.5" />{tCount}
             </span>}
           </div>
@@ -579,7 +579,7 @@ function SheetPanel({ session }: SheetPanelProps) {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search student…"
-              className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
+              className="w-full pl-8 pr-3 py-1.5 text-xs  bg-slate-800 border  border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500  text-slate-100 placeholder:text-slate-400"
             />
           </div>
 
@@ -587,7 +587,7 @@ function SheetPanel({ session }: SheetPanelProps) {
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value as typeof sortBy)}
-            className="px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-2.5 py-1.5 text-xs  bg-slate-800 border  border-slate-700 rounded-lg  text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="id">Sort: ID</option>
             <option value="name">Sort: Name</option>
@@ -597,15 +597,15 @@ function SheetPanel({ session }: SheetPanelProps) {
           {/* Bulk actions */}
           <div className="flex gap-1">
             <button onClick={() => setConfirmMarkAll("present")}
-              className="px-2.5 py-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors">
+              className="px-2.5 py-1.5 text-xs font-medium  text-emerald-300 border  border-emerald-800 rounded-lg  hover:bg-emerald-950/40 transition-colors">
               All P
             </button>
             <button onClick={() => setConfirmMarkAll("absent")}
-              className="px-2.5 py-1.5 text-xs font-medium text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors">
+              className="px-2.5 py-1.5 text-xs font-medium  text-rose-300 border  border-rose-800 rounded-lg  hover:bg-rose-950/40 transition-colors">
               All A
             </button>
             <button onClick={() => setConfirmMarkAll("clear")}
-              className="px-2.5 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+              className="px-2.5 py-1.5 text-xs font-medium  text-slate-400 border  border-slate-700 rounded-lg  hover:bg-slate-800 transition-colors">
               Clear
             </button>
           </div>
@@ -634,19 +634,19 @@ function SheetPanel({ session }: SheetPanelProps) {
       </div>
 
       {/* Legend */}
-      <div className="px-5 py-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-4 bg-slate-50 dark:bg-slate-900/60">
+      <div className="px-5 py-2 border-t  border-slate-800 flex items-center gap-4  bg-slate-900/60">
         {[
           { label: "Present",  color: "bg-emerald-500" },
           { label: "Absent",   color: "bg-rose-500"    },
           { label: "On Break", color: "bg-amber-500"   },
           { label: "Leave",    color: "bg-blue-500"    },
         ].map(l => (
-          <span key={l.label} className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+          <span key={l.label} className="flex items-center gap-1.5 text-xs  text-slate-400">
             <span className={`w-2 h-2 rounded-full ${l.color}`} />
             {l.label}
           </span>
         ))}
-        <span className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+        <span className="flex items-center gap-1.5 text-xs  text-slate-400">
           <Shirt className="w-3 h-3 text-indigo-500" />T-Shirt
         </span>
       </div>
@@ -696,36 +696,36 @@ function SessionItem({ session, selected, onSelect, onDelete }: SessionItemProps
     <>
       <div
         onClick={onSelect}
-        className={`px-4 py-3 cursor-pointer border-b border-slate-100 dark:border-slate-800 transition-all duration-150 group
+        className={`px-4 py-3 cursor-pointer border-b  border-slate-800 transition-all duration-150 group
           ${selected
-            ? "bg-blue-50 dark:bg-blue-950/30 border-l-2 border-l-blue-500"
-            : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-l-2 border-l-transparent"
+            ? " bg-blue-950/30 border-l-2 border-l-blue-500"
+            : " hover:bg-slate-800/50 border-l-2 border-l-transparent"
           }`}
       >
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 mb-0.5">
               <span className={`w-2 h-2 rounded-full flex-shrink-0 ${session.is_completed ? "bg-emerald-500" : "bg-amber-400"}`} />
-              <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate leading-tight">
+              <p className="text-sm font-medium  text-slate-200 truncate leading-tight">
                 {session.topic || formatDay(session.session_date)}
               </p>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 pl-4 leading-tight">
+            <p className="text-xs  text-slate-400 pl-4 leading-tight">
               {formatDateShort(session.session_date)}
             </p>
             <div className="flex items-center gap-1.5 mt-1.5 pl-4 flex-wrap">
-              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium  text-slate-400  bg-slate-800 px-2 py-0.5 rounded-full">
                 <MapPin className="w-2.5 h-2.5" />{session.branch}
               </span>
               {session.course && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded-full">
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium  text-blue-400  bg-blue-950/40 px-2 py-0.5 rounded-full">
                   <BookOpen className="w-2.5 h-2.5" />{session.course}
                 </span>
               )}
               {session.is_completed ? (
-                <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">✓ Done</span>
+                <span className="text-[11px] font-medium  text-emerald-400">✓ Done</span>
               ) : (
-                <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400">Pending</span>
+                <span className="text-[11px] font-medium  text-amber-400">Pending</span>
               )}
             </div>
           </div>
@@ -733,7 +733,7 @@ function SessionItem({ session, selected, onSelect, onDelete }: SessionItemProps
           {/* Delete button */}
           <button
             onClick={e => { e.stopPropagation(); setShowDeleteConfirm(true); }}
-            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all flex-shrink-0"
+            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-rose-500  hover:bg-rose-950/30 transition-all flex-shrink-0"
             aria-label="Delete session"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -813,18 +813,18 @@ export default function AdminAttendance() {
 
   if (!isAdmin) return (
     <div className="min-h-screen flex items-center justify-center">
-      <p className="text-slate-500 dark:text-slate-400 text-sm">Admin access required.</p>
+      <p className=" text-slate-400 text-sm">Admin access required.</p>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen  bg-slate-950">
       {/* Page Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4">
+      <div className=" bg-slate-900 border-b  border-slate-800 px-6 py-4">
         <div className="max-w-screen-xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Attendance Management</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            <h1 className="text-xl font-semibold  text-slate-100">Attendance Management</h1>
+            <p className="text-sm  text-slate-400 mt-0.5">
               Create sessions and mark student attendance
             </p>
           </div>
@@ -839,31 +839,31 @@ export default function AdminAttendance() {
       </div>
 
       {/* Filter bar */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-3">
+      <div className=" bg-slate-900 border-b  border-slate-800 px-6 py-3">
         <div className="max-w-screen-xl mx-auto flex items-center gap-3 flex-wrap">
           <Filter className="w-4 h-4 text-slate-400 flex-shrink-0" />
 
           <select value={filterBranch} onChange={e => { setFilterBranch(e.target.value); setSelectedSessionId(null); }}
-            className="px-3 py-1.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="px-3 py-1.5 text-sm  bg-slate-800 border  border-slate-700 rounded-lg  text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">All Branches</option>
             {BRANCHES.map(b => <option key={b} value={b}>{b}</option>)}
           </select>
 
           <select value={filterCourse} onChange={e => { setFilterCourse(e.target.value); setSelectedSessionId(null); }}
-            className="px-3 py-1.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="px-3 py-1.5 text-sm  bg-slate-800 border  border-slate-700 rounded-lg  text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">All Courses</option>
             {COURSES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
 
           <div className="flex items-center gap-1.5">
             <input type="date" value={filterStartDate} onChange={e => setFilterStartDate(e.target.value)}
-              className="px-3 py-1.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="px-3 py-1.5 text-sm  bg-slate-800 border  border-slate-700 rounded-lg  text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
             <span className="text-slate-400 text-sm">to</span>
             <input type="date" value={filterEndDate} onChange={e => setFilterEndDate(e.target.value)}
-              className="px-3 py-1.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              className="px-3 py-1.5 text-sm  bg-slate-800 border  border-slate-700 rounded-lg  text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
 
-          <button onClick={() => refetchSessions()} className="ml-auto p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500" aria-label="Refresh">
+          <button onClick={() => refetchSessions()} className="ml-auto p-2 rounded-lg  hover:bg-slate-800 transition-colors text-slate-500" aria-label="Refresh">
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
@@ -872,12 +872,12 @@ export default function AdminAttendance() {
       {/* Main split layout */}
       <div className="max-w-screen-xl mx-auto flex" style={{ height: "calc(100vh - 148px)" }}>
         {/* Sessions Sidebar */}
-        <div className="w-80 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col overflow-hidden">
-          <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+        <div className="w-80 flex-shrink-0 border-r  border-slate-800  bg-slate-900 flex flex-col overflow-hidden">
+          <div className="px-4 py-3 border-b  border-slate-800 flex items-center justify-between">
+            <span className="text-xs font-semibold  text-slate-400 uppercase tracking-wider">
               Sessions
             </span>
-            <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
+            <span className="text-xs  text-slate-500 font-mono">
               {sessionsLoading ? "…" : sortedSessions.length}
             </span>
           </div>
@@ -885,18 +885,18 @@ export default function AdminAttendance() {
           <div className="flex-1 overflow-y-auto">
             {sessionsLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+                <div key={i} className="px-4 py-3 border-b  border-slate-800">
                   <div className="flex items-center gap-2 mb-1.5">
-                    <div className="w-2 h-2 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse" />
-                    <div className="h-3.5 w-28 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                    <div className="w-2 h-2 rounded-full  bg-slate-700 animate-pulse" />
+                    <div className="h-3.5 w-28  bg-slate-700 rounded animate-pulse" />
                   </div>
-                  <div className="h-2.5 w-20 bg-slate-100 dark:bg-slate-800 rounded animate-pulse ml-4" />
+                  <div className="h-2.5 w-20  bg-slate-800 rounded animate-pulse ml-4" />
                 </div>
               ))
             ) : sortedSessions.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 px-4 text-center text-slate-400">
-                <Calendar className="w-8 h-8 mb-2 text-slate-300 dark:text-slate-600" />
-                <p className="text-sm text-slate-500 dark:text-slate-400">No sessions found</p>
+                <Calendar className="w-8 h-8 mb-2  text-slate-600" />
+                <p className="text-sm  text-slate-400">No sessions found</p>
                 <p className="text-xs mt-1">Adjust filters or create a new session</p>
               </div>
             ) : sortedSessions.map(s => (
@@ -912,13 +912,13 @@ export default function AdminAttendance() {
         </div>
 
         {/* Attendance Sheet Area */}
-        <div className="flex-1 bg-white dark:bg-slate-900 flex flex-col overflow-hidden">
+        <div className="flex-1  bg-slate-900 flex flex-col overflow-hidden">
           {selectedSession ? (
             <SheetPanel session={selectedSession} />
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 text-slate-400 p-8">
-              <BarChart3 className="w-12 h-12 text-slate-200 dark:text-slate-700" />
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Select a session to mark attendance</p>
+              <BarChart3 className="w-12 h-12  text-slate-700" />
+              <p className="text-sm font-medium  text-slate-400">Select a session to mark attendance</p>
               <p className="text-xs text-slate-400">
                 {sortedSessions.length === 0 ? "Create your first session using the button above." : "Click any session from the list on the left."}
               </p>

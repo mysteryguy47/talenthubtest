@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { ArrowLeft, CheckCircle2, XCircle, Clock, Trophy, X, Sparkles, Play, Zap, Target, Flame, Loader2, RotateCcw, Square, Star, AlertTriangle } from "lucide-react";
+import { ArrowLeft, CheckCircle2, XCircle, Clock, Trophy, Sparkles, Play, Zap, Target, Loader2, RotateCcw, Square, Star, AlertTriangle } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "../contexts/AuthContext";
 import { savePracticeSession, PracticeSessionData } from "../lib/userApi";
@@ -334,7 +334,7 @@ function DecimalNumericInput({
         className={className}
       />
       {(error || errorMessage) && (
-        <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error || errorMessage}</p>
+        <p className="mt-1 text-sm  text-red-400">{error || errorMessage}</p>
       )}
     </div>
   );
@@ -440,7 +440,7 @@ function NumericInput({
         className={className}
       />
       {(error || errorMessage) && (
-        <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error || errorMessage}</p>
+        <p className="mt-1 text-sm  text-red-400">{error || errorMessage}</p>
       )}
     </div>
   );
@@ -1996,6 +1996,12 @@ export default function Mental() {
       .mm-form-input:focus{border-color:rgba(123,92,229,.5)!important;box-shadow:0 0 0 3px rgba(123,92,229,.07)!important;}
       .mm-form-input::placeholder{color:rgba(255,255,255,.2)!important;font-weight:400!important;font-size:14px!important;}
       .mm-form-select{background:#141729!important;appearance:none;padding-right:36px!important;background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239D7FF0' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>")!important;background-repeat:no-repeat!important;background-position:right 14px center!important;}
+      .mm-stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+      .mm-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+      @media(max-width:640px){
+        .mm-stats-grid{grid-template-columns:repeat(3,1fr)!important}
+        .mm-form-grid{grid-template-columns:1fr!important}
+      }
     `;
     document.head.appendChild(s);
     return () => { document.getElementById(id)?.remove(); };
@@ -2036,7 +2042,7 @@ export default function Mental() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-indigo-600 mx-auto mb-4" />
-          <p className="text-lg text-gray-600 dark:text-slate-300">Preparing questions...</p>
+          <p className="text-lg  text-slate-300">Preparing questions...</p>
         </div>
       </div>
     );
@@ -2047,10 +2053,10 @@ export default function Mental() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4 transition-colors duration-300">
         <div className="text-center max-w-md">
-          <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl shadow-xl dark:shadow-2xl p-8 border border-slate-200/50 dark:border-slate-700/50 transition-all duration-300">
+          <div className=" bg-slate-800/90 backdrop-blur-sm rounded-2xl  shadow-2xl p-8 border  border-slate-700/50 transition-all duration-300">
             <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Error Loading Question</h2>
-            <p className="text-gray-600 dark:text-slate-300 mb-6">
+            <h2 className="text-2xl font-bold  text-white mb-2">Error Loading Question</h2>
+            <p className=" text-slate-300 mb-6">
               Unable to load the current question. Please try again.
             </p>
             <button
@@ -2086,17 +2092,7 @@ export default function Mental() {
         {/* Background glow */}
         <div style={{position:"fixed",inset:0,background:"radial-gradient(ellipse 60% 50% at 50% 20%, rgba(16,185,129,.06), transparent 70%)",pointerEvents:"none"}} />
 
-        {/* Fixed Session Timer */}
-        <div style={{position:"fixed",top:88,right:16,zIndex:40}}>
-          <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 16px",background:"var(--mm-surf)",border:"1px solid var(--mm-bdr2)",borderRadius:14,backdropFilter:"blur(12px)"}}>
-            <Clock style={{width:14,height:14,color:"var(--mm-pur2)"}} />
-            <span style={{fontFamily:"var(--mm-fm)",fontSize:13,fontWeight:600,color:"var(--mm-whi)",letterSpacing:"-.01em"}}>
-              {Math.floor(sessionElapsedTime / 60)}m {String(sessionElapsedTime % 60).padStart(2, '0')}s
-            </span>
-          </div>
-        </div>
-
-        <div style={{maxWidth:700,margin:"0 auto",padding:"80px 20px 60px"}}>
+        <div style={{maxWidth:700,margin:"0 auto",padding:"40px 20px 60px"}}>
           {/* Main results card */}
           <div className="mm-results-in" style={{background:"var(--mm-surf)",border:"1px solid var(--mm-bdr2)",borderRadius:28,overflow:"hidden",marginBottom:24}}>
             {/* Top accent bar */}
@@ -2114,7 +2110,7 @@ export default function Mental() {
               </div>
 
               {/* Stats grid */}
-              <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:10,marginBottom:24}}>
+              <div className="mm-stats-grid" style={{marginBottom:24}}>
                 {[
                   {label:"CORRECT",value:actualCorrect,color:"var(--mm-grn)",bg:"rgba(16,185,129,.08)",bdr:"rgba(16,185,129,.2)",delay:".05s"},
                   {label:"WRONG",value:results.filter(r=>!r.isCorrect).length,color:"var(--mm-red)",bg:"rgba(239,68,68,.08)",bdr:"rgba(239,68,68,.2)",delay:".1s"},
@@ -2170,7 +2166,7 @@ export default function Mental() {
                   </button>
                 </Link>
                 <Link href="/" style={{textDecoration:"none"}}>
-                  <button style={{width:"100%",padding:"14px 10px",background:"var(--mm-surf2)",border:"1px solid var(--mm-bdr2)",borderRadius:14,fontFamily:"var(--mm-fd)",fontSize:14,fontWeight:700,color:"var(--mm-whi2)",cursor:"pointer",letterSpacing:"-.01em",transition:"background .2s"}}
+                  <button style={{width:"100%",padding:"14px 10px",background:"var(--mm-surf2)",border:"1px solid var(--mm-bdr2)",borderRadius:14,fontFamily:"var(--mm-fd)",fontSize:14,fontWeight:800,color:"var(--mm-whi2)",cursor:"pointer",letterSpacing:"-.01em",transition:"background .2s"}}
                     onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.background="var(--mm-surf3)"}}
                     onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.background="var(--mm-surf2)"}}>
                     Go Home
@@ -2370,19 +2366,49 @@ export default function Mental() {
   }
 
   if (isStarted && currentQuestion) {
-    // Shared session timer widget
-    const sessionTimerWidget = (
-      <div style={{position:"fixed",top:88,right:16,zIndex:40}}>
-        <div style={{display:"flex",alignItems:"center",gap:8,padding:"7px 14px",background:"var(--mm-surf)",border:"1px solid var(--mm-bdr2)",borderRadius:12}}>
-          <Clock style={{width:13,height:13,color:"var(--mm-pur2)"}} />
-          <span style={{fontFamily:"var(--mm-fm)",fontSize:12,fontWeight:600,color:"var(--mm-whi)",letterSpacing:"-.01em"}}>
-            {Math.floor(sessionElapsedTime / 60)}m {String(sessionElapsedTime % 60).padStart(2, '0')}s
-          </span>
+    // Shared sticky top bar (matches BurstMode)
+    const stickyHeader = (
+      <>
+        <div style={{position:"sticky",top:0,zIndex:40,background:"rgba(6,7,15,.9)",backdropFilter:"blur(20px)",borderBottom:"1px solid var(--mm-bdr)",height:64,display:"grid",gridTemplateColumns:"80px 1fr 120px",alignItems:"center",padding:"0 24px"}}>
+          {/* Back / exit button */}
+          <button
+            onClick={exitPractice}
+            title="Exit Practice"
+            style={{width:36,height:36,borderRadius:10,background:"var(--mm-surf2)",border:"1px solid var(--mm-bdr)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--mm-muted)",cursor:"pointer",transition:"all .2s"}}
+            onMouseEnter={e=>{const b=e.currentTarget as HTMLButtonElement;b.style.borderColor="rgba(123,92,229,.3)";b.style.color="var(--mm-pur2)";b.style.background="rgba(123,92,229,.06)";}}
+            onMouseLeave={e=>{const b=e.currentTarget as HTMLButtonElement;b.style.borderColor="var(--mm-bdr)";b.style.color="var(--mm-muted)";b.style.background="var(--mm-surf2)";}}
+          >
+            <ArrowLeft style={{width:16,height:16}} />
+          </button>
+
+          {/* Session timer (center) */}
+          <div style={{textAlign:"center"}}>
+            <span style={{fontFamily:"var(--mm-fm)",fontSize:"clamp(22px,3vw,32px)",fontWeight:800,letterSpacing:"-.02em",color:"var(--mm-whi)"}}>
+              {Math.floor(sessionElapsedTime / 60)}:{String(sessionElapsedTime % 60).padStart(2, '0')}
+            </span>
+          </div>
+
+          {/* Live scores */}
+          <div style={{display:"flex",alignItems:"center",gap:14,justifyContent:"flex-end"}}>
+            <div style={{display:"flex",alignItems:"center",gap:5}}>
+              <span style={{fontFamily:"var(--mm-fm)",fontSize:16,fontWeight:800,color:"var(--mm-grn)"}}>{results.filter(r=>r.isCorrect).length}</span>
+              <CheckCircle2 style={{width:13,height:13,color:"var(--mm-grn)"}} />
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:5}}>
+              <span style={{fontFamily:"var(--mm-fm)",fontSize:16,fontWeight:800,color:"var(--mm-red)"}}>{results.filter(r=>!r.isCorrect).length}</span>
+              <XCircle style={{width:13,height:13,color:"var(--mm-red)"}} />
+            </div>
+          </div>
         </div>
-      </div>
+
+        {/* Progress drain bar */}
+        <div style={{height:4,position:"relative",overflow:"hidden",background:"var(--mm-bdr2)"}}>
+          <div style={{position:"absolute",left:0,top:0,height:"100%",width:`${((currentQuestionIndex+1)/numQuestions)*100}%`,background:"linear-gradient(90deg, var(--mm-pur), var(--mm-pur2))",transition:"width .4s cubic-bezier(.4,0,.2,1)"}} />
+        </div>
+      </>
     );
 
-    // Shared card header
+    // Shared card header (exit moved to sticky header)
     const cardHeader = (
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
@@ -2393,15 +2419,6 @@ export default function Mental() {
             {score} pts
           </span>
         </div>
-        <button
-          onClick={exitPractice}
-          title="Exit Practice"
-          style={{padding:"6px 8px",background:"transparent",border:"1px solid transparent",borderRadius:8,color:"var(--mm-muted)",cursor:"pointer",transition:"color .2s, background .2s, border-color .2s"}}
-          onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.color="var(--mm-red)";(e.currentTarget as HTMLButtonElement).style.background="rgba(239,68,68,.08)";(e.currentTarget as HTMLButtonElement).style.borderColor="rgba(239,68,68,.2)"}}
-          onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.color="var(--mm-muted)";(e.currentTarget as HTMLButtonElement).style.background="transparent";(e.currentTarget as HTMLButtonElement).style.borderColor="transparent"}}
-        >
-          <X style={{width:16,height:16}} />
-        </button>
       </div>
     );
 
@@ -2415,11 +2432,11 @@ export default function Mental() {
     // Handle Add/Sub question display (row by row)
     if ((currentQuestion.type === "add_sub" || currentQuestion.type === "integer_add_sub") && !isShowingAnswerTime) {
       return (
-        <div style={{minHeight:"100vh",background:"var(--mm-bg)",position:"relative"}}>
+        <div style={{minHeight:"100vh",background:"var(--mm-bg)",position:"relative",display:"flex",flexDirection:"column"}}>
           <div style={{position:"fixed",inset:0,background:"radial-gradient(ellipse 50% 40% at 50% 20%, rgba(123,92,229,.05), transparent 70%)",pointerEvents:"none"}} />
-          {sessionTimerWidget}
+          {stickyHeader}
 
-          <div style={{maxWidth:720,margin:"0 auto",padding:"80px 20px 60px"}}>
+          <div style={{maxWidth:720,margin:"0 auto",padding:"24px 20px 60px",flex:1,width:"100%",boxSizing:"border-box"}}>
             <div className="mm-scale-in" style={{background:"var(--mm-surf)",border:"1px solid var(--mm-bdr2)",borderRadius:24,overflow:"hidden"}}>
               <div style={{height:2,background:"linear-gradient(90deg, var(--mm-pur), var(--mm-pur2), transparent)"}} />
               <div style={{padding:"24px 28px"}}>
@@ -2543,11 +2560,11 @@ export default function Mental() {
     const timerBdr = timerRatio > 0.5 ? "rgba(16,185,129,.3)" : timerRatio > 0.25 ? "rgba(245,158,11,.3)" : "rgba(239,68,68,.3)";
 
     return (
-      <div style={{minHeight:"100vh",background:"var(--mm-bg)",position:"relative"}}>
+      <div style={{minHeight:"100vh",background:"var(--mm-bg)",position:"relative",display:"flex",flexDirection:"column"}}>
         <div style={{position:"fixed",inset:0,background:"radial-gradient(ellipse 50% 40% at 50% 20%, rgba(123,92,229,.05), transparent 70%)",pointerEvents:"none"}} />
-        {sessionTimerWidget}
+        {stickyHeader}
 
-        <div style={{maxWidth:640,margin:"0 auto",padding:"80px 20px 60px"}}>
+        <div style={{maxWidth:640,margin:"0 auto",padding:"24px 20px 60px",flex:1,width:"100%",boxSizing:"border-box"}}>
           <div className="mm-scale-in" style={{background:"var(--mm-surf)",border:"1px solid var(--mm-bdr2)",borderRadius:24,overflow:"hidden"}}>
             <div style={{height:2,background:"linear-gradient(90deg, var(--mm-pur), var(--mm-pur2), transparent)",position:"relative"}}>
               {/* Timer drain overlay */}
@@ -2626,7 +2643,7 @@ export default function Mental() {
                   }}
                   placeholder="Enter your answer"
                   className="mm-answer-input"
-                  style={{width:"100%",padding:"14px 20px",fontSize:22,fontFamily:"var(--mm-fm)",fontWeight:700,textAlign:"center",background:"var(--mm-surf2)",border:"1.5px solid rgba(123,92,229,.3)",borderRadius:14,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box",caretColor:"var(--mm-pur2)"}}
+                  style={{width:"100%",padding:"16px 20px",fontSize:24,fontFamily:"var(--mm-fm)",fontWeight:700,textAlign:"center",background:"var(--mm-surf2)",border:"2px solid rgba(123,92,229,.3)",borderRadius:14,color:"var(--mm-whi)",outline:"none",boxSizing:"border-box",caretColor:"var(--mm-pur2)"}}
                   autoFocus={!((currentQuestion.type === "add_sub" || currentQuestion.type === "integer_add_sub") && !isShowingAnswerTime)}
                   disabled={(currentQuestion.type === "add_sub" || currentQuestion.type === "integer_add_sub") && !isShowingAnswerTime}
                   ref={(input) => {
@@ -2653,14 +2670,16 @@ export default function Mental() {
   return (
     <div style={{minHeight:"100vh",background:"var(--mm-bg)"}}>
 
-      {/* Hero banner */}
+      {/* Hero banner — Glow Crown */}
       <div style={{position:"relative",overflow:"hidden",borderRadius:"0 0 28px 28px",padding:"52px 32px 56px",background:"linear-gradient(145deg,#12103A 0%,#1A1050 40%,#0E0B28 100%)",borderBottom:"1px solid rgba(123,92,229,.2)"}}>
+        {/* Atmospheric glow */}
+        <div style={{position:"absolute",top:"-20%",left:"50%",transform:"translateX(-50%)",width:500,height:400,background:"radial-gradient(ellipse at center, rgba(123,92,229,.15) 0%, rgba(123,92,229,.04) 50%, transparent 70%)",pointerEvents:"none"}} />
         {/* Grid pattern layer */}
         <div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(123,92,229,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(123,92,229,.05) 1px, transparent 1px)",backgroundSize:"48px 48px",WebkitMaskImage:"radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)"}} />
         {/* Bottom fade */}
         <div style={{position:"absolute",bottom:0,left:0,right:0,height:40,background:"linear-gradient(to bottom, transparent, var(--mm-bg))"}} />
         <div style={{position:"relative",zIndex:1,textAlign:"center"}}>
-          <div style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:60,height:60,borderRadius:18,background:"rgba(123,92,229,.2)",marginBottom:20}}>
+          <div style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:60,height:60,borderRadius:18,background:"rgba(123,92,229,.2)",marginBottom:20,boxShadow:"0 8px 32px rgba(123,92,229,.15)"}}>
             <Sparkles style={{width:28,height:28,color:"var(--mm-pur2)"}} />
           </div>
           <h1 style={{fontFamily:"var(--mm-fd)",fontSize:"clamp(28px,4vw,44px)",fontWeight:800,color:"var(--mm-whi)",margin:"0 0 10px",letterSpacing:"-.03em"}}>Mental Math Practice</h1>
@@ -2670,7 +2689,7 @@ export default function Mental() {
 
       {/* Form content */}
       <div style={{maxWidth:900,margin:"0 auto",padding:"32px 20px 60px"}}>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:24}}>
+        <div className="mm-form-grid">
           {/* Left Column */}
           <div className="mm-fade-up" style={{background:"var(--mm-surf)",border:"1px solid var(--mm-bdr)",borderRadius:20,padding:28,display:"flex",flexDirection:"column",gap:20,animationDelay:".1s"}}>
 
@@ -3265,14 +3284,14 @@ export default function Mental() {
   return (
     <ErrorBoundary
       fallback={
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-            <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">Something went wrong</h1>
-            <p className="text-slate-600 dark:text-slate-400 mb-6">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
+          <div className=" bg-slate-800 rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+            <h1 className="text-2xl font-bold  text-red-400 mb-4">Something went wrong</h1>
+            <p className=" text-slate-400 mb-6">
               The Mental Math practice encountered an error. Please try again.
             </p>
             <Link href="/">
-              <button className="px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 font-semibold transition-colors">
+              <button className="px-6 py-3  bg-blue-500 text-white rounded-lg  hover:bg-blue-600 font-semibold transition-colors">
                 Go to Home
               </button>
             </Link>
@@ -3285,7 +3304,7 @@ export default function Mental() {
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-bold text-gradient">Mental Math</h1>
             <Link href="/student-dashboard">
-              <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+              <button className="flex items-center gap-2 px-4 py-2 rounded-lg  text-gray-300  hover:bg-slate-700 transition-colors">
                 <ArrowLeft className="w-5 h-5" />
                 Back
               </button>
@@ -3295,10 +3314,10 @@ export default function Mental() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Controls Panel */}
             <div className="lg:col-span-2">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 border border-slate-200 dark:border-slate-700">
+              <div className=" bg-slate-800 rounded-2xl shadow-lg p-8 border  border-slate-700">
                 {/* Student Name Section */}
                 <div className="mb-8">
-                  <label htmlFor="studentName" className="block text-lg font-bold text-gray-700 dark:text-white mb-3">
+                  <label htmlFor="studentName" className="block text-lg font-bold  text-white mb-3">
                     Student Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -3315,7 +3334,7 @@ export default function Mental() {
                       }
                     }}
                     placeholder="Enter student name"
-                    className="w-full px-4 py-3 rounded-lg border-2 border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                    className="w-full px-4 py-3 rounded-lg border-2  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                   />
                   {studentNameError && (
                     <p className="text-red-500 text-sm mt-2">{studentNameError}</p>
@@ -3324,7 +3343,7 @@ export default function Mental() {
                 
                 {/* Operation Type Selector */}
                 <div className="mb-8">
-                  <h2 className="text-lg font-bold text-gray-700 dark:text-white mb-4">Operation Type</h2>
+                  <h2 className="text-lg font-bold  text-white mb-4">Operation Type</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {[
                       "multiplication", "division", "add_sub", "decimal_multiplication",
@@ -3337,7 +3356,7 @@ export default function Mental() {
                         className={`px-4 py-2 rounded-lg font-semibold transition-all ${
                           operationType === type
                             ? "bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg"
-                            : "bg-slate-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-slate-300 dark:hover:bg-slate-600"
+                            : " bg-slate-700  text-gray-300  hover:bg-slate-600"
                         }`}
                       >
                         {type.replace(/_/g, " ").split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
@@ -3348,7 +3367,7 @@ export default function Mental() {
 
                 {/* Number of Questions */}
                 <div className="mb-8">
-                  <label htmlFor="numQuestions" className="block text-lg font-bold text-gray-700 dark:text-white mb-3">
+                  <label htmlFor="numQuestions" className="block text-lg font-bold  text-white mb-3">
                     Number of Questions: <span className="text-indigo-600">{numQuestions}</span>
                   </label>
                   <input
@@ -3358,9 +3377,9 @@ export default function Mental() {
                     max="100"
                     value={numQuestions}
                     onChange={(e) => setNumQuestions(parseInt(e.target.value))}
-                    className="w-full h-2 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer"
+                    className="w-full h-2  bg-slate-600 rounded-lg appearance-none cursor-pointer"
                   />
-                  <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mt-2">
+                  <div className="flex justify-between text-sm  text-gray-400 mt-2">
                     <span>1</span>
                     <span>100</span>
                   </div>
@@ -3373,7 +3392,7 @@ export default function Mental() {
                     <>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-semibold  text-gray-300 mb-2">
                             {operationType === "multiplication" ? "Multiplicand Digits" : "Dividend Digits"}
                           </label>
                           <NumericInput
@@ -3381,11 +3400,11 @@ export default function Mental() {
                             onChange={operationType === "multiplication" ? setMultiplicandDigits : setDividendDigits}
                             min={1}
                             max={20}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                            className="w-full px-3 py-2 rounded-lg border  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-semibold  text-gray-300 mb-2">
                             {operationType === "multiplication" ? "Multiplier Digits" : "Divisor Digits"}
                           </label>
                           <NumericInput
@@ -3393,7 +3412,7 @@ export default function Mental() {
                             onChange={operationType === "multiplication" ? setMultiplierDigits : setDivisorDigits}
                             min={1}
                             max={20}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                            className="w-full px-3 py-2 rounded-lg border  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                           />
                         </div>
                       </div>
@@ -3405,7 +3424,7 @@ export default function Mental() {
                     <>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-semibold  text-gray-300 mb-2">
                             Digits
                           </label>
                           <NumericInput
@@ -3413,11 +3432,11 @@ export default function Mental() {
                             onChange={operationType === "add_sub" ? setAddSubDigits : setIntegerAddSubDigits}
                             min={1}
                             max={10}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                            className="w-full px-3 py-2 rounded-lg border  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-semibold  text-gray-300 mb-2">
                             Rows
                           </label>
                           <NumericInput
@@ -3425,7 +3444,7 @@ export default function Mental() {
                             onChange={operationType === "add_sub" ? setAddSubRows : setIntegerAddSubRows}
                             min={2}
                             max={10}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                            className="w-full px-3 py-2 rounded-lg border  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                           />
                         </div>
                       </div>
@@ -3437,7 +3456,7 @@ export default function Mental() {
                     <>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-semibold  text-gray-300 mb-2">
                             Multiplicand Digits
                           </label>
                           <NumericInput
@@ -3445,11 +3464,11 @@ export default function Mental() {
                             onChange={setDecimalMultMultiplicandDigits}
                             min={1}
                             max={10}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                            className="w-full px-3 py-2 rounded-lg border  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-semibold  text-gray-300 mb-2">
                             Multiplier Digits
                           </label>
                           <NumericInput
@@ -3457,7 +3476,7 @@ export default function Mental() {
                             onChange={setDecimalMultMultiplierDigits}
                             min={1}
                             max={10}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                            className="w-full px-3 py-2 rounded-lg border  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                           />
                         </div>
                       </div>
@@ -3469,7 +3488,7 @@ export default function Mental() {
                     <>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-semibold  text-gray-300 mb-2">
                             Dividend Digits
                           </label>
                           <NumericInput
@@ -3477,11 +3496,11 @@ export default function Mental() {
                             onChange={setDecimalDivDividendDigits}
                             min={1}
                             max={10}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                            className="w-full px-3 py-2 rounded-lg border  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-semibold  text-gray-300 mb-2">
                             Divisor Digits
                           </label>
                           <NumericInput
@@ -3489,7 +3508,7 @@ export default function Mental() {
                             onChange={setDecimalDivDivisorDigits}
                             min={1}
                             max={10}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                            className="w-full px-3 py-2 rounded-lg border  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                           />
                         </div>
                       </div>
@@ -3501,7 +3520,7 @@ export default function Mental() {
                     <>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-semibold  text-gray-300 mb-2">
                             First Number Digits
                           </label>
                           <NumericInput
@@ -3509,11 +3528,11 @@ export default function Mental() {
                             onChange={setLcmGcdFirstDigits}
                             min={1}
                             max={10}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                            className="w-full px-3 py-2 rounded-lg border  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-semibold  text-gray-300 mb-2">
                             Second Number Digits
                           </label>
                           <NumericInput
@@ -3521,7 +3540,7 @@ export default function Mental() {
                             onChange={setLcmGcdSecondDigits}
                             min={1}
                             max={10}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                            className="w-full px-3 py-2 rounded-lg border  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                           />
                         </div>
                       </div>
@@ -3532,7 +3551,7 @@ export default function Mental() {
                   {(operationType === "square_root" || operationType === "cube_root") && (
                     <>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-sm font-semibold  text-gray-300 mb-2">
                           Number Digits
                         </label>
                         <NumericInput
@@ -3540,7 +3559,7 @@ export default function Mental() {
                           onChange={setRootDigits}
                           min={1}
                           max={10}
-                          className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                          className="w-full px-3 py-2 rounded-lg border  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                         />
                       </div>
                     </>
@@ -3551,7 +3570,7 @@ export default function Mental() {
                     <>
                       <div className="grid grid-cols-3 gap-4">
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-semibold  text-gray-300 mb-2">
                             Min %
                           </label>
                           <NumericInput
@@ -3559,11 +3578,11 @@ export default function Mental() {
                             onChange={setPercentageMin}
                             min={1}
                             max={100}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                            className="w-full px-3 py-2 rounded-lg border  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-semibold  text-gray-300 mb-2">
                             Max %
                           </label>
                           <NumericInput
@@ -3571,11 +3590,11 @@ export default function Mental() {
                             onChange={setPercentageMax}
                             min={1}
                             max={100}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                            className="w-full px-3 py-2 rounded-lg border  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-semibold  text-gray-300 mb-2">
                             Number Digits
                           </label>
                           <NumericInput
@@ -3583,7 +3602,7 @@ export default function Mental() {
                             onChange={setPercentageNumberDigits}
                             min={1}
                             max={10}
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                            className="w-full px-3 py-2 rounded-lg border  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                           />
                         </div>
                       </div>
@@ -3593,7 +3612,7 @@ export default function Mental() {
                   {/* Time Limit Slider (shown for non-add_sub or shown during difficulty selection) */}
                   {operationType !== "add_sub" && difficultyMode !== "medium" && (
                     <div>
-                      <label htmlFor="timeLimit" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                      <label htmlFor="timeLimit" className="block text-sm font-semibold  text-gray-300 mb-3">
                         Time Limit per Question: <span className="text-indigo-600">{timeLimit}s</span>
                       </label>
                       <input
@@ -3603,7 +3622,7 @@ export default function Mental() {
                         max="300"
                         value={timeLimit}
                         onChange={(e) => setTimeLimit(parseInt(e.target.value))}
-                        className="w-full h-2 bg-slate-300 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer"
+                        className="w-full h-2  bg-slate-600 rounded-lg appearance-none cursor-pointer"
                       />
                     </div>
                   )}
@@ -3611,7 +3630,7 @@ export default function Mental() {
                   {/* Add/Sub Specific: Show Row Time input */}
                   {operationType === "add_sub" && (
                     <div>
-                      <label htmlFor="addSubRowTime" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                      <label htmlFor="addSubRowTime" className="block text-sm font-semibold  text-gray-300 mb-3">
                         Time to Show Each Row: <span className="text-indigo-600">{addSubRowTime.toFixed(1)}s</span>
                       </label>
                       <DecimalNumericInput
@@ -3620,7 +3639,7 @@ export default function Mental() {
                         min={0.5}
                         max={10}
                         step={0.1}
-                        className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-indigo-600 dark:bg-slate-700 dark:text-white transition-colors"
+                        className="w-full px-3 py-2 rounded-lg border  border-slate-600 focus:border-indigo-600 bg-slate-700 text-white transition-colors"
                       />
                       <TimeLimitSlider
                         value={addSubRowTime}
@@ -3636,31 +3655,31 @@ export default function Mental() {
             </div>
 
             {/* Right Panel: Summary */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 border border-slate-200 dark:border-slate-700">
-              <h2 className="text-xl font-bold text-gray-700 dark:text-white mb-6 flex items-center gap-2">
+            <div className=" bg-slate-800 rounded-2xl shadow-lg p-6 border  border-slate-700">
+              <h2 className="text-xl font-bold  text-white mb-6 flex items-center gap-2">
                 <Target className="w-6 h-6 text-indigo-600" />
                 Summary
               </h2>
 
               <div className="space-y-4">
-                <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Operation</p>
-                  <p className="text-lg font-bold text-gray-800 dark:text-white">{operationType.replace(/_/g, " ").toUpperCase()}</p>
+                <div className=" bg-slate-700 rounded-lg p-4">
+                  <p className="text-sm  text-gray-400">Operation</p>
+                  <p className="text-lg font-bold  text-white">{operationType.replace(/_/g, " ").toUpperCase()}</p>
                 </div>
 
-                <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Questions</p>
-                  <p className="text-lg font-bold text-gray-800 dark:text-white">{numQuestions}</p>
+                <div className=" bg-slate-700 rounded-lg p-4">
+                  <p className="text-sm  text-gray-400">Questions</p>
+                  <p className="text-lg font-bold  text-white">{numQuestions}</p>
                 </div>
 
-                <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Time Per Question</p>
-                  <p className="text-lg font-bold text-gray-800 dark:text-white">{operationType === "add_sub" ? `${addSubRowTime.toFixed(1)}s + 15s` : `${timeLimit}s`}</p>
+                <div className=" bg-slate-700 rounded-lg p-4">
+                  <p className="text-sm  text-gray-400">Time Per Question</p>
+                  <p className="text-lg font-bold  text-white">{operationType === "add_sub" ? `${addSubRowTime.toFixed(1)}s + 15s` : `${timeLimit}s`}</p>
                 </div>
 
-                <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Time</p>
-                  <p className="text-lg font-bold text-gray-800 dark:text-white">
+                <div className=" bg-slate-700 rounded-lg p-4">
+                  <p className="text-sm  text-gray-400">Total Time</p>
+                  <p className="text-lg font-bold  text-white">
                     {operationType === "add_sub"
                       ? `${((addSubRowTime * addSubRows + addSubAnswerTime) * numQuestions / 60).toFixed(1)} min`
                       : `${(timeLimit * numQuestions / 60).toFixed(1)} min`}
@@ -3668,7 +3687,7 @@ export default function Mental() {
                 </div>
 
                 {/* Start Button */}
-                <div className="col-span-1 lg:col-span-2 pt-6 border-t-2 border-slate-200 dark:border-slate-700">
+                <div className="col-span-1 lg:col-span-2 pt-6 border-t-2  border-slate-700">
                   <div>
                     <button
                       onClick={startCountdown}

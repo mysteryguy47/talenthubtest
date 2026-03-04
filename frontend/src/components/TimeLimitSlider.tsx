@@ -120,11 +120,11 @@ export default function TimeLimitSlider({
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between mb-2">
-        <label className="block text-sm font-bold text-slate-700 dark:text-white flex items-center gap-2">
-          <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+        <label className="block text-sm font-bold  text-white flex items-center gap-2">
+          <Clock className="w-4 h-4  text-indigo-400" />
           Time Limit per Question
         </label>
-        <div className="text-lg font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-lg">
+        <div className="text-lg font-bold  text-indigo-400  bg-indigo-900/30 px-3 py-1 rounded-lg">
           {formatValue(value)}
         </div>
       </div>
@@ -132,7 +132,7 @@ export default function TimeLimitSlider({
       {/* Premium Slider */}
       <div className="relative py-2">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full h-2 bg-gradient-to-r from-slate-200 via-indigo-200 to-purple-200 dark:from-slate-700 dark:via-indigo-800 dark:to-purple-800 rounded-full opacity-30"></div>
+          <div className="w-full h-2 bg-gradient-to-r from-slate-200 via-indigo-200 to-purple-200 from-slate-700 via-indigo-800 to-purple-800 rounded-full opacity-30"></div>
         </div>
         <input
           type="range"
@@ -193,14 +193,14 @@ export default function TimeLimitSlider({
 
       {/* Difficulty Preset Buttons - Premium Design */}
       <div className="pt-2">
-        <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Difficulty Presets:</div>
+        <div className="text-sm font-semibold  text-slate-300 mb-3">Difficulty Presets:</div>
         <div className="flex items-center gap-2.5 flex-wrap">
           <button
             onClick={() => handlePresetClick("easy")}
             className={`group relative px-3.5 py-2 text-sm font-bold rounded-xl transition-all duration-300 transform whitespace-nowrap ${
               difficultyMode === "easy"
-                ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-xl scale-105 ring-2 ring-green-300 dark:ring-green-500/50"
-                : "bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-400 hover:from-green-100 hover:to-emerald-100 dark:hover:from-green-900/50 dark:hover:to-emerald-900/50 hover:shadow-lg hover:scale-105 border-2 border-green-200 dark:border-green-700"
+                ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-xl scale-105 ring-2  ring-green-500/50"
+                : "bg-gradient-to-r from-green-50 to-emerald-50 from-green-900/30 to-emerald-900/30  text-green-400 hover:from-green-100 hover:to-emerald-100 hover:from-green-900/50 hover:to-emerald-900/50 hover:shadow-lg hover:scale-105 border-2  border-green-700"
             } hover:-translate-y-0.5 active:scale-100`}
           >
             <span className="relative z-10">{presets.easy.label}</span>
@@ -212,8 +212,8 @@ export default function TimeLimitSlider({
             onClick={() => handlePresetClick("medium")}
             className={`group relative px-3.5 py-2 text-sm font-bold rounded-xl transition-all duration-300 transform whitespace-nowrap ${
               difficultyMode === "medium"
-                ? "bg-gradient-to-r from-yellow-500 to-orange-600 text-white shadow-xl scale-105 ring-2 ring-yellow-300 dark:ring-yellow-500/50"
-                : "bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/30 dark:to-orange-900/30 text-yellow-700 dark:text-yellow-400 hover:from-yellow-100 hover:to-orange-100 dark:hover:from-yellow-900/50 dark:hover:to-orange-900/50 hover:shadow-lg hover:scale-105 border-2 border-yellow-200 dark:border-yellow-700"
+                ? "bg-gradient-to-r from-yellow-500 to-orange-600 text-white shadow-xl scale-105 ring-2  ring-yellow-500/50"
+                : "bg-gradient-to-r from-yellow-50 to-orange-50 from-yellow-900/30 to-orange-900/30  text-yellow-400 hover:from-yellow-100 hover:to-orange-100 hover:from-yellow-900/50 hover:to-orange-900/50 hover:shadow-lg hover:scale-105 border-2  border-yellow-700"
             } hover:-translate-y-0.5 active:scale-100`}
           >
             <span className="relative z-10">{presets.medium.label}</span>
@@ -225,8 +225,8 @@ export default function TimeLimitSlider({
             onClick={() => handlePresetClick("hard")}
             className={`group relative px-3.5 py-2 text-sm font-bold rounded-xl transition-all duration-300 transform whitespace-nowrap ${
               difficultyMode === "hard"
-                ? "bg-gradient-to-r from-red-500 to-pink-600 text-white shadow-xl scale-105 ring-2 ring-red-300 dark:ring-red-500/50"
-                : "bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/30 dark:to-pink-900/30 text-red-700 dark:text-red-400 hover:from-red-100 hover:to-pink-100 dark:hover:from-red-900/50 dark:hover:to-pink-900/50 hover:shadow-lg hover:scale-105 border-2 border-red-200 dark:border-red-700"
+                ? "bg-gradient-to-r from-red-500 to-pink-600 text-white shadow-xl scale-105 ring-2  ring-red-500/50"
+                : "bg-gradient-to-r from-red-50 to-pink-50 from-red-900/30 to-pink-900/30  text-red-400 hover:from-red-100 hover:to-pink-100 hover:from-red-900/50 hover:to-pink-900/50 hover:shadow-lg hover:scale-105 border-2  border-red-700"
             } hover:-translate-y-0.5 active:scale-100`}
           >
             <span className="relative z-10">{presets.hard.label}</span>
@@ -238,8 +238,8 @@ export default function TimeLimitSlider({
             onClick={handleCustomClick}
             className={`group relative px-3.5 py-2 text-sm font-bold rounded-xl transition-all duration-300 transform whitespace-nowrap ${
               difficultyMode === "custom"
-                ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-xl scale-105 ring-2 ring-indigo-300 dark:ring-indigo-500/50"
-                : "bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 text-indigo-700 dark:text-indigo-400 hover:from-indigo-100 hover:to-purple-100 dark:hover:from-indigo-900/50 dark:hover:to-purple-900/50 hover:shadow-lg hover:scale-105 border-2 border-indigo-200 dark:border-indigo-700"
+                ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-xl scale-105 ring-2  ring-indigo-500/50"
+                : "bg-gradient-to-r from-indigo-50 to-purple-50 from-indigo-900/30 to-purple-900/30  text-indigo-400 hover:from-indigo-100 hover:to-purple-100 hover:from-indigo-900/50 hover:to-purple-900/50 hover:shadow-lg hover:scale-105 border-2  border-indigo-700"
             } hover:-translate-y-0.5 active:scale-100`}
           >
             <span className="relative z-10">Custom</span>
@@ -252,10 +252,10 @@ export default function TimeLimitSlider({
 
       {/* Value Range Display */}
       <div className="flex justify-between items-center pt-2">
-        <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700/50 px-2.5 py-1 rounded-lg">
+        <span className="text-xs font-semibold  text-slate-400  bg-slate-700/50 px-2.5 py-1 rounded-lg">
           Min: {formatValue(minValue)}
         </span>
-        <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700/50 px-2.5 py-1 rounded-lg">
+        <span className="text-xs font-semibold  text-slate-400  bg-slate-700/50 px-2.5 py-1 rounded-lg">
           Max: {formatValue(maxValue)}
         </span>
       </div>

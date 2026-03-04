@@ -59,7 +59,48 @@ export default function PaperAttempt() {
   // Session state persistence
   const PAPER_SESSION_STORAGE_KEY = "paper_attempt_session_state";
   const [sessionState, setSessionState] = useState<"idle" | "started" | "in_progress" | "completed" | "aborted" | "recovered">("idle");
-  
+
+  // ── Design-system CSS injection ──────────────────────────────────────────
+  useEffect(() => {
+    const id = "pa-design-tokens";
+    if (document.getElementById(id)) return;
+    const s = document.createElement("style");
+    s.id = id;
+    s.textContent = `
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700;1,800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+      :root{--pa-bg:#06070F;--pa-surf:#0F1120;--pa-surf2:#141729;--pa-surf3:#1C2040;--pa-bdr:rgba(255,255,255,0.06);--pa-bdr2:rgba(255,255,255,0.10);--pa-pur:#7B5CE5;--pa-pur2:#9D7FF0;--pa-pur3:#C4ADFF;--pa-pglow:rgba(123,92,229,0.22);--pa-pdim:rgba(123,92,229,0.10);--pa-grn:#10B981;--pa-grn2:#059669;--pa-rdim:rgba(239,68,68,0.12);--pa-red:#EF4444;--pa-gld:#F59E0B;--pa-whi:#F0F2FF;--pa-whi2:#B8BDD8;--pa-muted:#525870;--pa-fd:'Playfair Display',Georgia,serif;--pa-fb:'DM Sans',sans-serif;--pa-fm:'JetBrains Mono',monospace;}
+      @keyframes pa-spin{to{transform:rotate(360deg)}}
+      @keyframes pa-fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+      @keyframes pa-scale-in{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+      @keyframes pa-trophy{0%{transform:scale(0) rotate(-20deg)}60%{transform:scale(1.15) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
+      @keyframes pa-progress{from{width:0}to{width:var(--acc)}}
+      @keyframes pa-count-up{from{opacity:0;transform:translateY(10px) scale(.85)}to{opacity:1;transform:none}}
+      @keyframes pa-timer-tick{0%,100%{opacity:1}50%{opacity:0.7}}
+      @keyframes pa-drain{from{width:100%}to{width:0%}}
+      .pa-stat-tile{transition:transform 0.2s,box-shadow 0.2s}
+      .pa-stat-tile:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.4)!important}
+      .pa-action-btn{transition:all 0.2s;cursor:pointer;border:none}
+      .pa-action-btn:hover{filter:brightness(1.15);transform:translateY(-2px)}
+      .pa-review-card{transition:all 0.2s}
+      .pa-review-card:hover{border-color:rgba(255,255,255,0.15)!important}
+      .pa-count-up{animation:pa-count-up .4s ease both}
+      .pa-qcard{background:var(--pa-surf2);border:1px solid var(--pa-bdr);border-radius:12px;padding:8px;transition:all 0.2s}
+      .pa-qcard:hover{border-color:rgba(123,92,229,0.35);box-shadow:0 4px 20px rgba(123,92,229,0.1)}
+      .pa-answer-input{background:var(--pa-surf);border:none;border-bottom:1.5px solid var(--pa-bdr2);border-radius:0;color:var(--pa-whi);font-family:var(--pa-fm);font-weight:600;text-align:center;transition:all 0.2s;outline:none}
+      .pa-answer-input:focus{border-bottom-color:var(--pa-pur);box-shadow:none;background:rgba(123,92,229,0.05)}
+      .pa-answer-input.answered{border-bottom-color:var(--pa-grn);color:var(--pa-grn)}
+      .pa-block-card{border-radius:16px;padding:24px;border:1px solid var(--pa-bdr);transition:all 0.3s;animation:pa-fade-up 0.4s ease both}
+      .pa-stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+      .pa-action-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+      @media(max-width:640px){
+        .pa-stats-grid{grid-template-columns:repeat(3,1fr)!important}
+        .pa-action-grid{grid-template-columns:1fr 1fr!important}
+      }
+    `;
+    document.head.appendChild(s);
+    return () => { document.getElementById(id)?.remove(); };
+  }, []);
+
   // Save paper attempt state to localStorage
   const savePaperSessionState = () => {
     if (!paperReady || isSubmitted || !attemptId) return; // Don't save if not ready, submitted, or no attempt ID
@@ -667,12 +708,11 @@ export default function PaperAttempt() {
 
   if (loading) {
     return (
-      <div style={{minHeight:'100vh',background:'#06070F',display:'flex',alignItems:'center',justifyContent:'center'}}>
-        <style>{`@keyframes pa-spin{to{transform:rotate(360deg)}}@keyframes pa-fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}`}</style>
+      <div style={{minHeight:'100vh',background:'var(--pa-bg)',display:'flex',alignItems:'center',justifyContent:'center'}}>
         <div style={{textAlign:'center',animation:'pa-fade-up 0.5s ease'}}>
-          <div style={{width:48,height:48,border:'3px solid #7B5CE5',borderTopColor:'transparent',borderRadius:'50%',animation:'pa-spin 0.9s linear infinite',margin:'0 auto 24px'}}></div>
-          <div style={{fontSize:18,color:'#B8BDD8',fontFamily:'DM Sans, sans-serif',fontWeight:500}}>Loading paper...</div>
-          <div style={{fontSize:12,color:'#525870',marginTop:8,fontFamily:'JetBrains Mono, monospace',letterSpacing:'0.08em'}}>PLEASE WAIT</div>
+          <div style={{width:48,height:48,border:'3px solid var(--pa-pur)',borderTopColor:'transparent',borderRadius:'50%',animation:'pa-spin 0.9s linear infinite',margin:'0 auto 24px'}}></div>
+          <div style={{fontSize:18,color:'var(--pa-whi2)',fontFamily:'var(--pa-fb)',fontWeight:500}}>Loading paper...</div>
+          <div style={{fontSize:12,color:'var(--pa-muted)',marginTop:8,fontFamily:'var(--pa-fm)',letterSpacing:'0.08em'}}>PLEASE WAIT</div>
         </div>
       </div>
     );
@@ -680,14 +720,14 @@ export default function PaperAttempt() {
 
   if (error && !paperConfig) {
     return (
-      <div style={{minHeight:'100vh',background:'#06070F',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
+      <div style={{minHeight:'100vh',background:'var(--pa-bg)',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
         <div style={{textAlign:'center',maxWidth:420}}>
-          <div style={{width:64,height:64,background:'rgba(239,68,68,0.12)',border:'1px solid rgba(239,68,68,0.3)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 20px'}}>
-            <XCircle style={{width:32,height:32,color:'#EF4444'}} />
+          <div style={{width:64,height:64,background:'var(--pa-rdim)',border:'1px solid rgba(239,68,68,0.3)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 20px'}}>
+            <XCircle style={{width:32,height:32,color:'var(--pa-red)'}} />
           </div>
-          <div style={{color:'#EF4444',marginBottom:16,fontFamily:'DM Sans, sans-serif',fontSize:17,fontWeight:500}}>{error}</div>
+          <div style={{color:'var(--pa-red)',marginBottom:16,fontFamily:'var(--pa-fb)',fontSize:17,fontWeight:500}}>{error}</div>
           <Link href="/create">
-            <button style={{padding:'12px 28px',background:'linear-gradient(135deg,#7B5CE5,#9D7FF0)',color:'white',borderRadius:12,border:'none',cursor:'pointer',fontFamily:'DM Sans, sans-serif',fontWeight:600,fontSize:14,boxShadow:'0 4px 20px rgba(123,92,229,0.25)'}}>
+            <button style={{padding:'12px 28px',background:'linear-gradient(135deg,var(--pa-pur),var(--pa-pur2))',color:'white',borderRadius:12,border:'none',cursor:'pointer',fontFamily:'var(--pa-fb)',fontWeight:600,fontSize:14,boxShadow:'0 4px 20px var(--pa-pglow)'}}>
               Go to Paper Creation
             </button>
           </Link>
@@ -699,90 +739,78 @@ export default function PaperAttempt() {
   if (isSubmitted && result) {
     const accuracy = result.accuracy || 0;
     return (
-      <div style={{minHeight:'100vh',background:'#06070F',paddingTop:40,paddingBottom:60}}>
-        <style>{`
-          @keyframes pa-scale-in{from{opacity:0;transform:scale(0.94)}to{opacity:1;transform:scale(1)}}
-          @keyframes pa-fade-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-          @keyframes pa-trophy{0%{transform:scale(0) rotate(-20deg)}60%{transform:scale(1.15) rotate(5deg)}100%{transform:scale(1) rotate(0deg)}}
-          @keyframes pa-progress{from{width:0}to{width:var(--acc)}}
-          .pa-stat-tile{transition:transform 0.2s,box-shadow 0.2s}
-          .pa-stat-tile:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.4)!important}
-          .pa-action-btn{transition:all 0.2s;cursor:pointer;border:none}
-          .pa-action-btn:hover{filter:brightness(1.15);transform:translateY(-2px)}
-          .pa-review-card{transition:all 0.2s}
-          .pa-review-card:hover{border-color:rgba(255,255,255,0.15)!important}
-        `}</style>
+      <div style={{minHeight:'100vh',background:'var(--pa-bg)',paddingTop:40,paddingBottom:60}}>
         <div style={{maxWidth:760,margin:'0 auto',padding:'0 16px'}}>
           <Link href="/dashboard">
-            <button style={{marginBottom:20,display:'flex',alignItems:'center',gap:8,padding:'10px 18px',background:'#0F1120',border:'1px solid rgba(255,255,255,0.08)',color:'#B8BDD8',borderRadius:12,cursor:'pointer',fontFamily:'DM Sans, sans-serif',fontWeight:500,fontSize:14}}>
+            <button style={{marginBottom:20,display:'flex',alignItems:'center',gap:8,padding:'10px 18px',background:'var(--pa-surf)',border:'1px solid var(--pa-bdr)',color:'var(--pa-whi2)',borderRadius:12,cursor:'pointer',fontFamily:'var(--pa-fb)',fontWeight:500,fontSize:14}}>
               <ArrowLeft style={{width:16,height:16}} />
               Back to Dashboard
             </button>
           </Link>
 
-          <div style={{background:'#0F1120',borderRadius:20,padding:'40px 36px',marginBottom:20,border:'1px solid rgba(255,255,255,0.07)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',animation:'pa-scale-in 0.4s cubic-bezier(0.34,1.2,0.64,1)',overflow:'hidden',position:'relative'}}>
-            <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:'linear-gradient(90deg,#7B5CE5,#10B981)'}} />
+          <div className="pa-scale-in" style={{background:'var(--pa-surf)',borderRadius:20,padding:'40px 36px',marginBottom:20,border:'1px solid var(--pa-bdr)',boxShadow:'0 24px 60px rgba(0,0,0,0.5)',animation:'pa-scale-in 0.4s cubic-bezier(0.34,1.2,0.64,1)',overflow:'hidden',position:'relative'}}>
+            <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:'linear-gradient(90deg,var(--pa-pur),var(--pa-grn))'}} />
             <div style={{textAlign:'center',marginBottom:32}}>
-              <div style={{width:72,height:72,borderRadius:'50%',background:'linear-gradient(135deg,#10B981,#059669)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px',boxShadow:'0 8px 32px rgba(16,185,129,0.4)',animation:'pa-trophy 0.6s cubic-bezier(0.34,1.56,0.64,1)'}}>
-                <Trophy style={{width:36,height:36,color:'white'}} />
+              <div style={{width:64,height:64,borderRadius:20,background:'linear-gradient(135deg,var(--pa-grn),var(--pa-grn2))',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px',boxShadow:'0 12px 40px rgba(16,185,129,0.35)',animation:'pa-trophy 0.6s cubic-bezier(0.34,1.56,0.64,1)'}}>
+                <Trophy style={{width:32,height:32,color:'white'}} />
               </div>
-              <h1 style={{fontSize:32,fontWeight:800,color:'#F0F2FF',fontFamily:"'Playfair Display', Georgia, serif",margin:'0 0 8px'}}>Paper Completed!</h1>
-              <p style={{color:'#525870',fontFamily:'DM Sans, sans-serif',fontSize:15,margin:0}}>{paperConfig?.title}</p>
+              <h1 style={{fontSize:'clamp(24px,4vw,36px)',fontWeight:800,color:'var(--pa-whi)',fontFamily:'var(--pa-fd)',margin:'0 0 8px',letterSpacing:'-.03em'}}>Paper Completed!</h1>
+              <p style={{color:'var(--pa-muted)',fontFamily:'var(--pa-fb)',fontSize:15,margin:0}}>{paperConfig?.title}</p>
             </div>
 
-            <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:12,marginBottom:24}}>
-              {[{val:result.correct_answers,label:'Correct',color:'#10B981',bg:'rgba(16,185,129,0.1)',border:'rgba(16,185,129,0.25)'},{val:result.wrong_answers,label:'Wrong',color:'#EF4444',bg:'rgba(239,68,68,0.1)',border:'rgba(239,68,68,0.25)'},{val:result.total_questions-result.correct_answers-result.wrong_answers,label:'Unattempted',color:'#F59E0B',bg:'rgba(245,158,11,0.1)',border:'rgba(245,158,11,0.25)'},{val:result.accuracy.toFixed(1)+'%',label:'Accuracy',color:'#9D7FF0',bg:'rgba(123,92,229,0.1)',border:'rgba(123,92,229,0.25)'},{val:result.points_earned,label:'Points',color:'#10B981',bg:'rgba(16,185,129,0.08)',border:'rgba(16,185,129,0.2)'}].map(({val,label,color,bg,border})=>(
-                <div key={label} className="pa-stat-tile" style={{background:bg,border:`1px solid ${border}`,borderRadius:14,padding:'18px 8px',textAlign:'center',boxShadow:'0 4px 16px rgba(0,0,0,0.2)'}}>
-                  <div style={{fontSize:28,fontWeight:800,color,fontFamily:'JetBrains Mono, monospace',lineHeight:1}}>{val}</div>
-                  <div style={{fontSize:12,color:'#B8BDD8',fontFamily:'DM Sans, sans-serif',marginTop:6,fontWeight:500}}>{label}</div>
+            <div className="pa-stats-grid" style={{marginBottom:24}}>
+              {[{val:result.correct_answers,label:'Correct',color:'var(--pa-grn)',bg:'rgba(16,185,129,0.1)',border:'rgba(16,185,129,0.25)',delay:0},{val:result.wrong_answers,label:'Wrong',color:'var(--pa-red)',bg:'rgba(239,68,68,0.1)',border:'rgba(239,68,68,0.25)',delay:.07},{val:result.total_questions-result.correct_answers-result.wrong_answers,label:'Missed',color:'var(--pa-gld)',bg:'rgba(245,158,11,0.1)',border:'rgba(245,158,11,0.25)',delay:.14},{val:result.accuracy.toFixed(1)+'%',label:'Accuracy',color:'var(--pa-pur2)',bg:'rgba(123,92,229,0.1)',border:'rgba(123,92,229,0.25)',delay:.21},{val:result.points_earned,label:'Points',color:'var(--pa-grn)',bg:'rgba(16,185,129,0.08)',border:'rgba(16,185,129,0.2)',delay:.28}].map(({val,label,color,bg,border,delay})=>(
+                <div key={label} className="pa-stat-tile pa-count-up" style={{background:bg,border:`1px solid ${border}`,borderRadius:14,padding:'14px 8px',textAlign:'center',boxShadow:'0 4px 16px rgba(0,0,0,0.2)',animationDelay:`${delay}s`}}>
+                  <div style={{fontSize:'clamp(18px,2.5vw,26px)',fontWeight:700,color,fontFamily:'var(--pa-fm)',lineHeight:1}}>{val}</div>
+                  <div style={{fontSize:9,color:'var(--pa-muted)',fontFamily:'var(--pa-fm)',marginTop:6,fontWeight:600,letterSpacing:'.12em',textTransform:'uppercase'}}>{label}</div>
                 </div>
               ))}
             </div>
             {/* Accuracy bar */}
             <div style={{marginBottom:24}}>
               <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
-                <span style={{fontSize:12,color:'#525870',fontFamily:'DM Sans, sans-serif',fontWeight:500}}>ACCURACY</span>
-                <span style={{fontSize:12,color:'#9D7FF0',fontFamily:'JetBrains Mono, monospace',fontWeight:600}}>{result.accuracy.toFixed(1)}%</span>
+                <span style={{fontSize:10,color:'var(--pa-muted)',fontFamily:'var(--pa-fm)',fontWeight:600,letterSpacing:'.12em',textTransform:'uppercase'}}>ACCURACY</span>
+                <span style={{fontSize:13,color:'var(--pa-whi2)',fontFamily:'var(--pa-fm)',fontWeight:700}}>{result.accuracy.toFixed(1)}%</span>
               </div>
-              <div style={{height:6,background:'rgba(255,255,255,0.06)',borderRadius:99,overflow:'hidden'}}>
-                <div style={{height:'100%',background:'linear-gradient(90deg,#7B5CE5,#10B981)',borderRadius:99,width:`${result.accuracy}%`,transition:'width 1s ease'}} />
+              <div style={{height:6,background:'var(--pa-surf2)',borderRadius:99,overflow:'hidden'}}>
+                <div style={{height:'100%',background:'linear-gradient(90deg,var(--pa-red) 0%,var(--pa-gld) 45%,var(--pa-grn) 100%)',borderRadius:99,width:`${result.accuracy}%`,transition:'width 1.4s cubic-bezier(.4,0,.2,1) .4s',boxShadow:accuracy > 70 ? '0 0 12px rgba(16,185,129,.2)' : undefined}} />
               </div>
             </div>
 
-            <div style={{background:'#141729',border:'1px solid rgba(255,255,255,0.06)',borderRadius:14,padding:'20px 24px',marginBottom:24}}>
+            <div style={{background:'var(--pa-surf2)',border:'1px solid var(--pa-bdr)',borderRadius:16,padding:'20px 24px',marginBottom:24}}>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,textAlign:'center'}}>
                 <div>
-                  <div style={{fontSize:12,color:'#525870',fontFamily:'DM Sans, sans-serif',fontWeight:500,marginBottom:4}}>TIME TAKEN</div>
-                  <div style={{fontSize:24,fontWeight:700,color:'#F0F2FF',fontFamily:'JetBrains Mono, monospace'}}>
+                  <div style={{fontSize:10,color:'var(--pa-muted)',fontFamily:'var(--pa-fm)',fontWeight:600,letterSpacing:'.12em',textTransform:'uppercase',marginBottom:4}}>TIME TAKEN</div>
+                  <div style={{fontSize:22,fontWeight:700,color:'var(--pa-whi)',fontFamily:'var(--pa-fm)'}}>
                     {result.time_taken ? formatTime(Math.floor(result.time_taken)) : '—'}
                   </div>
                 </div>
                 <div>
-                  <div style={{fontSize:12,color:'#525870',fontFamily:'DM Sans, sans-serif',fontWeight:500,marginBottom:4}}>SCORE</div>
-                  <div style={{fontSize:24,fontWeight:700,color:'#F0F2FF',fontFamily:'JetBrains Mono, monospace'}}>
+                  <div style={{fontSize:10,color:'var(--pa-muted)',fontFamily:'var(--pa-fm)',fontWeight:600,letterSpacing:'.12em',textTransform:'uppercase',marginBottom:4}}>SCORE</div>
+                  <div style={{fontSize:22,fontWeight:700,color:'var(--pa-whi)',fontFamily:'var(--pa-fm)'}}>
                     {result.score} / {result.total_questions}
                   </div>
                 </div>
               </div>
             </div>
 
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12}}>
+            <div className="pa-action-grid">
               <button
                 onClick={handleReAttempt}
                 disabled={reAttempting || !paperConfig || !generatedBlocks || seed === null}
                 className="pa-action-btn"
-                style={{padding:'14px 20px',background:'linear-gradient(135deg,#7B5CE5,#9D7FF0)',color:'white',borderRadius:12,fontWeight:700,fontFamily:'DM Sans, sans-serif',fontSize:14,boxShadow:'0 4px 20px rgba(123,92,229,0.3)',display:'flex',alignItems:'center',justifyContent:'center',gap:8,opacity:reAttempting||!paperConfig||!generatedBlocks||seed===null?0.5:1}}
+                style={{padding:'14px 10px',background:'linear-gradient(135deg,var(--pa-pur),#5535C0)',color:'white',borderRadius:14,fontWeight:800,fontFamily:'var(--pa-fd)',fontSize:14,boxShadow:'0 6px 20px var(--pa-pglow)',display:'flex',alignItems:'center',justifyContent:'center',gap:8,opacity:reAttempting||!paperConfig||!generatedBlocks||seed===null?0.5:1}}
               >
-                <RotateCcw style={{width:16,height:16,animation:reAttempting?'pa-spin 0.8s linear infinite':undefined}} />
+                <RotateCcw style={{width:15,height:15,animation:reAttempting?'pa-spin 0.8s linear infinite':undefined}} />
                 {reAttempting ? 'Starting...' : 'Re-attempt'}
               </button>
               <Link href="/dashboard" style={{textDecoration:'none'}}>
-                <button className="pa-action-btn" style={{width:'100%',padding:'14px 20px',background:'linear-gradient(135deg,#10B981,#059669)',color:'white',borderRadius:12,fontWeight:700,fontFamily:'DM Sans, sans-serif',fontSize:14,boxShadow:'0 4px 20px rgba(16,185,129,0.3)'}}>
-                  Dashboard
+                <button className="pa-action-btn" style={{width:'100%',padding:'14px 10px',background:'linear-gradient(135deg,var(--pa-grn),var(--pa-grn2))',color:'white',borderRadius:14,fontWeight:800,fontFamily:'var(--pa-fd)',fontSize:14,boxShadow:'0 6px 20px rgba(16,185,129,0.2)',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+                  <Trophy style={{width:15,height:15}} />Dashboard
                 </button>
               </Link>
               <Link href="/create" style={{textDecoration:'none'}}>
-                <button className="pa-action-btn" style={{width:'100%',padding:'14px 20px',background:'#141729',border:'1px solid rgba(255,255,255,0.1)',color:'#B8BDD8',borderRadius:12,fontWeight:600,fontFamily:'DM Sans, sans-serif',fontSize:14}}>
+                <button className="pa-action-btn" style={{width:'100%',padding:'14px 10px',background:'var(--pa-surf2)',border:'1px solid var(--pa-bdr2)',color:'var(--pa-whi2)',borderRadius:14,fontWeight:800,fontFamily:'var(--pa-fd)',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
                   Create New
                 </button>
               </Link>
@@ -790,8 +818,8 @@ export default function PaperAttempt() {
           </div>
 
           {/* Results breakdown */}
-          <div style={{background:'#0F1120',borderRadius:20,padding:'32px 36px',border:'1px solid rgba(255,255,255,0.07)',boxShadow:'0 24px 60px rgba(0,0,0,0.4)',animation:'pa-fade-up 0.5s ease 0.2s both'}}>
-            <h2 style={{fontSize:22,fontWeight:700,color:'#F0F2FF',fontFamily:"'Playfair Display', Georgia, serif",marginBottom:24}}>Question Review</h2>
+          <div style={{background:'var(--pa-surf)',borderRadius:20,padding:'32px 36px',border:'1px solid var(--pa-bdr)',boxShadow:'0 24px 60px rgba(0,0,0,0.4)',animation:'pa-fade-up 0.5s ease 0.2s both'}}>
+            <h2 style={{fontSize:22,fontWeight:700,color:'var(--pa-whi)',fontFamily:'var(--pa-fd)',marginBottom:24}}>Question Review</h2>
             
             {/* Separate questions into categories */}
             {(() => {
@@ -846,9 +874,41 @@ export default function PaperAttempt() {
 
               return (
                 <div className="space-y-8">
+                  {wrongQuestions.length > 0 && (
+                    <div>
+                      <h3 style={{fontSize:18,fontWeight:700,color:'var(--pa-red)',fontFamily:'var(--pa-fd)',marginBottom:16,display:'flex',alignItems:'center',gap:8}}>
+                        <XCircle style={{width:20,height:20}} />
+                        Wrong Answers ({wrongQuestions.length})
+                      </h3>
+                      <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                        {wrongQuestions.map(({ question, blockTitle }) => {
+                          const userAnswerStr = answers[question.id] || "";
+                          return (
+                            <div key={question.id} className="pa-review-card" style={{padding:'14px 16px',borderRadius:12,border:'1px solid rgba(239,68,68,0.14)',background:'rgba(239,68,68,0.05)'}}>
+                              <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
+                                <div style={{flex:1}}>
+                                  {blockTitle && (<p style={{fontSize:11,color:'rgba(239,68,68,0.7)',marginBottom:4,fontFamily:'var(--pa-fm)',letterSpacing:'0.06em',textTransform:'uppercase'}}>{blockTitle}</p>)}
+                                  <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
+                                    <span style={{fontWeight:600,color:'var(--pa-whi)',fontFamily:'var(--pa-fm)',fontSize:14}}>Q{question.id}:</span>
+                                    <MathQuestion question={question} showAnswer={false} largeFont={true} />
+                                  </div>
+                                  <div style={{display:'flex',alignItems:'center',gap:16,fontSize:13}}>
+                                    <span style={{color:'var(--pa-red)',fontFamily:'var(--pa-fm)'}}>Your answer: <span style={{fontWeight:600}}>{userAnswerStr}</span></span>
+                                    <span style={{color:'var(--pa-muted)',fontFamily:'var(--pa-fm)'}}>Correct: <span style={{fontWeight:600,color:'var(--pa-whi2)'}}>{question.answer}</span></span>
+                                  </div>
+                                </div>
+                                <XCircle style={{width:20,height:20,color:'var(--pa-red)',flexShrink:0,marginLeft:12}} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   {correctQuestions.length > 0 && (
                     <div>
-                      <h3 style={{fontSize:18,fontWeight:700,color:'#10B981',fontFamily:"'Playfair Display', Georgia, serif",marginBottom:16,display:'flex',alignItems:'center',gap:8}}>
+                      <h3 style={{fontSize:18,fontWeight:700,color:'var(--pa-grn)',fontFamily:'var(--pa-fd)',marginBottom:16,display:'flex',alignItems:'center',gap:8}}>
                         <CheckCircle2 style={{width:20,height:20}} />
                         Correct Answers ({correctQuestions.length})
                       </h3>
@@ -859,55 +919,23 @@ export default function PaperAttempt() {
                             <div
                               key={question.id}
                               className="pa-review-card"
-                              style={{padding:'14px 16px',borderRadius:12,border:'1px solid rgba(16,185,129,0.25)',background:'rgba(16,185,129,0.07)'}}
+                              style={{padding:'14px 16px',borderRadius:12,border:'1px solid rgba(16,185,129,0.14)',background:'rgba(16,185,129,0.05)'}}
                             >
                               <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
                                 <div style={{flex:1}}>
                                   {blockTitle && (
-                                    <p style={{fontSize:11,color:'rgba(16,185,129,0.7)',marginBottom:4,fontFamily:'JetBrains Mono, monospace',letterSpacing:'0.06em',textTransform:'uppercase'}}>{blockTitle}</p>
+                                    <p style={{fontSize:11,color:'rgba(16,185,129,0.7)',marginBottom:4,fontFamily:'var(--pa-fm)',letterSpacing:'0.06em',textTransform:'uppercase'}}>{blockTitle}</p>
                                   )}
                                   <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
-                                    <span style={{fontWeight:600,color:'#F0F2FF',fontFamily:'DM Sans, sans-serif'}}>Q{question.id}:</span>
+                                    <span style={{fontWeight:600,color:'var(--pa-whi)',fontFamily:'var(--pa-fm)',fontSize:14}}>Q{question.id}:</span>
                                     <MathQuestion question={question} showAnswer={false} largeFont={true} />
                                   </div>
                                   <div style={{display:'flex',alignItems:'center',gap:16,fontSize:13}}>
-                                    <span style={{color:'#10B981',fontFamily:'DM Sans, sans-serif'}}>Your answer: <span style={{fontWeight:600}}>{userAnswerStr}</span></span>
-                                    <span style={{color:'#525870',fontFamily:'DM Sans, sans-serif'}}>Correct: <span style={{fontWeight:600,color:'#B8BDD8'}}>{question.answer}</span></span>
+                                    <span style={{color:'var(--pa-grn)',fontFamily:'var(--pa-fm)'}}>Your answer: <span style={{fontWeight:600}}>{userAnswerStr}</span></span>
+                                    <span style={{color:'var(--pa-muted)',fontFamily:'var(--pa-fm)'}}>Correct: <span style={{fontWeight:600,color:'var(--pa-whi2)'}}>{question.answer}</span></span>
                                   </div>
                                 </div>
-                                <CheckCircle2 style={{width:20,height:20,color:'#10B981',flexShrink:0,marginLeft:12}} />
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {wrongQuestions.length > 0 && (
-                    <div>
-                      <h3 style={{fontSize:18,fontWeight:700,color:'#EF4444',fontFamily:"'Playfair Display', Georgia, serif",marginBottom:16,display:'flex',alignItems:'center',gap:8}}>
-                        <XCircle style={{width:20,height:20}} />
-                        Wrong Answers ({wrongQuestions.length})
-                      </h3>
-                      <div style={{display:'flex',flexDirection:'column',gap:8}}>
-                        {wrongQuestions.map(({ question, blockTitle }) => {
-                          const userAnswerStr = answers[question.id] || "";
-                          return (
-                            <div key={question.id} className="pa-review-card" style={{padding:'14px 16px',borderRadius:12,border:'1px solid rgba(239,68,68,0.25)',background:'rgba(239,68,68,0.07)'}}>
-                              <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
-                                <div style={{flex:1}}>
-                                  {blockTitle && (<p style={{fontSize:11,color:'rgba(239,68,68,0.7)',marginBottom:4,fontFamily:'JetBrains Mono, monospace',letterSpacing:'0.06em',textTransform:'uppercase'}}>{blockTitle}</p>)}
-                                  <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
-                                    <span style={{fontWeight:600,color:'#F0F2FF',fontFamily:'DM Sans, sans-serif'}}>Q{question.id}:</span>
-                                    <MathQuestion question={question} showAnswer={false} largeFont={true} />
-                                  </div>
-                                  <div style={{display:'flex',alignItems:'center',gap:16,fontSize:13}}>
-                                    <span style={{color:'#EF4444',fontFamily:'DM Sans, sans-serif'}}>Your answer: <span style={{fontWeight:600}}>{userAnswerStr}</span></span>
-                                    <span style={{color:'#525870',fontFamily:'DM Sans, sans-serif'}}>Correct: <span style={{fontWeight:600,color:'#B8BDD8'}}>{question.answer}</span></span>
-                                  </div>
-                                </div>
-                                <XCircle style={{width:20,height:20,color:'#EF4444',flexShrink:0,marginLeft:12}} />
+                                <CheckCircle2 style={{width:20,height:20,color:'var(--pa-grn)',flexShrink:0,marginLeft:12}} />
                               </div>
                             </div>
                           );
@@ -918,26 +946,26 @@ export default function PaperAttempt() {
 
                   {unattemptedQuestions.length > 0 && (
                     <div>
-                      <h3 style={{fontSize:18,fontWeight:700,color:'#F59E0B',fontFamily:"'Playfair Display', Georgia, serif",marginBottom:16,display:'flex',alignItems:'center',gap:8}}>
+                      <h3 style={{fontSize:18,fontWeight:700,color:'var(--pa-gld)',fontFamily:'var(--pa-fd)',marginBottom:16,display:'flex',alignItems:'center',gap:8}}>
                         <Square style={{width:20,height:20}} />
                         Unattempted ({unattemptedQuestions.length})
                       </h3>
                       <div style={{display:'flex',flexDirection:'column',gap:8}}>
                         {unattemptedQuestions.map(({ question, blockTitle }) => (
-                          <div key={question.id} className="pa-review-card" style={{padding:'14px 16px',borderRadius:12,border:'1px solid rgba(245,158,11,0.25)',background:'rgba(245,158,11,0.07)'}}>
+                          <div key={question.id} className="pa-review-card" style={{padding:'14px 16px',borderRadius:12,border:'1px solid rgba(245,158,11,0.14)',background:'rgba(245,158,11,0.05)'}}>
                             <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
                               <div style={{flex:1}}>
-                                {blockTitle && (<p style={{fontSize:11,color:'rgba(245,158,11,0.7)',marginBottom:4,fontFamily:'JetBrains Mono, monospace',letterSpacing:'0.06em',textTransform:'uppercase'}}>{blockTitle}</p>)}
+                                {blockTitle && (<p style={{fontSize:11,color:'rgba(245,158,11,0.7)',marginBottom:4,fontFamily:'var(--pa-fm)',letterSpacing:'0.06em',textTransform:'uppercase'}}>{blockTitle}</p>)}
                                 <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
-                                  <span style={{fontWeight:600,color:'#F0F2FF',fontFamily:'DM Sans, sans-serif'}}>Q{question.id}:</span>
+                                  <span style={{fontWeight:600,color:'var(--pa-whi)',fontFamily:'var(--pa-fm)',fontSize:14}}>Q{question.id}:</span>
                                   <MathQuestion question={question} showAnswer={false} largeFont={true} />
                                 </div>
                                 <div style={{display:'flex',alignItems:'center',gap:16,fontSize:13}}>
-                                  <span style={{color:'#F59E0B',fontFamily:'DM Sans, sans-serif'}}>Your answer: <span style={{fontWeight:600}}>—</span></span>
-                                  <span style={{color:'#525870',fontFamily:'DM Sans, sans-serif'}}>Correct: <span style={{fontWeight:600,color:'#B8BDD8'}}>{question.answer}</span></span>
+                                  <span style={{color:'var(--pa-gld)',fontFamily:'var(--pa-fm)'}}>Your answer: <span style={{fontWeight:600}}>—</span></span>
+                                  <span style={{color:'var(--pa-muted)',fontFamily:'var(--pa-fm)'}}>Correct: <span style={{fontWeight:600,color:'var(--pa-whi2)'}}>{question.answer}</span></span>
                                 </div>
                               </div>
-                              <Square style={{width:20,height:20,color:'#F59E0B',flexShrink:0,marginLeft:12}} />
+                              <Square style={{width:20,height:20,color:'var(--pa-gld)',flexShrink:0,marginLeft:12}} />
                             </div>
                           </div>
                         ))}
@@ -957,11 +985,11 @@ export default function PaperAttempt() {
   if (!paperConfig || !generatedBlocks || generatedBlocks.length === 0) {
     if (error) {
       return (
-        <div style={{minHeight:'100vh',background:'#06070F',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
+        <div style={{minHeight:'100vh',background:'var(--pa-bg)',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
           <div style={{textAlign:'center'}}>
-            <div style={{color:'#EF4444',marginBottom:16,fontFamily:'DM Sans, sans-serif',fontSize:17}}>{error}</div>
+            <div style={{color:'var(--pa-red)',marginBottom:16,fontFamily:'var(--pa-fb)',fontSize:17}}>{error}</div>
             <Link href="/create">
-              <button style={{padding:'12px 28px',background:'linear-gradient(135deg,#7B5CE5,#9D7FF0)',color:'white',borderRadius:12,border:'none',cursor:'pointer',fontFamily:'DM Sans, sans-serif',fontWeight:600,fontSize:14}}>
+              <button style={{padding:'12px 28px',background:'linear-gradient(135deg,var(--pa-pur),var(--pa-pur2))',color:'white',borderRadius:12,border:'none',cursor:'pointer',fontFamily:'var(--pa-fb)',fontWeight:600,fontSize:14}}>
                 Go to Paper Creation
               </button>
             </Link>
@@ -971,10 +999,10 @@ export default function PaperAttempt() {
     }
     // Still loading or no data
     return (
-      <div style={{minHeight:'100vh',background:'#06070F',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <div style={{minHeight:'100vh',background:'var(--pa-bg)',display:'flex',alignItems:'center',justifyContent:'center'}}>
         <div style={{textAlign:'center'}}>
-          <div style={{width:48,height:48,border:'3px solid #7B5CE5',borderTopColor:'transparent',borderRadius:'50%',animation:'pa-spin 0.9s linear infinite',margin:'0 auto 24px'}}></div>
-          <div style={{fontSize:18,color:'#B8BDD8',fontFamily:'DM Sans, sans-serif'}}>Loading paper...</div>
+          <div style={{width:48,height:48,border:'3px solid var(--pa-pur)',borderTopColor:'transparent',borderRadius:'50%',animation:'pa-spin 0.9s linear infinite',margin:'0 auto 24px'}}></div>
+          <div style={{fontSize:18,color:'var(--pa-whi2)',fontFamily:'var(--pa-fb)'}}>Loading paper...</div>
         </div>
       </div>
     );
@@ -987,50 +1015,49 @@ export default function PaperAttempt() {
     
     return (
       <div style={{position:'fixed',inset:0,zIndex:50,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(0,0,0,0.75)',backdropFilter:'blur(16px)'}}>
-        <style>{`@keyframes pa-scale-in{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}`}</style>
-        <div style={{background:'#0F1120',borderRadius:20,padding:'36px 32px',maxWidth:460,width:'calc(100% - 32px)',position:'relative',border:'1px solid rgba(255,255,255,0.08)',boxShadow:'0 32px 80px rgba(0,0,0,0.7)',overflow:'hidden',animation:'pa-scale-in 0.3s cubic-bezier(0.34,1.56,0.64,1)'}}>
-          <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:'linear-gradient(90deg,#7B5CE5,#9D7FF0)'}} />
+        <div style={{background:'var(--pa-surf)',borderRadius:20,padding:'36px 32px',maxWidth:460,width:'calc(100% - 32px)',position:'relative',border:'1px solid var(--pa-bdr2)',boxShadow:'0 32px 80px rgba(0,0,0,0.7)',overflow:'hidden',animation:'pa-scale-in 0.3s cubic-bezier(0.34,1.56,0.64,1)'}}>
+          <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:'linear-gradient(90deg,var(--pa-pur),var(--pa-pur2))'}} />
           <button
             onClick={() => setShowStartScreen(false)}
-            style={{position:'absolute',top:16,right:16,color:'#525870',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:8,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',padding:6,transition:'all 0.2s'}}
+            style={{position:'absolute',top:16,right:16,color:'var(--pa-muted)',background:'rgba(255,255,255,0.05)',border:'1px solid var(--pa-bdr2)',borderRadius:8,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',padding:6,transition:'all 0.2s'}}
             title="Close"
           >
             <X style={{width:16,height:16}} />
           </button>
           <div style={{textAlign:'center',marginBottom:28,marginTop:8}}>
-            <div style={{width:56,height:56,borderRadius:'50%',background:'linear-gradient(135deg,rgba(123,92,229,0.2),rgba(157,127,240,0.1))',border:'1px solid rgba(123,92,229,0.3)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px'}}>
-              <Target style={{width:26,height:26,color:'#9D7FF0'}} />
+            <div style={{width:56,height:56,borderRadius:18,background:'linear-gradient(135deg,rgba(123,92,229,0.2),rgba(157,127,240,0.1))',border:'1px solid rgba(123,92,229,0.3)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 14px'}}>
+              <Target style={{width:26,height:26,color:'var(--pa-pur2)'}} />
             </div>
-            <h2 style={{fontSize:26,fontWeight:800,color:'#F0F2FF',fontFamily:"'Playfair Display', Georgia, serif",margin:'0 0 6px'}}>{paperConfig.title}</h2>
-            <p style={{color:'#525870',fontFamily:'JetBrains Mono, monospace',fontSize:12,letterSpacing:'0.1em',textTransform:'uppercase',margin:0}}>{paperConfig.level}</p>
+            <h2 style={{fontSize:26,fontWeight:800,color:'var(--pa-whi)',fontFamily:'var(--pa-fd)',margin:'0 0 6px'}}>{paperConfig.title}</h2>
+            <p style={{color:'var(--pa-muted)',fontFamily:'var(--pa-fm)',fontSize:12,letterSpacing:'0.1em',textTransform:'uppercase',margin:0}}>{paperConfig.level}</p>
           </div>
           
           <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:20}}>
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',background:'#141729',border:'1px solid rgba(255,255,255,0.06)',borderRadius:10}}>
-              <span style={{color:'#B8BDD8',fontFamily:'DM Sans, sans-serif',fontWeight:500,fontSize:14}}>Total Questions:</span>
-              <span style={{color:'#F0F2FF',fontFamily:'JetBrains Mono, monospace',fontWeight:700,fontSize:20}}>{totalQuestions}</span>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',background:'var(--pa-surf2)',border:'1px solid var(--pa-bdr)',borderRadius:10}}>
+              <span style={{color:'var(--pa-whi2)',fontFamily:'var(--pa-fb)',fontWeight:500,fontSize:14}}>Total Questions:</span>
+              <span style={{color:'var(--pa-whi)',fontFamily:'var(--pa-fm)',fontWeight:700,fontSize:20}}>{totalQuestions}</span>
             </div>
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',background:'#141729',border:'1px solid rgba(255,255,255,0.06)',borderRadius:10}}>
-              <span style={{color:'#B8BDD8',fontFamily:'DM Sans, sans-serif',fontWeight:500,fontSize:14}}>Blocks:</span>
-              <span style={{color:'#F0F2FF',fontFamily:'JetBrains Mono, monospace',fontWeight:700,fontSize:20}}>{generatedBlocks.length}</span>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',background:'var(--pa-surf2)',border:'1px solid var(--pa-bdr)',borderRadius:10}}>
+              <span style={{color:'var(--pa-whi2)',fontFamily:'var(--pa-fb)',fontWeight:500,fontSize:14}}>Blocks:</span>
+              <span style={{color:'var(--pa-whi)',fontFamily:'var(--pa-fm)',fontWeight:700,fontSize:20}}>{generatedBlocks.length}</span>
             </div>
           </div>
 
           <div style={{background:'rgba(245,158,11,0.08)',border:'1px solid rgba(245,158,11,0.2)',borderRadius:10,padding:'12px 16px',marginBottom:24}}>
-            <p style={{fontSize:13,color:'#F59E0B',fontFamily:'DM Sans, sans-serif',margin:0,lineHeight:1.6}}>
+            <p style={{fontSize:13,color:'var(--pa-gld)',fontFamily:'var(--pa-fb)',margin:0,lineHeight:1.6}}>
               <strong>Note:</strong> The timer will start as soon as you click "Start Paper". Make sure you're ready before proceeding.
             </p>
           </div>
 
           <div style={{display:'flex',gap:12}}>
             <Link href="/create" style={{flex:1}}>
-              <button style={{width:'100%',padding:'14px 24px',background:'#141729',border:'1px solid rgba(255,255,255,0.08)',color:'#B8BDD8',borderRadius:12,fontWeight:600,fontFamily:'DM Sans, sans-serif',cursor:'pointer',fontSize:14}}>
+              <button style={{width:'100%',padding:'14px 24px',background:'var(--pa-surf2)',border:'1px solid var(--pa-bdr2)',color:'var(--pa-whi2)',borderRadius:12,fontWeight:600,fontFamily:'var(--pa-fb)',cursor:'pointer',fontSize:14}}>
                 Cancel
               </button>
             </Link>
             <button
               onClick={handleStartPaper}
-              style={{flex:1,padding:'14px 24px',background:'linear-gradient(135deg,#10B981,#059669)',color:'white',border:'none',borderRadius:12,fontWeight:700,fontFamily:'DM Sans, sans-serif',cursor:'pointer',fontSize:14,boxShadow:'0 4px 20px rgba(16,185,129,0.3)'}}
+              style={{flex:1,padding:'14px 24px',background:'linear-gradient(135deg,var(--pa-grn),var(--pa-grn2))',color:'white',border:'none',borderRadius:12,fontWeight:700,fontFamily:'var(--pa-fb)',cursor:'pointer',fontSize:14,boxShadow:'0 4px 20px rgba(16,185,129,0.3)'}}
             >
               Start Paper
             </button>
@@ -1041,60 +1068,55 @@ export default function PaperAttempt() {
   }
 
   return (
-    <div style={{minHeight:'100vh',background:'#06070F',paddingBottom:120}}>
-      <style>{`
-        @keyframes pa-spin{to{transform:rotate(360deg)}}
-        @keyframes pa-fade-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes pa-timer-tick{0%,100%{opacity:1}50%{opacity:0.7}}
-        .pa-qcard{background:#141729;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:8px;transition:all 0.2s}
-        .pa-qcard:hover{border-color:rgba(123,92,229,0.35);box-shadow:0 4px 20px rgba(123,92,229,0.1)}
-        .pa-answer-input{background:#0F1120;border:none;border-bottom:1.5px solid rgba(255,255,255,0.15);border-radius:0;color:#F0F2FF;font-family:'JetBrains Mono',monospace;font-weight:600;text-align:center;transition:all 0.2s;outline:none}
-        .pa-answer-input:focus{border-bottom-color:#7B5CE5;box-shadow:none;background:rgba(123,92,229,0.05)}
-        .pa-answer-input.answered{border-bottom-color:#10B981;color:#10B981}
-        .pa-block-card{border-radius:16px;padding:24px;border:1px solid rgba(255,255,255,0.06);transition:all 0.3s;animation:pa-fade-up 0.4s ease both}
-      `}</style>
+    <div style={{minHeight:'100vh',background:'var(--pa-bg)',paddingBottom:120}}>
 
       {/* Sticky Header */}
-      <header style={{position:'sticky',top:0,zIndex:40,height:68,background:'rgba(6,7,15,0.85)',backdropFilter:'blur(20px)',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',alignItems:'center',padding:'0 24px'}}>
-        <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',alignItems:'center',width:'100%',maxWidth:1100,margin:'0 auto',gap:16}}>
-          {/* Left: Exit */}
-          <div>
-            <button
-              onClick={() => setShowExitConfirm(true)}
-              style={{display:'flex',alignItems:'center',gap:8,padding:'8px 16px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:10,color:'#B8BDD8',cursor:'pointer',fontFamily:'DM Sans, sans-serif',fontWeight:500,fontSize:13}}
-            >
-              <ArrowLeft style={{width:15,height:15}} />
-              Exit Paper
-            </button>
-          </div>
-          {/* Center: Title */}
-          <div style={{display:'flex',alignItems:'center',gap:10}}>
-            <Target style={{width:18,height:18,color:'#7B5CE5',flexShrink:0}} />
-            <h1 style={{fontSize:17,fontWeight:800,color:'#F0F2FF',fontFamily:"'Playfair Display', Georgia, serif",margin:0,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:360}}>{paperConfig.title}</h1>
-          </div>
-          {/* Right: Timer + Progress */}
-          <div style={{display:'flex',alignItems:'center',gap:16,justifyContent:'flex-end'}}>
-            <div style={{display:'flex',alignItems:'center',gap:8,padding:'6px 14px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:10}}>
-              <Clock style={{width:14,height:14,color:'#7B5CE5'}} />
-              <span style={{fontSize:16,fontWeight:700,color:'#F0F2FF',fontFamily:'JetBrains Mono, monospace',animation:'pa-timer-tick 1s ease-in-out infinite'}}>{formatTime(currentTime)}</span>
+      <header style={{position:'sticky',top:0,zIndex:40,background:'rgba(6,7,15,0.9)',backdropFilter:'blur(20px)',borderBottom:'1px solid var(--pa-bdr)'}}>
+        <div style={{height:64,display:'flex',alignItems:'center',padding:'0 24px'}}>
+          <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',alignItems:'center',width:'100%',maxWidth:1100,margin:'0 auto',gap:16}}>
+            {/* Left: Exit */}
+            <div>
+              <button
+                onClick={() => setShowExitConfirm(true)}
+                style={{display:'flex',alignItems:'center',gap:8,padding:'8px 16px',background:'rgba(255,255,255,0.05)',border:'1px solid var(--pa-bdr2)',borderRadius:10,color:'var(--pa-whi2)',cursor:'pointer',fontFamily:'var(--pa-fb)',fontWeight:500,fontSize:13}}
+              >
+                <ArrowLeft style={{width:15,height:15}} />
+                Exit Paper
+              </button>
             </div>
-            <div style={{fontSize:12,fontWeight:700,color:'#525870',fontFamily:'JetBrains Mono, monospace',letterSpacing:'0.06em'}}>{answeredCount}/{totalQuestions}</div>
+            {/* Center: Title */}
+            <div style={{display:'flex',alignItems:'center',gap:10}}>
+              <Target style={{width:18,height:18,color:'var(--pa-pur)',flexShrink:0}} />
+              <h1 style={{fontSize:17,fontWeight:800,color:'var(--pa-whi)',fontFamily:'var(--pa-fd)',margin:0,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:360}}>{paperConfig.title}</h1>
+            </div>
+            {/* Right: Timer + Progress */}
+            <div style={{display:'flex',alignItems:'center',gap:16,justifyContent:'flex-end'}}>
+              <div style={{display:'flex',alignItems:'center',gap:8,padding:'6px 14px',background:'rgba(255,255,255,0.05)',border:'1px solid var(--pa-bdr2)',borderRadius:10}}>
+                <Clock style={{width:14,height:14,color:'var(--pa-pur)'}} />
+                <span style={{fontSize:16,fontWeight:700,color:'var(--pa-whi)',fontFamily:'var(--pa-fm)',animation:'pa-timer-tick 1s ease-in-out infinite'}}>{formatTime(currentTime)}</span>
+              </div>
+              <div style={{fontSize:12,fontWeight:700,color:'var(--pa-muted)',fontFamily:'var(--pa-fm)',letterSpacing:'0.06em'}}>{answeredCount}/{totalQuestions}</div>
+            </div>
           </div>
+        </div>
+        {/* Drain bar */}
+        <div style={{height:4,position:'relative',overflow:'hidden',background:'var(--pa-surf2)'}}>
+          <div style={{position:'absolute',left:0,top:0,height:'100%',width:`${totalQuestions ? (answeredCount/totalQuestions)*100 : 0}%`,background:'linear-gradient(90deg,var(--pa-pur),var(--pa-grn))',transition:'width 0.4s cubic-bezier(.4,0,.2,1)',boxShadow:'2px 0 12px currentColor'}} />
         </div>
       </header>
 
       {/* Exit Confirmation Modal */}
       {showExitConfirm && (
         <div style={{position:'fixed',inset:0,zIndex:50,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(0,0,0,0.75)',backdropFilter:'blur(12px)'}}>
-          <div style={{background:'#0F1120',borderRadius:16,padding:'28px 32px',maxWidth:420,width:'calc(100% - 32px)',border:'1px solid rgba(255,255,255,0.08)',boxShadow:'0 24px 60px rgba(0,0,0,0.6)'}}>
-            <h3 style={{fontSize:20,fontWeight:700,color:'#F0F2FF',fontFamily:"'Playfair Display', Georgia, serif",marginBottom:8}}>Exit Paper?</h3>
-            <p style={{color:'#B8BDD8',fontFamily:'DM Sans, sans-serif',fontSize:14,marginBottom:24,lineHeight:1.6}}>
+          <div style={{background:'var(--pa-surf)',borderRadius:16,padding:'28px 32px',maxWidth:420,width:'calc(100% - 32px)',border:'1px solid var(--pa-bdr2)',boxShadow:'0 24px 60px rgba(0,0,0,0.6)'}}>
+            <h3 style={{fontSize:20,fontWeight:700,color:'var(--pa-whi)',fontFamily:'var(--pa-fd)',marginBottom:8}}>Exit Paper?</h3>
+            <p style={{color:'var(--pa-whi2)',fontFamily:'var(--pa-fb)',fontSize:14,marginBottom:24,lineHeight:1.6}}>
               Your progress will be saved, but the timer will stop. Are you sure you want to exit?
             </p>
             <div style={{display:'flex',gap:12}}>
               <button
                 onClick={() => { setShowExitConfirm(false); }}
-                style={{flex:1,padding:'12px 20px',background:'#141729',border:'1px solid rgba(255,255,255,0.08)',color:'#B8BDD8',borderRadius:10,fontWeight:600,fontFamily:'DM Sans, sans-serif',cursor:'pointer',fontSize:14}}
+                style={{flex:1,padding:'12px 20px',background:'var(--pa-surf2)',border:'1px solid var(--pa-bdr2)',color:'var(--pa-whi2)',borderRadius:10,fontWeight:600,fontFamily:'var(--pa-fb)',cursor:'pointer',fontSize:14}}
               >
                 Continue
               </button>
@@ -1106,7 +1128,7 @@ export default function PaperAttempt() {
                   }
                   window.location.href = '/create';
                 }}
-                style={{flex:1,padding:'12px 20px',background:'rgba(239,68,68,0.15)',border:'1px solid rgba(239,68,68,0.3)',color:'#EF4444',borderRadius:10,fontWeight:600,fontFamily:'DM Sans, sans-serif',cursor:'pointer',fontSize:14}}
+                style={{flex:1,padding:'12px 20px',background:'rgba(239,68,68,0.15)',border:'1px solid rgba(239,68,68,0.3)',color:'var(--pa-red)',borderRadius:10,fontWeight:600,fontFamily:'var(--pa-fb)',cursor:'pointer',fontSize:14}}
               >
                 Exit Paper
               </button>
@@ -1123,9 +1145,9 @@ export default function PaperAttempt() {
               return null;
             }
             return (
-            <div key={blockIdx} className="pa-block-card" style={{background:'#0F1120',animationDelay:`${blockIdx*0.07}s`}}>
+            <div key={blockIdx} className="pa-block-card" style={{background:'var(--pa-surf)',animationDelay:`${blockIdx*0.07}s`}}>
               {block.config?.title && (
-                <h2 style={{fontSize:15,fontWeight:700,color:'#9D7FF0',fontFamily:'JetBrains Mono, monospace',marginBottom:16,letterSpacing:'0.08em',textTransform:'uppercase'}}>{block.config.title}</h2>
+                <h2 style={{fontSize:15,fontWeight:700,color:'var(--pa-pur2)',fontFamily:'var(--pa-fm)',marginBottom:16,letterSpacing:'0.08em',textTransform:'uppercase'}}>{block.config.title}</h2>
               )}
               
               {block.questions.some(q => q?.isVertical) ? (
@@ -1134,7 +1156,7 @@ export default function PaperAttempt() {
                   {block.questions.map((question) => (
                     <div key={question.id} className="pa-qcard" style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
                       <div style={{textAlign:'center',marginBottom:4}}>
-                        <span style={{fontWeight:700,color:'#9D7FF0',fontFamily:'JetBrains Mono, monospace',fontSize:11}}>{question.id}.</span>
+                        <span style={{fontWeight:700,color:'var(--pa-pur2)',fontFamily:'var(--pa-fm)',fontSize:11}}>{question.id}.</span>
                       </div>
                       <MathQuestion question={question} showAnswer={false} hideSerialNumber={true} largeFont={true} />
                       <input
@@ -1170,8 +1192,8 @@ export default function PaperAttempt() {
                       {columns.map((colQuestions, colIdx) => (
                         <div key={colIdx} style={{display:'flex',flexDirection:'column',gap:8}}>
                           {colQuestions.map((question) => (
-                    <div key={question.id} style={{display:'flex',alignItems:'center',gap:12,padding:'10px 0',borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
-                      <span style={{fontWeight:700,color:'#9D7FF0',fontFamily:'JetBrains Mono, monospace',fontSize:13,minWidth:'2rem'}}>{question.id}.</span>
+                    <div key={question.id} style={{display:'flex',alignItems:'center',gap:12,padding:'10px 0',borderBottom:'1px solid var(--pa-bdr)'}}>
+                      <span style={{fontWeight:700,color:'var(--pa-pur2)',fontFamily:'var(--pa-fm)',fontSize:13,minWidth:'2rem'}}>{question.id}.</span>
                       <div style={{flex:1,display:'flex',alignItems:'center',gap:12}}>
                         <div style={{flex:1}}>
                           <MathQuestion question={question} showAnswer={false} hideSerialNumber={true} largeFont={true} />
@@ -1206,22 +1228,22 @@ export default function PaperAttempt() {
         </div>
 
         {/* Submit Bar */}
-        <div style={{position:'sticky',bottom:0,left:0,right:0,background:'rgba(6,7,15,0.9)',backdropFilter:'blur(20px)',borderTop:'1px solid rgba(255,255,255,0.07)',padding:'14px 24px',zIndex:30}}>
+        <div style={{position:'sticky',bottom:0,left:0,right:0,background:'rgba(6,7,15,0.9)',backdropFilter:'blur(20px)',borderTop:'1px solid var(--pa-bdr)',padding:'14px 24px',zIndex:30}}>
           <div style={{maxWidth:1100,margin:'0 auto',display:'flex',alignItems:'center',justifyContent:'space-between',gap:16}}>
             {/* Progress */}
             <div style={{flex:1,maxWidth:400}}>
-              <div style={{display:'flex',justifyContent:'space-between',marginBottom:6,fontSize:12,color:'#525870',fontFamily:'JetBrains Mono, monospace'}}>
-                <span>{answeredCount === totalQuestions ? <span style={{color:'#10B981',fontWeight:600}}>All answered!</span> : <span>{totalQuestions - answeredCount} remaining</span>}</span>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:6,fontSize:12,color:'var(--pa-muted)',fontFamily:'var(--pa-fm)'}}>
+                <span>{answeredCount === totalQuestions ? <span style={{color:'var(--pa-grn)',fontWeight:600}}>All answered!</span> : <span>{totalQuestions - answeredCount} remaining</span>}</span>
                 <span>{answeredCount}/{totalQuestions}</span>
               </div>
-              <div style={{height:4,background:'rgba(255,255,255,0.06)',borderRadius:99}}>
-                <div style={{height:'100%',background:'linear-gradient(90deg,#7B5CE5,#10B981)',borderRadius:99,width:`${totalQuestions ? (answeredCount/totalQuestions)*100 : 0}%`,transition:'width 0.3s ease'}} />
+              <div style={{height:4,background:'var(--pa-bdr)',borderRadius:99}}>
+                <div style={{height:'100%',background:'linear-gradient(90deg,var(--pa-pur),var(--pa-grn))',borderRadius:99,width:`${totalQuestions ? (answeredCount/totalQuestions)*100 : 0}%`,transition:'width 0.3s ease'}} />
               </div>
             </div>
             <button
               onClick={handleSubmit}
               disabled={submitting || answeredCount === 0}
-              style={{padding:'12px 32px',background:'linear-gradient(135deg,#10B981,#059669)',color:'white',borderRadius:12,fontWeight:700,fontFamily:'DM Sans, sans-serif',fontSize:15,border:'none',cursor:submitting||answeredCount===0?'not-allowed':'pointer',opacity:submitting||answeredCount===0?0.5:1,boxShadow:'0 4px 20px rgba(16,185,129,0.3)',display:'flex',alignItems:'center',gap:8,transition:'all 0.2s'}}
+              style={{padding:'12px 32px',background:'linear-gradient(135deg,var(--pa-grn),var(--pa-grn2))',color:'white',borderRadius:12,fontWeight:700,fontFamily:'var(--pa-fb)',fontSize:15,border:'none',cursor:submitting||answeredCount===0?'not-allowed':'pointer',opacity:submitting||answeredCount===0?0.5:1,boxShadow:'0 4px 20px rgba(16,185,129,0.3)',display:'flex',alignItems:'center',gap:8,transition:'all 0.2s'}}
             >
               {submitting ? (
                 <>
@@ -1239,7 +1261,7 @@ export default function PaperAttempt() {
         </div>
 
         {error && (
-          <div style={{margin:'16px 0',padding:'14px 16px',background:'rgba(239,68,68,0.08)',border:'1px solid rgba(239,68,68,0.25)',borderRadius:12,color:'#EF4444',fontFamily:'DM Sans, sans-serif',fontSize:14}}>
+          <div style={{margin:'16px 0',padding:'14px 16px',background:'var(--pa-rdim)',border:'1px solid rgba(239,68,68,0.25)',borderRadius:12,color:'var(--pa-red)',fontFamily:'var(--pa-fb)',fontSize:14}}>
             {error}
           </div>
         )}
