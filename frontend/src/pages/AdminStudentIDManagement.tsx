@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { LoadingScreen } from "../components/LoadingScreen";
 import { useAuth } from "../contexts/AuthContext";
 import {
   getAllStudents,
@@ -6,10 +7,11 @@ import {
   VacantId,
   updateStudentPublicId,
   generateNextStudentId,
-  deleteVacantId
+  deleteVacantId,
+  bulkAssignStudentIds,
+  BulkAssignResult,
 } from "../lib/userApi";
-import { Edit2, Save, X, AlertCircle, CheckCircle2, Loader2, Search, RefreshCw, Users, IdCard, Plus, Archive } from "lucide-react";
-import Skeleton from "../components/Skeleton";
+import { Edit2, Save, X, AlertCircle, CheckCircle2, Loader2, Search, RefreshCw, Users, IdCard, Plus, Archive, Zap } from "lucide-react";
 import { useLocation } from "wouter";
 
 export default function AdminStudentIDManagement() {
@@ -30,6 +32,9 @@ export default function AdminStudentIDManagement() {
   const [_loadingVacantIds, setLoadingVacantIds] = useState(false);
   const [showVacantIdsModal, setShowVacantIdsModal] = useState(false);
   const [deletingVacantId, setDeletingVacantId] = useState<number | null>(null);
+  const [bulkAssigning, setBulkAssigning] = useState(false);
+  const [bulkResult, setBulkResult] = useState<{ assigned: number; results: BulkAssignResult[]; message: string } | null>(null);
+  const [showBulkResultModal, setShowBulkResultModal] = useState(false);
   const [sortBy, setSortBy] = useState<"id" | "name" | "not_assigned" | "assigned">("id");
 
   useEffect(() => {
@@ -235,10 +240,10 @@ export default function AdminStudentIDManagement() {
     setShowVacantIds(false);
   };
 
-  const handleGenerateSuggestedId = async (branch?: string) => {
+  const handleGenerateSuggestedId = async () => {
     try {
       setError(null);
-      const result = await generateNextStudentId(branch);
+      const result = await generateNextStudentId();
       
       // Extract the number part from TH-0001 format
       if (result.suggested_id && result.suggested_id.startsWith("TH-")) {
@@ -248,6 +253,27 @@ export default function AdminStudentIDManagement() {
       }
     } catch (err: any) {
       setError(err.message || "Failed to generate suggested ID");
+    }
+  };
+
+  const handleBulkAssign = async () => {
+    const unassignedCount = students.filter(s => !s.public_id).length;
+    if (unassignedCount === 0) return;
+    if (!confirm(`Assign TH IDs to all ${unassignedCount} unassigned students? This cannot be undone.`)) return;
+    try {
+      setBulkAssigning(true);
+      setError(null);
+      const result = await bulkAssignStudentIds();
+      setBulkResult(result);
+      setShowBulkResultModal(true);
+      setSuccess(result.message);
+      await loadStudents();
+      await loadVacantIds();
+      setTimeout(() => setSuccess(null), 5000);
+    } catch (err: any) {
+      setError(err.message || "Bulk assignment failed");
+    } finally {
+      setBulkAssigning(false);
     }
   };
 
@@ -268,27 +294,7 @@ export default function AdminStudentIDManagement() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <div className="container mx-auto pt-32 pb-20 px-6">
-          <div className="mb-10 space-y-4">
-            <Skeleton className="h-10 w-80" />
-            <Skeleton className="h-5 w-96" />
-          </div>
-          <div className="flex gap-4 mb-8">
-            <Skeleton className="h-12 w-full max-w-md rounded-xl" />
-            <Skeleton className="h-12 w-40 rounded-xl" />
-          </div>
-          <div className="bg-card border border-border rounded-[2.5rem] p-6">
-            <div className="space-y-4">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <Skeleton key={`student-row-skeleton-${index}`} className="h-12 rounded-xl" />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (
@@ -327,6 +333,14 @@ export default function AdminStudentIDManagement() {
               <option value="not_assigned">Not Assigned First</option>
               <option value="assigned">Assigned First</option>
             </select>
+            <button
+              onClick={handleBulkAssign}
+              disabled={bulkAssigning || students.filter(s => !s.public_id).length === 0}
+              className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-all disabled:opacity-50"
+            >
+              {bulkAssigning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+              Bulk Assign{students.filter(s => !s.public_id).length > 0 ? ` (${students.filter(s => !s.public_id).length})` : ""}
+            </button>
             <button
               onClick={loadStudents}
               className="flex items-center gap-2 px-6 py-3 bg-secondary text-secondary-foreground rounded-xl font-medium hover:bg-secondary/80 transition-all"
@@ -476,7 +490,7 @@ export default function AdminStudentIDManagement() {
                             )}
                           </div>
                           <button
-                            onClick={() => handleGenerateSuggestedId(student.branch)}
+                            onClick={() => handleGenerateSuggestedId()}
                             className="p-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
                             title="Generate suggested ID (fills the input with next available ID)"
                           >
@@ -613,6 +627,54 @@ export default function AdminStudentIDManagement() {
                         )}
                         Delete
                       </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Assign Result Modal */}
+      {showBulkResultModal && bulkResult && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowBulkResultModal(false)}
+        >
+          <div
+            className="bg-card border border-border rounded-[2.5rem] shadow-2xl max-w-lg w-full max-h-[80vh] overflow-hidden flex flex-col"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="p-8 border-b border-border flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-black tracking-tight text-card-foreground">Bulk Assign Complete</h2>
+                <p className="text-muted-foreground mt-1">{bulkResult.message}</p>
+              </div>
+              <button
+                onClick={() => setShowBulkResultModal(false)}
+                className="p-2 hover:bg-destructive/10 rounded-lg"
+              >
+                <X className="w-5 h-5 text-destructive" />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto flex-1 scrollbar-premium">
+              {bulkResult.results.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No IDs were assigned.</p>
+              ) : (
+                <div className="space-y-2">
+                  {bulkResult.results.map(r => (
+                    <div
+                      key={r.user_id}
+                      className="flex items-center justify-between px-4 py-3 bg-background/50 border border-border rounded-xl"
+                    >
+                      <div>
+                        <span className="font-medium text-card-foreground">{r.student_name}</span>
+                        <span className="ml-2 font-mono text-sm text-green-400">{r.assigned_id}</span>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded font-medium ${r.source === "vacant" ? "bg-blue-500/10 text-blue-400" : "bg-green-500/10 text-green-400"}`}>
+                        {r.source === "vacant" ? "Reused" : "New"}
+                      </span>
                     </div>
                   ))}
                 </div>

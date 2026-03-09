@@ -43,7 +43,7 @@ export default function GridMaster() {
       <div
         style={{
           minHeight: "100vh",
-          background: "#06070F",
+          background: "#07070F",
           fontFamily: "'DM Sans', sans-serif",
           color: "#eef0f7",
         }}

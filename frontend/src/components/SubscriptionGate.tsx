@@ -5,6 +5,7 @@ import { Lock, History, RefreshCcw } from "lucide-react";
 import { useSubscription } from "../contexts/SubscriptionContext";
 import { useAuth } from "../contexts/AuthContext";
 import Login from "./Login";
+import { LoadingScreen } from "./LoadingScreen";
 
 interface SubscriptionGateProps {
   /** If true, only blocks if account suspended / not in allowlist — not for inactive subscriptions */
@@ -26,11 +27,7 @@ export default function SubscriptionGate({ softOnly = false, children }: Subscri
 
   // Still loading auth or subscription
   if (loading || isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="text-slate-500">Loading...</div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   // Not logged in → show login

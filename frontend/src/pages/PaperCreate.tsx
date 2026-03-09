@@ -1243,7 +1243,7 @@ export default function PaperCreate() {
   };
 
   return (
-    <div style={{minHeight:'100vh',background:'#06070F',paddingBottom:80}}>
+    <div style={{minHeight:'100vh',background:'#07070F',paddingBottom:80}}>
       <style>{`
         @keyframes pc-fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
         @keyframes pc-scale-in{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
@@ -1284,7 +1284,7 @@ export default function PaperCreate() {
         {/* Grid pattern */}
         <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(123,92,229,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(123,92,229,.05) 1px, transparent 1px)", backgroundSize:"48px 48px", WebkitMaskImage:"radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)" } as React.CSSProperties} />
         {/* Bottom fade */}
-        <div style={{ position:"absolute", bottom:0, left:0, right:0, height:44, background:"linear-gradient(to bottom, transparent, #06070F)" }} />
+        <div style={{ position:"absolute", bottom:0, left:0, right:0, height:44, background:"linear-gradient(to bottom, transparent, #07070F)" }} />
         <div style={{ position:"relative", zIndex:1, textAlign:"center" }}>
           <div style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", width:60, height:60, borderRadius:18, background:"rgba(123,92,229,.2)", marginBottom:20, boxShadow:"0 8px 32px rgba(123,92,229,.15)" }}>
             <FileDown style={{ width:28, height:28, color:"#9D7FF0" }} />

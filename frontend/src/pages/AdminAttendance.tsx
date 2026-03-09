@@ -6,7 +6,7 @@ import {
   BarChart3, X, BookOpen, MapPin, RefreshCw
 } from "lucide-react";
 import {
-  getSessions, createSession, deleteSession, getAttendanceSheet, markAttendance,
+  getSessions, createSession, deleteSession, getAttendanceSheet, bulkMarkAttendance,
   AttendanceSheet, ClassSession, StudentEntry,
   AttendanceStatus, SessionCreatePayload, STATUS_LABELS, STATUS_COLORS,
   BRANCHES, COURSES, formatSessionDate as _formatSessionDate, getInitials, avatarColor
@@ -358,7 +358,7 @@ function SheetPanel({ session }: SheetPanelProps) {
   const { data: sheet, isLoading, isError, refetch } = useQuery<AttendanceSheet>({
     queryKey: sheetKey,
     queryFn:  () => getAttendanceSheet(session.id),
-    staleTime: 30_000,
+    staleTime: 0,          // always fetch fresh on session switch so user sees latest saves
     refetchOnWindowFocus: false,
   });
 
@@ -371,12 +371,16 @@ function SheetPanel({ session }: SheetPanelProps) {
   const [sortBy, setSortBy] = useState<"id" | "name" | "unmarked">("id");
   const [confirmMarkAll, setConfirmMarkAll] = useState<AttendanceStatus | "clear" | null>(null);
 
-  // Debounce refs: one per student profile ID
-  const debounceRefs = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  // Batch save: collect all pending changes then flush as one bulk API call
+  const pendingBatch = useRef<Map<number, { status: AttendanceStatus; tShirt: boolean }>>(new Map());
+  const batchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Track which session.id has been initialized — prevents server refetch from wiping
+  // in-progress local state (e.g. if React Query background-refetches the sheet)
+  const initializedRef = useRef<number | null>(null);
 
-  // Sync local state when sheet data arrives/changes
+  // Sync local state from server — only once per session, never again while component is live
   useEffect(() => {
-    if (!sheet) return;
+    if (!sheet || initializedRef.current === session.id) return;
     const next: typeof localData = {};
     sheet.students.forEach(s => {
       next[s.student_profile_id] = {
@@ -387,82 +391,140 @@ function SheetPanel({ session }: SheetPanelProps) {
     });
     setLocalData(next);
     setSaveStates({});
-  }, [sheet]);
+    initializedRef.current = session.id;
+  }, [sheet, session.id]);
 
-  const setSave = useCallback((id: number, state: SaveState) => {
-    setSaveStates(prev => ({ ...prev, [id]: state }));
-  }, []);
+  // Flush all pending changes as a single bulk API call
+  const flushBatch = useCallback(async () => {
+    const batch = pendingBatch.current;
+    if (batch.size === 0) return;
+    const entries = Array.from(batch.entries());
+    batch.clear();
 
-  const persistChange = useCallback((
-    studentProfileId: number,
-    status: AttendanceStatus,
-    tShirt: boolean
-  ) => {
-    setSave(studentProfileId, "saving");
+    setSaveStates(prev => {
+      const next = { ...prev };
+      entries.forEach(([id]) => { next[id] = "saving"; });
+      return next;
+    });
 
-    apiSave(session.id, studentProfileId, status, tShirt)
-      .then(record => {
-        setLocalData(prev => ({
-          ...prev,
-          [studentProfileId]: { status, t_shirt_worn: tShirt, record_id: record.id },
-        }));
-        setSave(studentProfileId, "saved");
-        qc.invalidateQueries({ queryKey: sheetKey });
-        setTimeout(() => setSave(studentProfileId, "idle"), 1500);
-      })
-      .catch(() => {
-        setSave(studentProfileId, "error");
-        setTimeout(() => setSave(studentProfileId, "idle"), 3000);
+    try {
+      await bulkMarkAttendance({
+        session_id: session.id,
+        attendance_data: entries.map(([student_profile_id, { status, tShirt }]) => ({
+          session_id:         session.id,   // required by AttendanceRecordCreate schema
+          student_profile_id,
+          status,
+          t_shirt_worn: status === "present" ? tShirt : false,
+        })),
       });
-  }, [session.id, qc, sheetKey, setSave]);
+
+      setSaveStates(prev => {
+        const next = { ...prev };
+        entries.forEach(([id]) => { next[id] = "saved"; });
+        return next;
+      });
+
+      // Update is_completed in the sessions sidebar immediately — no reload needed
+      qc.setQueriesData<ClassSession[]>(
+        { predicate: (query) => query.queryKey[0] === "sessions" },
+        (old) => old?.map(s => s.id === session.id ? { ...s, is_completed: true } : s)
+      );
+
+      setTimeout(() => {
+        setSaveStates(prev => {
+          const next = { ...prev };
+          entries.forEach(([id]) => { if (next[id] === "saved") next[id] = "idle"; });
+          return next;
+        });
+      }, 1500);
+    } catch {
+      setSaveStates(prev => {
+        const next = { ...prev };
+        entries.forEach(([id]) => { next[id] = "error"; });
+        return next;
+      });
+      setTimeout(() => {
+        setSaveStates(prev => {
+          const next = { ...prev };
+          entries.forEach(([id]) => { if (next[id] === "error") next[id] = "idle"; });
+          return next;
+        });
+      }, 3000);
+    }
+  }, [session.id, qc]);
+
+  // Restart the 400 ms countdown after every change
+  const scheduleBatch = useCallback(() => {
+    if (batchTimerRef.current) clearTimeout(batchTimerRef.current);
+    batchTimerRef.current = setTimeout(flushBatch, 400);
+  }, [flushBatch]);
+
+  // When the user switches sessions (session.id changes) flush any unsaved changes
+  // immediately so nothing is lost — fire-and-forget, component may be re-rendering
+  useEffect(() => {
+    const sessionId = session.id;
+    return () => {
+      if (batchTimerRef.current) clearTimeout(batchTimerRef.current);
+      const batch = pendingBatch.current;
+      if (batch.size > 0) {
+        const entries = Array.from(batch.entries());
+        batch.clear();
+        bulkMarkAttendance({
+          session_id: sessionId,
+          attendance_data: entries.map(([sid, { status, tShirt }]) => ({
+            student_profile_id: sid,
+            status,
+            t_shirt_worn: status === "present" ? tShirt : false,
+          })),
+        }).catch(() => {});
+      }
+    };
+  }, [session.id]);
 
   const handleStatusChange = useCallback((studentProfileId: number, status: AttendanceStatus) => {
     const current = localData[studentProfileId];
     const tShirt = status !== "present" ? false : (current?.t_shirt_worn ?? false);
-
-    // Optimistic update
+    // Instant optimistic update — UI reflects change immediately
     setLocalData(prev => ({
       ...prev,
       [studentProfileId]: { ...prev[studentProfileId], status, t_shirt_worn: tShirt },
     }));
-    setSave(studentProfileId, "saving");
-
-    // Debounce the API call
-    if (debounceRefs.current[studentProfileId]) clearTimeout(debounceRefs.current[studentProfileId]);
-    debounceRefs.current[studentProfileId] = setTimeout(() => {
-      persistChange(studentProfileId, status, tShirt);
-    }, 300);
-  }, [localData, persistChange, setSave]);
+    // Queue in batch; overwrites any prior pending change for this student
+    pendingBatch.current.set(studentProfileId, { status, tShirt });
+    scheduleBatch();
+  }, [localData, scheduleBatch]);
 
   const handleTshirtChange = useCallback((studentProfileId: number, value: boolean) => {
     const current = localData[studentProfileId];
     if (current?.status !== "present") return;
-
     setLocalData(prev => ({
       ...prev,
       [studentProfileId]: { ...prev[studentProfileId], t_shirt_worn: value },
     }));
-    setSave(studentProfileId, "saving");
-
-    if (debounceRefs.current[studentProfileId]) clearTimeout(debounceRefs.current[studentProfileId]);
-    debounceRefs.current[studentProfileId] = setTimeout(() => {
-      persistChange(studentProfileId, "present", value);
-    }, 300);
-  }, [localData, persistChange, setSave]);
+    pendingBatch.current.set(studentProfileId, { status: "present", tShirt: value });
+    scheduleBatch();
+  }, [localData, scheduleBatch]);
 
   const handleMarkAll = (status: AttendanceStatus | "clear") => {
     if (!sheet) return;
-    sheet.students.forEach(s => {
-      if (status === "clear") {
-        // just reset local state visually; don't call API for unmark in bulk
+    if (status === "clear") {
+      sheet.students.forEach(s => {
         setLocalData(prev => ({
           ...prev,
           [s.student_profile_id]: { ...prev[s.student_profile_id], status: null, t_shirt_worn: false },
         }));
-      } else {
-        handleStatusChange(s.student_profile_id, status);
-      }
-    });
+      });
+    } else {
+      // Optimistic-update all students + add them all to the batch at once
+      const updates: typeof localData = {};
+      sheet.students.forEach(s => {
+        const tShirt = status !== "present" ? false : (localData[s.student_profile_id]?.t_shirt_worn ?? false);
+        updates[s.student_profile_id] = { ...localData[s.student_profile_id], status, t_shirt_worn: tShirt };
+        pendingBatch.current.set(s.student_profile_id, { status, tShirt });
+      });
+      setLocalData(prev => ({ ...prev, ...updates }));
+      scheduleBatch();
+    }
     setConfirmMarkAll(null);
   };
 
@@ -664,21 +726,6 @@ function SheetPanel({ session }: SheetPanelProps) {
   );
 }
 
-// Actual API save helper
-async function apiSave(
-  sessionId: number,
-  studentProfileId: number,
-  status: AttendanceStatus,
-  tShirt: boolean
-) {
-  return markAttendance({
-    session_id:        sessionId,
-    student_profile_id: studentProfileId,
-    status,
-    t_shirt_worn: status === "present" ? tShirt : false,
-  });
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Session List Item
 // ─────────────────────────────────────────────────────────────────────────────
@@ -818,9 +865,9 @@ export default function AdminAttendance() {
   );
 
   return (
-    <div className="min-h-screen  bg-slate-950">
+    <div className="min-h-screen" style={{ background: '#07070F' }}>
       {/* Page Header */}
-      <div className=" bg-slate-900 border-b  border-slate-800 px-6 py-4">
+      <div className="bg-[#0c0e1a] border-b  border-slate-800 px-6 py-4">
         <div className="max-w-screen-xl mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold  text-slate-100">Attendance Management</h1>
@@ -839,7 +886,7 @@ export default function AdminAttendance() {
       </div>
 
       {/* Filter bar */}
-      <div className=" bg-slate-900 border-b  border-slate-800 px-6 py-3">
+      <div className="bg-[#0c0e1a] border-b  border-slate-800 px-6 py-3">
         <div className="max-w-screen-xl mx-auto flex items-center gap-3 flex-wrap">
           <Filter className="w-4 h-4 text-slate-400 flex-shrink-0" />
 

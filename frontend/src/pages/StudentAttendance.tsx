@@ -370,9 +370,9 @@ export default function StudentAttendance() {
   for (let i = 0; i < calendarCells.length; i += 7) rows.push(calendarCells.slice(i, i + 7));
 
   return (
-    <div className="min-h-screen  bg-slate-950">
+    <div className="min-h-screen" style={{ background: '#07070F' }}>
       {/* Header */}
-      <div className=" bg-slate-900 border-b  border-slate-800 px-6 py-4">
+      <div className="bg-[#0c0e1a] border-b  border-slate-800 px-6 py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold  text-slate-100">My Attendance</h1>

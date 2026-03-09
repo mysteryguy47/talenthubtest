@@ -1292,13 +1292,19 @@ async def delete_student(
     """Delete a student account and all associated data.
     
     Deletion order is explicit to be robust against any DB-level FK constraint
-    configurations (some tables lack ORM-side cascade on User, e.g. Leaderboard).
+    configurations (some tables use RESTRICT on the user FK, e.g. RewardEvent).
     """
     from models import (
-        VacantId, Leaderboard, PointsLog, Reward,
+        VacantId, PointsLog,
         PaperAttempt, PracticeSession, StudentProfile,
         ProfileAuditLog, AttendanceRecord, Certificate,
         FeeAssignment, FeeTransaction,
+    )
+    from reward_models import (
+        RewardEvent, StudentBadgeAward, MonthlyLeaderboardSnapshot,
+    )
+    from subscription_models import (
+        UserSubscription, PaymentOrder, SubscriptionAuditLog,
     )
 
     student = db.query(User).filter(
@@ -1365,9 +1371,9 @@ async def delete_student(
             db.delete(profile)
             db.flush()
 
-        # ── Step 7: Delete leaderboard entry (NOT in User ORM cascade) ───────
-        db.query(Leaderboard).filter(
-            Leaderboard.user_id == student_id
+        # ── Step 7: Delete leaderboard snapshots (NOT in User ORM cascade) ──
+        db.query(MonthlyLeaderboardSnapshot).filter(
+            MonthlyLeaderboardSnapshot.student_id == student_id
         ).delete(synchronize_session=False)
 
         # ── Step 8: Delete practice sessions + their individual attempts ──────
@@ -1390,9 +1396,12 @@ async def delete_student(
             PaperAttempt.user_id == student_id
         ).delete(synchronize_session=False)
 
-        # ── Step 10: Delete rewards ──────────────────────────────────────────
-        db.query(Reward).filter(
-            Reward.user_id == student_id
+        # ── Step 10: Delete reward events and badge awards ───────────────────
+        db.query(RewardEvent).filter(
+            RewardEvent.student_id == student_id
+        ).delete(synchronize_session=False)
+        db.query(StudentBadgeAward).filter(
+            StudentBadgeAward.student_id == student_id
         ).delete(synchronize_session=False)
 
         # ── Step 11: Delete points logs ──────────────────────────────────────
@@ -1400,12 +1409,32 @@ async def delete_student(
             PointsLog.user_id == student_id
         ).delete(synchronize_session=False)
 
-        # ── Step 12: Finally delete the user ─────────────────────────────────
+        # ── Step 12: Delete subscription audit log (RESTRICT on user_id) ─────
+        db.query(SubscriptionAuditLog).filter(
+            SubscriptionAuditLog.user_id == student_id
+        ).delete(synchronize_session=False)
+
+        # ── Step 13: Delete payment orders (RESTRICT on user_id) ─────────────
+        db.query(PaymentOrder).filter(
+            PaymentOrder.user_id == student_id
+        ).delete(synchronize_session=False)
+
+        # ── Step 14: Delete user subscriptions (RESTRICT on user_id) ─────────
+        db.query(UserSubscription).filter(
+            UserSubscription.user_id == student_id
+        ).delete(synchronize_session=False)
+
+        # ── Step 15: Finally delete the user ─────────────────────────────────
         db.delete(student)
         db.commit()
 
     except Exception as e:
         db.rollback()
+        import logging as _logging, traceback as _tb
+        _logging.getLogger(__name__).error(
+            "[DELETE_STUDENT] Failed for user_id=%s: %s\n%s",
+            student_id, e, _tb.format_exc()
+        )
         raise HTTPException(
             status_code=500,
             detail=f"Failed to delete student '{student_name}': {str(e)}"
@@ -2306,31 +2335,129 @@ async def delete_vacant_id(
 
 @router.post("/admin/generate-student-id")
 async def generate_next_student_id(
-    branch: Optional[str] = Query(None),
     admin: User = Depends(get_current_admin),
     db: Session = Depends(get_db)
 ):
-    """Generate the next available student ID for a specific branch or general."""
-    prefix = "TH"  # Default prefix
+    """Suggest the next available TH-XXXX student ID (always TH prefix)."""
+    next_id = generate_public_id(db)
+    return {"suggested_id": next_id}
 
-    if branch:
-        # Use branch-specific prefix
-        branch_prefixes = {
-            "rohini-16": "R16",
-            "rohini-11": "R11",
-            "gurgaon": "GGN",
-            "online": "ONL"
-        }
-        prefix = branch_prefixes.get(branch.lower(), "TH")
 
-    next_id = generate_public_id(db, prefix)
+@router.post("/admin/bulk-assign-ids")
+async def bulk_assign_student_ids(
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Assign TH-XXXX IDs to every student that currently has no public_id.
+
+    Assignment rules (applied in this exact order to avoid clashes):
+      1. Vacant IDs (from the vacant_ids table) are consumed first, sorted
+         numerically so the lowest numbers are reused first.
+      2. Once vacant IDs are exhausted, fresh sequential TH numbers are used,
+         always choosing the smallest number not already taken by any profile.
+      3. Each assignment is committed atomically so a partial failure leaves
+         the database consistent.
+      4. The corresponding VacantId row is deleted when a vacant ID is consumed.
+
+    Returns a summary of what was assigned.
+    """
+    from models import StudentProfile, VacantId as VacantIdModel
+
+    # ── 1. Find all students without a public_id ──────────────────────────────
+    unassigned_profiles = (
+        db.query(StudentProfile)
+        .filter(
+            StudentProfile.public_id.is_(None),
+            StudentProfile.user_id.isnot(None),
+        )
+        .order_by(StudentProfile.user_id.asc())
+        .all()
+    )
+
+    if not unassigned_profiles:
+        return {"assigned": 0, "results": [], "message": "All students already have IDs assigned."}
+
+    # ── 2. Build the pool of available IDs ───────────────────────────────────
+    # 2a. Collect all numbers already in use (any TH-xxxx profile)
+    existing = db.query(StudentProfile.public_id).filter(
+        StudentProfile.public_id.isnot(None),
+        StudentProfile.public_id.like("TH-%"),
+    ).all()
+    used: set = set()
+    for (pid,) in existing:
+        try:
+            used.add(int(pid.split("-")[1]))
+        except (ValueError, IndexError):
+            pass
+
+    # 2b. Collect vacant IDs, sorted numerically (smallest first)
+    vacant_rows = (
+        db.query(VacantIdModel)
+        .filter(VacantIdModel.public_id.like("TH-%"))
+        .all()
+    )
+    # Sort numerically
+    vacant_rows.sort(key=lambda v: int(v.public_id.split("-")[1]) if v.public_id.split("-")[1].isdigit() else 9999)
+    vacant_queue = list(vacant_rows)  # will pop from front
+
+    # 2c. Fresh-number generator: smallest TH number not in `used`
+    _fresh_counter = 1
+
+    def _next_fresh() -> str:
+        nonlocal _fresh_counter
+        while _fresh_counter in used:
+            _fresh_counter += 1
+        n = _fresh_counter
+        used.add(n)
+        _fresh_counter += 1
+        return f"TH-{n:04d}"
+
+    # ── 3. Assign IDs ─────────────────────────────────────────────────────────
+    results = []
+    assigned_count = 0
+
+    for profile in unassigned_profiles:
+        if vacant_queue:
+            # Use a vacant ID first
+            vacant_row = vacant_queue.pop(0)
+            new_id = vacant_row.public_id
+            # Mark the vacant-id number as used so fresh counter skips it
+            try:
+                used.add(int(new_id.split("-")[1]))
+            except (ValueError, IndexError):
+                pass
+            db.delete(vacant_row)
+            source = "vacant"
+        else:
+            new_id = _next_fresh()
+            source = "fresh"
+
+        profile.public_id = new_id
+        student_name = (
+            db.query(User.name).filter(User.id == profile.user_id).scalar() or "Unknown"
+        )
+        results.append({
+            "user_id": profile.user_id,
+            "student_name": student_name,
+            "assigned_id": new_id,
+            "source": source,
+        })
+        assigned_count += 1
+
+    try:
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Bulk assignment failed: {str(e)}"
+        )
 
     return {
-        "suggested_id": next_id,
-        "prefix": prefix,
-        "branch": branch
+        "assigned": assigned_count,
+        "results": results,
+        "message": f"Successfully assigned IDs to {assigned_count} student(s).",
     }
-
 
 
 

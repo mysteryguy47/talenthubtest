@@ -84,7 +84,7 @@ export default function MaintenancePage({ message }: Props) {
         }
       `}</style>
 
-      <div style={{ position: "fixed", inset: 0, background: "linear-gradient(160deg,#07061a 0%,#0c0e1a 55%,#0e0a24 100%)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "'DM Sans',system-ui,sans-serif", overflow: "hidden" }}>
+      <div style={{ position: "fixed", inset: 0, background: "#07070F", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "'DM Sans',system-ui,sans-serif", overflow: "hidden" }}>
 
         {/* Floating particles */}
         {PARTICLES.map((p) => (

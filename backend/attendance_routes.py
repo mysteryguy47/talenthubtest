@@ -376,24 +376,21 @@ async def mark_attendance(
     db: Session = Depends(get_db)
 ):
     """Mark attendance for a single student."""
-    # Check if record already exists
+    # Fetch both existing record and session in one pass before any writes
     existing = db.query(AttendanceRecord).filter(
         AttendanceRecord.session_id == attendance_data.session_id,
         AttendanceRecord.student_profile_id == attendance_data.student_profile_id
     ).first()
-    
+    session_obj = db.query(ClassSession).filter(ClassSession.id == attendance_data.session_id).first()
+
     if existing:
-        # Update existing record
         existing.status = attendance_data.status
         existing.t_shirt_worn = attendance_data.t_shirt_worn if attendance_data.t_shirt_worn is not None else existing.t_shirt_worn
         existing.remarks = attendance_data.remarks
         existing.marked_by_user_id = admin.id
         existing.updated_at = get_ist_now()
-        db.commit()
-        db.refresh(existing)
         record = existing
     else:
-        # Create new record
         record = AttendanceRecord(
             session_id=attendance_data.session_id,
             student_profile_id=attendance_data.student_profile_id,
@@ -403,22 +400,15 @@ async def mark_attendance(
             marked_by_user_id=admin.id
         )
         db.add(record)
-        db.commit()
-        db.refresh(record)
-    
-    # Mark session as completed
-    session = db.query(ClassSession).filter(ClassSession.id == attendance_data.session_id).first()
-    if session:
-        session.is_completed = True
-        db.commit()
-    
-    # Get student info for response
-    profile = db.query(StudentProfile).filter(StudentProfile.id == attendance_data.student_profile_id).first()
+
+    # Mark session completed in the same transaction (no second commit)
+    if session_obj and not session_obj.is_completed:
+        session_obj.is_completed = True
+
+    # flush assigns PK to new records, all Python-side defaults already set
+    db.flush()
     response = AttendanceRecordResponse.model_validate(record)
-    if profile:
-        response.student_name = profile.full_name or profile.display_name
-        response.student_public_id = profile.public_id
-    
+    db.commit()
     return response
 
 
@@ -429,52 +419,53 @@ async def mark_bulk_attendance(
     db: Session = Depends(get_db)
 ):
     """Mark attendance for multiple students at once."""
-    results = []
-    
-    for attendance_data in bulk_data.attendance_data:
-        # Check if record already exists
-        existing = db.query(AttendanceRecord).filter(
+    if not bulk_data.attendance_data:
+        return []
+
+    # Fetch ALL existing records for this session in a single query
+    student_ids = [a.student_profile_id for a in bulk_data.attendance_data]
+    existing_map = {
+        r.student_profile_id: r
+        for r in db.query(AttendanceRecord).filter(
             AttendanceRecord.session_id == bulk_data.session_id,
-            AttendanceRecord.student_profile_id == attendance_data.student_profile_id
-        ).first()
-        
+            AttendanceRecord.student_profile_id.in_(student_ids)
+        ).all()
+    }
+
+    session_obj = db.query(ClassSession).filter(ClassSession.id == bulk_data.session_id).first()
+
+    results = []
+    for attendance_data in bulk_data.attendance_data:
+        existing = existing_map.get(attendance_data.student_profile_id)
         if existing:
             existing.status = attendance_data.status
-            existing.t_shirt_worn = getattr(attendance_data, 't_shirt_worn', False) if hasattr(attendance_data, 't_shirt_worn') else existing.t_shirt_worn
+            t_shirt = getattr(attendance_data, 't_shirt_worn', None)
+            existing.t_shirt_worn = t_shirt if t_shirt is not None else existing.t_shirt_worn
             existing.remarks = attendance_data.remarks
             existing.marked_by_user_id = admin.id
             existing.updated_at = get_ist_now()
-            record = existing
+            results.append(existing)
         else:
             record = AttendanceRecord(
                 session_id=bulk_data.session_id,
                 student_profile_id=attendance_data.student_profile_id,
                 status=attendance_data.status,
-                t_shirt_worn=getattr(attendance_data, 't_shirt_worn', False) if hasattr(attendance_data, 't_shirt_worn') else False,
+                t_shirt_worn=getattr(attendance_data, 't_shirt_worn', None) or False,
                 remarks=attendance_data.remarks,
                 marked_by_user_id=admin.id
             )
             db.add(record)
-        
-        results.append(record)
-    
-    # Mark session as completed
-    session = db.query(ClassSession).filter(ClassSession.id == bulk_data.session_id).first()
-    if session:
-        session.is_completed = True
-    
+            results.append(record)
+
+    # Mark session completed in the same transaction
+    if session_obj and not session_obj.is_completed:
+        session_obj.is_completed = True
+
+    # flush: assigns PKs to new records; all Python-side defaults (timestamps) already set
+    db.flush()
+    # Build Pydantic responses while objects are fully in-session (zero lazy-load overhead)
+    response_list = [AttendanceRecordResponse.model_validate(r) for r in results]
     db.commit()
-    
-    # Add student info to responses
-    response_list = []
-    for record in results:
-        profile = db.query(StudentProfile).filter(StudentProfile.id == record.student_profile_id).first()
-        response = AttendanceRecordResponse.model_validate(record)
-        if profile:
-            response.student_name = profile.full_name or profile.display_name
-            response.student_public_id = profile.public_id
-        response_list.append(response)
-    
     return response_list
 
 

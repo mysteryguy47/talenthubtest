@@ -176,7 +176,7 @@ export default function Login() {
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
         :root {
-          --lg-bg:      #06070F;
+          --lg-bg:      #07070F;
           --lg-surf:    #0F1120;
           --lg-surf2:   #141729;
           --lg-border:  rgba(255,255,255,0.07);
@@ -288,7 +288,7 @@ export default function Login() {
         {/* Layer 1 — Deep space radial */}
         <div style={{
           position: "absolute", inset: 0,
-          background: "radial-gradient(ellipse 120% 100% at 50% 0%, #1A1040 0%, #0D0A24 35%, #06070F 70%)",
+          background: "radial-gradient(ellipse 120% 100% at 50% 0%, #1A1040 0%, #0D0A24 35%, #07070F 70%)",
           pointerEvents: "none",
         }} />
 

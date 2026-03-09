@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { LoadingScreen } from "../components/LoadingScreen";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
 import {
@@ -320,19 +321,12 @@ export default function StudentProfile() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-400 mx-auto mb-4" />
-          <p className="text-white">Loading profile...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#07070F' }}>
         <div className="text-center">
           <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
           <p className="text-white">Failed to load profile</p>
@@ -343,7 +337,7 @@ export default function StudentProfile() {
   }
 
   const D = {
-    bg:      "#0c0e1a",
+    bg:      "#07070F",
     surf:    "#131629",
     surf2:   "#181b2e",
     border:  "rgba(255,255,255,0.08)",

@@ -47,7 +47,7 @@ export default function Header() {
   }, [(user as any)?.current_streak]);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -113,9 +113,10 @@ export default function Header() {
     <header
       className={`sticky top-0 z-[200] py-4 transition-all duration-500 ${
         scrolled
-          ? "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-lg"
+          ? "backdrop-blur-xl border-b border-border/50 shadow-lg"
           : "bg-transparent"
       }`}
+      style={scrolled ? { background: "rgba(7,8,15,0.88)" } : undefined}
     >
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 relative">

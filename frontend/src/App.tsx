@@ -2,9 +2,11 @@ import { Switch, Route } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { SubscriptionProvider } from "./contexts/SubscriptionContext";
+import { Suspense, useEffect, useState } from "react";
+import { LoadingScreen } from "./components/LoadingScreen";
+import './styles/loading.css';
 
 import MaintenancePage from "./pages/MaintenancePage";
-import { useEffect, useState } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import GraceBanner from "./components/GraceBanner";
@@ -27,6 +29,8 @@ import AbacusCourse from "./pages/AbacusCourse";
 import VedicMathsCourse from "./pages/VedicMathsCourse";
 import HandwritingCourse from "./pages/HandwritingCourse";
 import STEMCourse from "./pages/STEMCourse";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import GridMaster from "./pages/GridMaster";
 import SorobanAbacus from "./pages/SorobanAbacus";
 import Pricing from "./pages/Pricing";
@@ -53,11 +57,7 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   
   if (loading) {
     console.log("🟡 [PROTECTED] Still loading, showing loading screen");
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 from-slate-900 via-slate-800 to-slate-900">
-        <div className="text-xl  text-slate-100">Loading...</div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
   
   if (!isAuthenticated) {
@@ -73,11 +73,7 @@ function AdminRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated, loading, isAdmin } = useAuth();
   
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 from-slate-900 via-slate-800 to-slate-900">
-        <div className="text-xl  text-slate-100">Loading...</div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
   
   if (!isAuthenticated) {
@@ -130,9 +126,10 @@ function AppContent() {
         isOpen={showInactivityWarning} 
         onDismiss={dismissWarning} 
       />
-      <div className="flex flex-col min-h-screen  bg-slate-950 transition-colors duration-300">
+      <div className="flex flex-col min-h-screen transition-colors duration-300" style={{ background: '#07070F' }}>
         <Header />        <GraceBanner />        <main className="flex-grow">
           <ErrorBoundary>
+            <Suspense fallback={<LoadingScreen />}>
             <Switch>
               <Route path="/login" component={Login} />
               <Route path="/" component={Home} />
@@ -206,6 +203,8 @@ function AppContent() {
               <Route path="/courses/vedic-maths" component={VedicMathsCourse} />
               <Route path="/courses/handwriting" component={HandwritingCourse} />
               <Route path="/courses/stem" component={STEMCourse} />
+              <Route path="/privacy-policy" component={PrivacyPolicy} />
+              <Route path="/terms-of-service" component={TermsOfService} />
               <Route path="/tools/gridmaster" component={GridMaster} />
               <Route path="/tools/soroban" component={SorobanAbacus} />
               <Route path="/pricing" component={Pricing} />
@@ -221,6 +220,7 @@ function AppContent() {
               </Route>
               <Route component={NotFound} />
             </Switch>
+            </Suspense>
           </ErrorBoundary>
         </main>
         <Footer />
@@ -229,6 +229,29 @@ function AppContent() {
       <StreakCelebrationOverlay />
       <SuperLetterCinematic />
     </ErrorBoundary>
+  );
+}
+
+/** Detects network loss anywhere on the site and overlays a reconnecting screen */
+function NetworkGuard({ children }: { children: ReactNode }) {
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  useEffect(() => {
+    const goOffline = () => setIsOffline(true);
+    const goOnline  = () => setIsOffline(false);
+    window.addEventListener('offline', goOffline);
+    window.addEventListener('online',  goOnline);
+    return () => {
+      window.removeEventListener('offline', goOffline);
+      window.removeEventListener('online',  goOnline);
+    };
+  }, []);
+
+  return (
+    <>
+      {children}
+      {isOffline && <LoadingScreen transparent context="Reconnecting" />}
+    </>
   );
 }
 
@@ -243,8 +266,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <SubscriptionProvider>
-          <AppContent />
-          <SpeedInsights />
+          <NetworkGuard>
+            <AppContent />
+            <SpeedInsights />
+          </NetworkGuard>
         </SubscriptionProvider>
       </AuthProvider>
     </QueryClientProvider>

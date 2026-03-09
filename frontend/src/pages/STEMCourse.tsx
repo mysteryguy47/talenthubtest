@@ -258,10 +258,19 @@ function StatCell({ end, suffix="", label, last=false }: { end:number;suffix?:st
 function StatsBar() {
   return (
     <div className="rsp-stats-grid" style={{ background:"var(--st-surf)", border:"1px solid var(--st-bdr)", borderRadius:18, display:"grid", gridTemplateColumns:"repeat(4,1fr)", overflow:"hidden" }}>
-      <StatCell end={5}   label="Courses Available" />
-      <StatCell end={15}  suffix=" yrs" label="Age Span (4–18)" />
-      <StatCell end={3}   label="Delhi Branches" />
-      <StatCell end={500} suffix="+" label="Graduates" last />
+      <StatCell end={5} label="Courses Available" />
+      <div style={{ textAlign:"center", padding:"26px 16px", borderRight:"1px solid var(--st-bdr)" }}>
+        <div style={{ fontFamily:"var(--st-font-d)", fontSize:"clamp(26px,3.2vw,38px)", fontWeight:800, letterSpacing:"-.04em", lineHeight:1 }} className="st-orange-text">4–18 yrs</div>
+        <div style={{ fontFamily:"var(--st-font-m)", fontSize:9, color:"var(--st-muted)", letterSpacing:".14em", textTransform:"uppercase", marginTop:7 }}>Age Span</div>
+      </div>
+      <div style={{ textAlign:"center", padding:"26px 16px", borderRight:"1px solid var(--st-bdr)" }}>
+        <div style={{ fontFamily:"var(--st-font-d)", fontSize:"clamp(26px,3.2vw,38px)", fontWeight:800, letterSpacing:"-.04em", lineHeight:1 }} className="st-orange-text">AI/ML</div>
+        <div style={{ fontFamily:"var(--st-font-m)", fontSize:9, color:"var(--st-muted)", letterSpacing:".14em", textTransform:"uppercase", marginTop:7 }}>Driven Curriculum</div>
+      </div>
+      <div style={{ textAlign:"center", padding:"26px 16px" }}>
+        <div style={{ fontFamily:"var(--st-font-d)", fontSize:"clamp(26px,3.2vw,38px)", fontWeight:800, letterSpacing:"-.04em", lineHeight:1 }} className="st-orange-text">8–12wk</div>
+        <div style={{ fontFamily:"var(--st-font-m)", fontSize:9, color:"var(--st-muted)", letterSpacing:".14em", textTransform:"uppercase", marginTop:7 }}>Per Course</div>
+      </div>
     </div>
   );
 }
@@ -320,22 +329,15 @@ function Hero() {
           <div style={{ width:60, height:3, background:"linear-gradient(90deg,var(--st-o),transparent)", borderRadius:2, marginBottom:24, opacity:loaded?1:0, transition:"opacity .7s ease .5s" }} />
 
           <p style={{ fontSize:17, lineHeight:1.78, color:"var(--st-white2)", maxWidth:460, marginBottom:36, fontWeight:300, opacity:loaded?1:0, transform:loaded?"none":"translateY(16px)", transition:"all .7s ease .34s" }}>
-            Robotics, IoT, AI, and aerospace engineering — unlocked for ages 4 to 18. Five progressive courses under the Black Monkey brand, available at Talent Hub. Where engineers are made, not born.
+            Robotics, IoT, AI, and Drone Building — unlocked for ages 4 to 18. Five progressive courses under Black Monkey, available at Talent Hub. Where engineers are made, not born.
           </p>
 
           <div style={{ display:"flex", gap:12, flexWrap:"wrap", opacity:loaded?1:0, transition:"opacity .7s ease .44s" }}>
-            <button className="st-btn-o">Explore All Courses →</button>
-            <a href="tel:+919266117055" className="st-btn-s">📞 +91 92661 17055</a>
+            <button className="st-btn-o" onClick={() => document.getElementById('st-begin')?.scrollIntoView({behavior:'smooth'})}>Enroll in STEM →</button>
+            <button className="st-btn-s">View Demo</button>
           </div>
 
-          <div style={{ display:"flex", gap:28, marginTop:40, paddingTop:32, borderTop:"1px solid var(--st-bdr)", opacity:loaded?1:0, transition:"opacity .8s ease .58s" }}>
-            {[["5","Courses"],["4–18","Age Range"],["8–12 wk","Per Course"],["3","Branches"]].map(([v,l]) => (
-              <div key={l}>
-                <div style={{ fontFamily:"var(--st-font-d)", fontSize:24, fontWeight:800, letterSpacing:"-.04em", color:"var(--st-white)" }}>{v}</div>
-                <div style={{ fontFamily:"var(--st-font-m)", fontSize:9, color:"var(--st-muted)", letterSpacing:".1em", textTransform:"uppercase", marginTop:2 }}>{l}</div>
-              </div>
-            ))}
-          </div>
+
         </div>
 
         {/* ── RIGHT — course pathway card ── */}
@@ -371,14 +373,11 @@ function Hero() {
             </div>
           </div>
 
-          {/* Float badges */}
-          <div style={{ position:"absolute", top:-18, right:-18, background:"linear-gradient(135deg,#0C2A26,#0a1f1d)", border:"1px solid rgba(0,217,192,.3)", borderRadius:14, padding:"10px 16px", fontFamily:"var(--st-font-d)", fontWeight:700, fontSize:13, color:"var(--st-teal)", boxShadow:"0 8px 28px rgba(0,0,0,.5)", animation:"st-float 4.5s ease-in-out infinite", zIndex:10 }}>
-            🐒 Black Monkey
-          </div>
-          <div style={{ position:"absolute", bottom:60, left:-24, background:"rgba(7,6,10,.95)", backdropFilter:"blur(16px)", border:"1px solid rgba(224,92,40,.22)", borderRadius:14, padding:"12px 16px", animation:"st-float-r 5.5s ease-in-out infinite 1.5s", boxShadow:"0 8px 28px rgba(0,0,0,.5)", zIndex:10 }}>
+
+          <a href="https://blackmonkey.in" target="_blank" rel="noopener noreferrer" style={{ position:"absolute", bottom:60, left:-24, background:"rgba(7,6,10,.95)", backdropFilter:"blur(16px)", border:"1px solid rgba(224,92,40,.22)", borderRadius:14, padding:"12px 16px", animation:"st-float-r 5.5s ease-in-out infinite 1.5s", boxShadow:"0 8px 28px rgba(0,0,0,.5)", zIndex:10, textDecoration:"none" }}>
             <div style={{ fontFamily:"var(--st-font-m)", fontSize:9, color:"var(--st-o2)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:4 }}>Available At</div>
             <div style={{ fontFamily:"var(--st-font-d)", fontSize:14, fontWeight:700, color:"white" }}>blackmonkey.in ↗</div>
-          </div>
+          </a>
         </div>
       </div>
     </section>
@@ -390,7 +389,7 @@ function CourseDetails() {
   const [active, setActive] = useState(1);
   const c = COURSES[active];
   return (
-    <section style={{ padding:"100px 24px", background:"var(--st-bg2)", position:"relative" }}>
+    <section style={{ padding:"100px 24px", background:"var(--st-bg)", position:"relative" }}>
       <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:"50%", height:1, background:"linear-gradient(90deg,transparent,rgba(224,92,40,.35),transparent)" }} />
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
         <FadeIn>
@@ -446,8 +445,7 @@ function CourseDetails() {
             <p style={{ fontSize:15, lineHeight:1.78, color:"var(--st-white2)", marginBottom:24, fontWeight:300 }}>{c.desc}</p>
 
             <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
-              <button className="st-btn-o" style={{ background:`linear-gradient(135deg,${c.color},${c.color}99)` }}>Enroll in {c.code} →</button>
-              <button className="st-btn-s">Full Details ↗</button>
+              <a href="https://blackmonkey.in" target="_blank" rel="noopener noreferrer" className="st-btn-o" style={{ background:`linear-gradient(135deg,${c.color},${c.color}99)`, textDecoration:"none" }}>Enroll in {c.code} →</a>
             </div>
           </div>
 
@@ -477,21 +475,7 @@ function CourseDetails() {
           </div>
         </div>
 
-        {/* 5-card mini grid */}
-        <div className="rsp-stem-tabs" style={{ marginTop:18, display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:10 }}>
-          {COURSES.map((tab, i) => (
-            <FadeIn key={i} delay={i*.07}>
-              <div onClick={() => setActive(i)} style={{ background:active===i?tab.dim:"var(--st-surf)", border:`1px solid ${active===i?tab.bdr:"var(--st-bdr)"}`, borderRadius:16, padding:"18px 12px", textAlign:"center", cursor:"pointer", transition:"all .25s ease", boxShadow:active===i?`0 0 28px ${tab.dim}`:"none" }}
-                onMouseEnter={e => { if(active!==i){(e.currentTarget as HTMLElement).style.borderColor=tab.bdr;(e.currentTarget as HTMLElement).style.transform="translateY(-4px)";} }}
-                onMouseLeave={e => { if(active!==i){(e.currentTarget as HTMLElement).style.borderColor="var(--st-bdr)";(e.currentTarget as HTMLElement).style.transform="none";} }}>
-                <div style={{ fontSize:22, marginBottom:7 }}>{tab.icon}</div>
-                <div style={{ fontFamily:"var(--st-font-m)", fontSize:9, fontWeight:700, color:tab.color, letterSpacing:".12em", marginBottom:3 }}>{tab.code}</div>
-                <div style={{ fontFamily:"var(--st-font-d)", fontSize:12, fontWeight:700, color:active===i?"var(--st-white)":"var(--st-white2)", lineHeight:1.2 }}>{tab.name}</div>
-                <div style={{ fontFamily:"var(--st-font-m)", fontSize:9, color:"var(--st-muted)", marginTop:5 }}>{tab.ages}</div>
-              </div>
-            </FadeIn>
-          ))}
-        </div>
+
       </div>
     </section>
   );
@@ -536,7 +520,7 @@ function Why() {
 // ─── PATHWAY TIMELINE ─────────────────────────────────────────────────────────
 function Pathway() {
   return (
-    <section style={{ padding:"100px 24px", background:"var(--st-bg2)", position:"relative" }}>
+    <section style={{ padding:"100px 24px", background:"var(--st-bg)", position:"relative" }}>
       <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:"50%", height:1, background:"linear-gradient(90deg,transparent,rgba(224,92,40,.3),transparent)" }} />
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
         <FadeIn>
@@ -575,7 +559,7 @@ function Pathway() {
               Join at any level appropriate for your child's age. Full programme details at{" "}
               <span style={{ color:"var(--st-o2)", fontWeight:600 }}>blackmonkey.in</span>
             </p>
-            <button className="st-btn-o">Visit blackmonkey.in for Full Details ↗</button>
+            <a href="https://blackmonkey.in" target="_blank" rel="noopener noreferrer" className="st-btn-o" style={{ textDecoration:"none" }}>Visit blackmonkey.in for Full Details ↗</a>
           </div>
         </FadeIn>
       </div>
@@ -586,7 +570,7 @@ function Pathway() {
 // ─── CTA BANNER ───────────────────────────────────────────────────────────────
 function CTABanner() {
   return (
-    <section style={{ padding:"80px 24px", background:"var(--st-bg)" }}>
+    <section id="st-begin" style={{ padding:"80px 24px", background:"var(--st-bg)" }}>
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
         <FadeIn>
           <div className="st-scanlines rsp-cta-inner" style={{ position:"relative", borderRadius:28, overflow:"hidden", background:"linear-gradient(135deg,#1a0e06,#0e0905,var(--st-bg))", border:"1px solid rgba(224,92,40,.22)", padding:"72px 60px", boxShadow:"0 40px 100px rgba(0,0,0,.55)" }}>
@@ -607,8 +591,14 @@ function CTABanner() {
                   STEM courses by Black Monkey are available at all Talent Hub branches. Walk in, try a free demo session, and let your child discover what they're capable of building.
                 </p>
                 <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
-                  <button className="st-btn-o">Book Free Demo →</button>
-                  <a href="tel:+919266117055" className="st-btn-s">📞 +91 92661 17055</a>
+                  <a href="https://wa.me/919266117055" className="st-btn-o" style={{ textDecoration:"none" }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{flexShrink:0}}><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    Get in Touch
+                  </a>
+                  <a href="tel:+919266117055" className="st-btn-s" style={{ textDecoration:"none" }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{flexShrink:0}}><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                    Call Us
+                  </a>
                 </div>
                 <div style={{ marginTop:18, display:"flex", gap:20, flexWrap:"wrap" }}>
                   {["Free demo session","Age-appropriate placement","All 5 courses available"].map(t => (
@@ -664,7 +654,7 @@ export default function STEMCourse() {
       <STEMStyles />
       <Hero />
       <MarqueeBar />
-      <div style={{ padding:"72px 24px 0", background:"var(--st-bg2)" }}>
+      <div style={{ padding:"72px 24px 0", background:"var(--st-bg)" }}>
         <div style={{ maxWidth:1200, margin:"0 auto" }}>
           <FadeIn><StatsBar /></FadeIn>
         </div>

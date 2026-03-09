@@ -269,13 +269,10 @@ function CounterCell({ label, end, suffix = "" }: { label: string; end: number; 
 function StatsBar() {
   return (
     <div className="rsp-stats-grid" style={{ background:"var(--vd-surface)", border:"1px solid var(--vd-border)", borderRadius:20, display:"grid", gridTemplateColumns:"repeat(4,1fr)", overflow:"hidden" }}>
-      <CounterCell end={16}  label="Sacred Sutras" />
-      <CounterCell end={4}   label="Mastery Levels" />
-      <CounterCell end={18}  suffix="yrs" label="Years of Teaching" />
-      <div style={{ textAlign:"center", padding:"28px 20px" }}>
-        <div style={{ fontFamily:"var(--vd-font-s)", fontSize:"clamp(28px,4vw,44px)", fontWeight:800, letterSpacing:"-.02em" }} className="vd-gold-text">10+</div>
-        <div style={{ fontFamily:"var(--vd-font-m)", fontSize:10, color:"var(--vd-muted)", letterSpacing:".14em", textTransform:"uppercase", marginTop:8 }}>Sec to Multiply 8-Digits</div>
-      </div>
+      <CounterCell end={16} label="Sacred Sutras" />
+      <CounterCell end={4}  label="Mastery Levels" />
+      <CounterCell end={90} suffix="+" label="Concepts" />
+      <CounterCell end={4}  label="Appx Months Per Level" />
     </div>
   );
 }
@@ -342,19 +339,11 @@ function Hero() {
           </p>
 
           <div style={{ display:"flex", gap:12, flexWrap:"wrap", opacity:loaded?1:0, transition:"opacity .7s ease .42s" }}>
-            <button className="vd-btn-gold">Enroll in Vedic Maths →</button>
-            <button className="vd-btn-outline">Book Free Demo Class</button>
+            <button className="vd-btn-gold" onClick={() => document.getElementById('vd-begin')?.scrollIntoView({behavior:'smooth'})}>Enroll in Vedic Maths →</button>
+            <a href="/tools/gridmaster" className="vd-btn-outline" style={{ textDecoration:"none" }}>Try Vedic Grid</a>
           </div>
 
-          {/* Mini stats row */}
-          <div style={{ display:"flex", gap:32, marginTop:44, paddingTop:34, borderTop:"1px solid rgba(212,160,23,.12)", opacity:loaded?1:0, transition:"opacity .8s ease .58s" }}>
-            {[["16","Sacred Sutras"],["4","Levels"],["10+","Age, Class 5+"],["800+","Students"]].map(([v,l]) => (
-              <div key={l}>
-                <div style={{ fontFamily:"var(--vd-font-s)", fontSize:26, fontWeight:800, color:"var(--vd-cream)" }}>{v}</div>
-                <div style={{ fontFamily:"var(--vd-font-m)", fontSize:9, color:"var(--vd-muted)", letterSpacing:".12em", textTransform:"uppercase", marginTop:2 }}>{l}</div>
-              </div>
-            ))}
-          </div>
+
         </div>
 
         {/* ── RIGHT — Calculation showcase card ── */}
@@ -367,7 +356,7 @@ function Hero() {
             {/* Scan glow */}
             <div style={{ position:"absolute", left:0, right:0, height:2, background:"linear-gradient(90deg,transparent,rgba(212,160,23,.35),transparent)", animation:"vd-scan 3.8s ease-in-out infinite", pointerEvents:"none" }} />
 
-            <div className="vd-lbl" style={{ marginBottom:22 }}>Calculation Sync — Live Demos</div>
+            <div className="vd-lbl" style={{ marginBottom:22 }}>Calculation - Live Demos</div>
 
             {/* Main calc display — key forces re-animation on change */}
             <div key={calcStep} style={{ animation:"vd-reveal-num .42s ease both", marginBottom:22 }}>
@@ -407,17 +396,9 @@ function Hero() {
             <div style={{ fontFamily:"var(--vd-font-s)", fontSize:14, fontWeight:700, color:"var(--vd-cream)", fontStyle:"italic" }}>10+ · Class 5 Onwards</div>
           </div>
 
-          {/* Float badge — bottom left */}
-          <div style={{ position:"absolute", bottom:72, left:-28, background:"rgba(7,6,10,.95)", backdropFilter:"blur(18px)", border:"1px solid rgba(212,160,23,.18)", borderRadius:16, padding:"14px 18px", animation:"vd-float-rev 5.2s ease-in-out infinite 1.2s", boxShadow:"0 10px 32px rgba(0,0,0,.5)", zIndex:10 }}>
-            <div style={{ fontFamily:"var(--vd-font-m)", fontSize:9, color:"var(--vd-muted)", letterSpacing:".12em", textTransform:"uppercase", marginBottom:4 }}>Achievement</div>
-            <div style={{ fontFamily:"var(--vd-font-s)", fontSize:14, fontWeight:700, color:"var(--vd-cream)", fontStyle:"italic" }}>National Winners 🥇</div>
-          </div>
 
-          {/* Float badge — bottom right */}
-          <div style={{ position:"absolute", bottom:-16, right:22, background:"rgba(212,160,23,.1)", border:"1px solid rgba(212,160,23,.24)", backdropFilter:"blur(12px)", borderRadius:14, padding:"10px 16px", animation:"vd-float 6s ease-in-out infinite 0.6s", zIndex:10 }}>
-            <div style={{ fontFamily:"var(--vd-font-m)", fontSize:9, color:"var(--vd-gold2)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:4 }}>Monthly Test</div>
-            <div style={{ fontFamily:"var(--vd-font-s)", fontSize:13, fontWeight:700, color:"var(--vd-cream)", fontStyle:"italic" }}>Last Sunday ✓</div>
-          </div>
+
+
         </div>
       </div>
     </section>
@@ -430,7 +411,7 @@ function SutrasShowcase() {
   const cur = SUTRAS[active];
 
   return (
-    <section style={{ padding:"100px 0", background:"var(--vd-bg2)", position:"relative", overflow:"hidden" }}>
+    <section style={{ padding:"100px 0", background:"var(--vd-bg)", position:"relative", overflow:"hidden" }}>
       <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:"65%", height:1, background:"linear-gradient(90deg,transparent,rgba(212,160,23,.35),transparent)" }} />
       <div style={{ position:"absolute", top:"10%", right:"-5%", width:"40vw", height:"40vw", borderRadius:"50%", background:"radial-gradient(circle,rgba(212,160,23,.05),transparent 70%)", pointerEvents:"none" }} />
 
@@ -602,7 +583,7 @@ function LevelsSection() {
 // ─── OUTCOMES ────────────────────────────────────────────────────────────────
 function Outcomes() {
   return (
-    <section style={{ padding:"100px 24px", background:"var(--vd-bg2)", position:"relative" }}>
+    <section style={{ padding:"100px 24px", background:"var(--vd-bg)", position:"relative" }}>
       <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:"60%", height:1, background:"linear-gradient(90deg,transparent,rgba(212,160,23,.3),transparent)" }} />
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
         <FadeIn>
@@ -617,9 +598,8 @@ function Outcomes() {
           {OUTCOMES.map((o, i) => (
             <FadeIn key={i} delay={i*0.08}>
               <div className="vd-card" style={{ padding:"30px" }}>
-                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:16 }}>
+                <div style={{ marginBottom:16 }}>
                   <div style={{ fontSize:34 }}>{o.icon}</div>
-                  <div style={{ fontFamily:"var(--vd-font-s)", fontSize:20, fontWeight:800, letterSpacing:"-.01em" }} className="vd-gold-text">{o.metric}</div>
                 </div>
                 <h3 style={{ fontFamily:"var(--vd-font-s)", fontSize:17, fontWeight:700, fontStyle:"italic", letterSpacing:"-.01em", marginBottom:10, color:"var(--vd-cream)" }}>{o.title}</h3>
                 <p style={{ fontSize:13, lineHeight:1.78, color:"var(--vd-cream2)", fontWeight:300 }}>{o.desc}</p>
@@ -669,7 +649,7 @@ function FAQSection() {
 // ─── CTA BANNER ──────────────────────────────────────────────────────────────
 function CTABanner() {
   return (
-    <section style={{ padding:"80px 24px", background:"var(--vd-bg2)" }}>
+    <section id="vd-begin" style={{ padding:"80px 24px", background:"var(--vd-bg)" }}>
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
         <FadeIn>
           <div className="rsp-cta-inner" style={{ position:"relative", borderRadius:28, overflow:"hidden", background:"linear-gradient(135deg,#1a1200 0%,#0e0900 50%,#080600 100%)", border:"1px solid rgba(212,160,23,.22)", padding:"72px 64px", boxShadow:"0 44px 110px rgba(0,0,0,.5)" }}>
@@ -690,11 +670,13 @@ function CTABanner() {
                 One free demo class. Experience the sutra method first-hand and understand why students describe their first session as a genuine revelation.
               </p>
               <div style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap", marginBottom:32 }}>
-                <button className="vd-btn-gold" style={{ fontSize:15, padding:"15px 32px" }}>
-                  Book Free Demo →
-                </button>
-                <a href="tel:+919266117055" className="vd-btn-outline" style={{ borderColor:"rgba(212,160,23,.25)", color:"rgba(245,237,216,.75)", fontSize:15 }}>
-                  📞 +91 92661 17055
+                <a href="https://wa.me/919266117055" className="vd-btn-gold" style={{ fontSize:15, padding:"15px 32px", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:8 }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{flexShrink:0}}><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                  Get in Touch
+                </a>
+                <a href="tel:+919266117055" className="vd-btn-outline" style={{ borderColor:"rgba(212,160,23,.25)", color:"rgba(245,237,216,.75)", fontSize:15, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:8 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{flexShrink:0}}><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                  Call Us
                 </a>
               </div>
               <div style={{ display:"flex", gap:28, justifyContent:"center", flexWrap:"wrap" }}>

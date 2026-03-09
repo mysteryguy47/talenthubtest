@@ -490,7 +490,7 @@ export default function BurstMode() {
     style.textContent = `
       @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700;1,800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
       :root {
-        --bm-bg: #06070F; --bm-bg2: #0B0D1A; --bm-surf: #0F1120; --bm-surf2: #141729; --bm-surf3: #1A1F38;
+        --bm-bg: #07070F; --bm-bg2: #0B0D1A; --bm-surf: #0F1120; --bm-surf2: #141729; --bm-surf3: #1A1F38;
         --bm-bdr: rgba(255,255,255,0.06); --bm-bdr2: rgba(255,255,255,0.10);
         --bm-burst: #F97316; --bm-burst2: #FB923C; --bm-burst3: #FED7AA;
         --bm-burstdim: rgba(249,115,22,0.12); --bm-burstglow: rgba(249,115,22,0.22);

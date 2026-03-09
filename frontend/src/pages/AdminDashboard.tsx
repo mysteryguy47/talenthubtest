@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { LoadingScreen } from "../components/LoadingScreen";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
 import { 
@@ -10,7 +11,6 @@ import {
 } from "../lib/userApi";
 import { PaperAttemptDetail } from "../lib/api";
 import { Shield, Users, BarChart3, Target, TrendingUp, User as UserIcon, Edit2, RefreshCw, Database, X, Brain, FileText, Clock, Eye, CheckCircle2, XCircle, Trophy, IdCard } from "lucide-react";
-import Skeleton from "../components/Skeleton";
 import { useLocation } from "wouter";
 import { formatDateToIST, formatDateOnlyToIST } from "../lib/timezoneUtils";
 
@@ -199,26 +199,7 @@ export default function AdminDashboard() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <div className="container mx-auto pt-32 pb-20 px-6">
-          <div className="mb-10 space-y-4">
-            <Skeleton className="h-10 w-72" />
-            <Skeleton className="h-5 w-96" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <Skeleton key={`admin-stats-skeleton-${index}`} className="h-32 rounded-[2.5rem]" />
-            ))}
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {Array.from({ length: 2 }).map((_, index) => (
-              <Skeleton key={`admin-panel-skeleton-${index}`} className="h-64 rounded-[2.5rem]" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!isAdmin) {
@@ -237,7 +218,7 @@ export default function AdminDashboard() {
 
   if (!stats) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#07070F' }}>
         <div className="text-xl  text-red-400">Failed to load dashboard</div>
       </div>
     );

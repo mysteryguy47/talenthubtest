@@ -132,85 +132,40 @@ def validate_level_type(level_type: Optional[str]) -> Tuple[bool, Optional[str]]
 
 def generate_public_id(db, prefix: str = "TH") -> str:
     """
-    Generate the next public ID in format TH-0001, TH-0002, etc.
-    
-    Args:
-        db: Database session
-        prefix: Prefix for the ID (default: "TH")
-    
+    Generate the next available TH-XXXX public ID.
+
+    Always uses the "TH" prefix regardless of the prefix argument (branch-based
+    prefixes are no longer supported).  Finds the lowest number >= 1 that is not
+    already assigned to any StudentProfile, so the sequence has no gaps.
+
     Returns:
-        Next available public ID string
+        Next available public ID string, e.g. "TH-0005"
     """
-    from models import StudentProfile
-    
-    # Get the highest existing public_id number
-    last_profile = db.query(StudentProfile).filter(
+    from models import StudentProfile, VacantId
+
+    # Collect all numbers already in use (any TH-xxxx profile)
+    existing = db.query(StudentProfile.public_id).filter(
         StudentProfile.public_id.isnot(None),
-        StudentProfile.public_id.like(f"{prefix}-%")
-    ).order_by(StudentProfile.public_id.desc()).first()
-    
-    if not last_profile or not last_profile.public_id:
-        # No existing profiles, start with 0001
-        next_number = 1
-    else:
-        # Extract number from last public_id (e.g., "TH-0001" -> 1)
+        StudentProfile.public_id.like("TH-%"),
+    ).all()
+    used: set = set()
+    for (pid,) in existing:
         try:
-            last_number_str = last_profile.public_id.split("-")[-1]
-            next_number = int(last_number_str) + 1
+            used.add(int(pid.split("-")[1]))
         except (ValueError, IndexError):
-            # If parsing fails, start from 1
-            next_number = 1
-    
-    # Format with zero padding (4 digits)
-    return f"{prefix}-{next_number:04d}"
+            pass
+
+    # Find the smallest unused number >= 1
+    next_number = 1
+    while next_number in used:
+        next_number += 1
+
+    return f"TH-{next_number:04d}"
 
 
 def generate_branch_specific_id(db, branch: str = None, prefix: str = None) -> str:
-    """
-    Generate a branch-specific public ID.
-
-    Args:
-        db: Database session
-        branch: Student branch (rohini-16, rohini-11, gurgaon, online)
-        prefix: Custom prefix (optional)
-
-    Returns:
-        Branch-specific public ID
-    """
-    # Define branch prefixes
-    branch_prefixes = {
-        "rohini-16": "R16",
-        "rohini-11": "R11",
-        "gurgaon": "GGN",
-        "online": "ONL"
-    }
-
-    # Use provided prefix or get from branch
-    if prefix:
-        final_prefix = prefix.upper()
-    elif branch and branch.lower() in branch_prefixes:
-        final_prefix = branch_prefixes[branch.lower()]
-    else:
-        final_prefix = "TH"  # Default fallback
-
-    return generate_public_id(db, final_prefix)
+    """Kept for backwards compatibility — always delegates to generate_public_id (TH prefix)."""
+    return generate_public_id(db)
 
 
-def get_branch_prefix(branch: str) -> str:
-    """
-    Get the standard prefix for a branch.
 
-    Args:
-        branch: Branch name
-
-    Returns:
-        Branch-specific prefix
-    """
-    branch_prefixes = {
-        "rohini-16": "R16",
-        "rohini-11": "R11",
-        "gurgaon": "GGN",
-        "online": "ONL"
-    }
-
-    return branch_prefixes.get(branch.lower(), "TH")

@@ -31,7 +31,7 @@ class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4 transition-colors duration-300">
+        <div className="min-h-screen flex items-center justify-center p-4 transition-colors duration-300" style={{ background: '#07070F' }}>
           <div className=" bg-slate-800 rounded-2xl  shadow-2xl p-8 max-w-md w-full text-center border  border-slate-700">
             <h1 className="text-2xl font-bold  text-red-400 mb-4">Something went wrong</h1>
             <p className=" text-slate-400 mb-6">

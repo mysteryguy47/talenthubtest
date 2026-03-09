@@ -524,11 +524,25 @@ export async function updateStudentPublicId(studentId: number, request: UpdateSt
   return apiClient.put(`/users/admin/students/${studentId}/public-id`, request);
 }
 
-export async function generateNextStudentId(branch?: string): Promise<{suggested_id: string; prefix: string; branch?: string}> {
-  const endpoint = branch 
-    ? `/users/admin/generate-student-id?branch=${encodeURIComponent(branch)}`
-    : "/users/admin/generate-student-id";
-  return apiClient.post(endpoint, {});
+export async function generateNextStudentId(): Promise<{suggested_id: string}> {
+  return apiClient.post("/users/admin/generate-student-id", {});
+}
+
+export interface BulkAssignResult {
+  user_id: number;
+  student_name: string;
+  assigned_id: string;
+  source: "vacant" | "fresh";
+}
+
+export interface BulkAssignResponse {
+  assigned: number;
+  results: BulkAssignResult[];
+  message: string;
+}
+
+export async function bulkAssignStudentIds(): Promise<BulkAssignResponse> {
+  return apiClient.post("/users/admin/bulk-assign-ids", {});
 }
 
 export interface VacantId {

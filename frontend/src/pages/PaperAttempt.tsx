@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, Link } from "wouter";
 import { useAuth } from "../contexts/AuthContext";
+import { LoadingScreen } from "../components/LoadingScreen";
 import { 
   startPaperAttempt, 
   submitPaperAttempt, 
@@ -67,7 +68,7 @@ export default function PaperAttempt() {
     s.id = id;
     s.textContent = `
       @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700;1,800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
-      :root{--pa-bg:#06070F;--pa-surf:#0F1120;--pa-surf2:#141729;--pa-surf3:#1C2040;--pa-bdr:rgba(255,255,255,0.06);--pa-bdr2:rgba(255,255,255,0.10);--pa-pur:#7B5CE5;--pa-pur2:#9D7FF0;--pa-pur3:#C4ADFF;--pa-pglow:rgba(123,92,229,0.22);--pa-pdim:rgba(123,92,229,0.10);--pa-grn:#10B981;--pa-grn2:#059669;--pa-rdim:rgba(239,68,68,0.12);--pa-red:#EF4444;--pa-gld:#F59E0B;--pa-whi:#F0F2FF;--pa-whi2:#B8BDD8;--pa-muted:#525870;--pa-fd:'Playfair Display',Georgia,serif;--pa-fb:'DM Sans',sans-serif;--pa-fm:'JetBrains Mono',monospace;}
+      :root{--pa-bg:#07070F;--pa-surf:#0F1120;--pa-surf2:#141729;--pa-surf3:#1C2040;--pa-bdr:rgba(255,255,255,0.06);--pa-bdr2:rgba(255,255,255,0.10);--pa-pur:#7B5CE5;--pa-pur2:#9D7FF0;--pa-pur3:#C4ADFF;--pa-pglow:rgba(123,92,229,0.22);--pa-pdim:rgba(123,92,229,0.10);--pa-grn:#10B981;--pa-grn2:#059669;--pa-rdim:rgba(239,68,68,0.12);--pa-red:#EF4444;--pa-gld:#F59E0B;--pa-whi:#F0F2FF;--pa-whi2:#B8BDD8;--pa-muted:#525870;--pa-fd:'Playfair Display',Georgia,serif;--pa-fb:'DM Sans',sans-serif;--pa-fm:'JetBrains Mono',monospace;}
       @keyframes pa-spin{to{transform:rotate(360deg)}}
       @keyframes pa-fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
       @keyframes pa-scale-in{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
@@ -706,15 +707,7 @@ export default function PaperAttempt() {
   const answeredCount = Object.keys(answers).length;
 
   if (loading) {
-    return (
-      <div style={{minHeight:'100vh',background:'var(--pa-bg)',display:'flex',alignItems:'center',justifyContent:'center'}}>
-        <div style={{textAlign:'center',animation:'pa-fade-up 0.5s ease'}}>
-          <div style={{width:48,height:48,border:'3px solid var(--pa-pur)',borderTopColor:'transparent',borderRadius:'50%',animation:'pa-spin 0.9s linear infinite',margin:'0 auto 24px'}}></div>
-          <div style={{fontSize:18,color:'var(--pa-whi2)',fontFamily:'var(--pa-fb)',fontWeight:500}}>Loading paper...</div>
-          <div style={{fontSize:12,color:'var(--pa-muted)',marginTop:8,fontFamily:'var(--pa-fm)',letterSpacing:'0.08em'}}>PLEASE WAIT</div>
-        </div>
-      </div>
-    );
+    return <LoadingScreen context="Your Paper" />;
   }
 
   if (error && !paperConfig) {
@@ -997,14 +990,7 @@ export default function PaperAttempt() {
       );
     }
     // Still loading or no data
-    return (
-      <div style={{minHeight:'100vh',background:'var(--pa-bg)',display:'flex',alignItems:'center',justifyContent:'center'}}>
-        <div style={{textAlign:'center'}}>
-          <div style={{width:48,height:48,border:'3px solid var(--pa-pur)',borderTopColor:'transparent',borderRadius:'50%',animation:'pa-spin 0.9s linear infinite',margin:'0 auto 24px'}}></div>
-          <div style={{fontSize:18,color:'var(--pa-whi2)',fontFamily:'var(--pa-fb)'}}>Loading paper...</div>
-        </div>
-      </div>
-    );
+    return <LoadingScreen context="Your Paper" />;
   }
 
   // Start screen overlay
@@ -1268,4 +1254,3 @@ export default function PaperAttempt() {
     </div>
   );
 }
-

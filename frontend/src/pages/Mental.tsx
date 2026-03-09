@@ -1958,7 +1958,7 @@ export default function Mental() {
     s.id = id;
     s.textContent = `
       @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700;1,800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
-      :root{--mm-bg:#06070F;--mm-bg2:#0B0D1A;--mm-surf:#0F1120;--mm-surf2:#141729;--mm-surf3:#1C2040;--mm-bdr:rgba(255,255,255,0.06);--mm-bdr2:rgba(255,255,255,0.10);--mm-pur:#7B5CE5;--mm-pur2:#9D7FF0;--mm-pur3:#C4ADFF;--mm-pglow:rgba(123,92,229,0.22);--mm-pdim:rgba(123,92,229,0.10);--mm-grn:#10B981;--mm-rdim:rgba(239,68,68,0.12);--mm-red:#EF4444;--mm-gld:#F59E0B;--mm-whi:#F0F2FF;--mm-whi2:#B8BDD8;--mm-muted:#525870;--mm-fd:'Playfair Display',Georgia,serif;--mm-fb:'DM Sans',sans-serif;--mm-fm:'JetBrains Mono',monospace;}
+      :root{--mm-bg:#07070F;--mm-bg2:#0B0D1A;--mm-surf:#0F1120;--mm-surf2:#141729;--mm-surf3:#1C2040;--mm-bdr:rgba(255,255,255,0.06);--mm-bdr2:rgba(255,255,255,0.10);--mm-pur:#7B5CE5;--mm-pur2:#9D7FF0;--mm-pur3:#C4ADFF;--mm-pglow:rgba(123,92,229,0.22);--mm-pdim:rgba(123,92,229,0.10);--mm-grn:#10B981;--mm-rdim:rgba(239,68,68,0.12);--mm-red:#EF4444;--mm-gld:#F59E0B;--mm-whi:#F0F2FF;--mm-whi2:#B8BDD8;--mm-muted:#525870;--mm-fd:'Playfair Display',Georgia,serif;--mm-fb:'DM Sans',sans-serif;--mm-fm:'JetBrains Mono',monospace;}
       @keyframes mm-fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
       @keyframes mm-fade-in{from{opacity:0}to{opacity:1}}
       @keyframes mm-scale-in{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
@@ -3277,7 +3277,7 @@ export default function Mental() {
   return (
     <ErrorBoundary
       fallback={
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
+        <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#07070F' }}>
           <div className=" bg-slate-800 rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
             <h1 className="text-2xl font-bold  text-red-400 mb-4">Something went wrong</h1>
             <p className=" text-slate-400 mb-6">

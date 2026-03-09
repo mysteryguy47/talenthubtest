@@ -42,7 +42,7 @@ export default function StudentRewards({
   );
 
   return (
-    <div className="min-h-screen bg-zinc-950 px-4 py-6 md:px-8 md:py-8 max-w-5xl mx-auto space-y-6">
+    <div className="min-h-screen px-4 py-6 md:px-8 md:py-8 max-w-5xl mx-auto space-y-6" style={{ background: '#07070F' }}>
       {/* Title */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}

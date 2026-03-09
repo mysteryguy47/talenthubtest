@@ -181,7 +181,7 @@ const OUTCOMES = [
   { icon: "🎯", title: "Focus Depth", metric: "3×", desc: "Holding a moving bead image in mind demands intense focus. Students report 3× improvement in sustained attention span." },
   { icon: "🏆", title: "Competition Wins", metric: "🥇", desc: "Regular monthly tests and national/international olympiads give students real competitive exposure — and real wins on their cv." },
   { icon: "📜", title: "Certified Growth", metric: "10", desc: "Every level completed earns a certificate and medal. Tangible milestones that build authentic pride and unstoppable momentum." },
-  { icon: "💼", title: "Full Kit Day 1", metric: "✓", desc: "Abacus tool, course books, premium branded bag, and academy t-shirt. Everything needed from the very first class." },
+  { icon: "💼", title: "Full Kit Day 1", metric: "✓", desc: "Abacus tool, course books, kit bag, and t-shirt. Everything needed from the very first class." },
 ];
 
 const HOW_STEPS = [
@@ -192,10 +192,10 @@ const HOW_STEPS = [
 ];
 
 const KIT_ITEMS = [
-  { icon: "🧮", name: "Professional Abacus Tool", desc: "The exact competition-grade instrument used in class and olympiads — durable, child-sized, precision-crafted." },
-  { icon: "📚", name: "Level Course Books", desc: "Level-specific structured workbooks: mental math drills, progressive exercises, and official practice sets included." },
-  { icon: "🎒", name: "Premium Talent Hub Bag", desc: "Branded premium backpack. Students wear it as a badge of belonging — and it fits every single thing they need." },
-  { icon: "👕", name: "Official Academy T-Shirt", desc: "The Talent Hub uniform, issued at day one. Worn with pride during olympiads, monthly tests, and every big event." },
+  { icon: "🧮", name: "Abacus Tool", desc: "The exact competition-grade instrument used in class and olympiads — durable & child-sized." },
+  { icon: "📚", name: "Level Course Books", desc: "Level-specific structured workbooks: mental math drills, progressive exercises, and activities included." },
+  { icon: "🎒", name: "Study Abacus Bag", desc: "Students wear it as a badge of belonging — and it fits every single thing they need." },
+  { icon: "👕", name: "Study Abacus T-Shirt", desc: "The Study Abacus uniform, issued at day one. Worn with pride during classes,  olympiads, monthly tests." },
 ];
 
 const FAQS = [
@@ -289,13 +289,10 @@ function CounterCell({ label, end, suffix = "", delay = 0 }: { label:string; end
 function StatsBar() {
   return (
     <div className="rsp-stats-grid" style={{ background:"var(--ab-surface)", border:"1px solid var(--ab-border)", borderRadius:20, display:"grid", gridTemplateColumns:"repeat(4,1fr)", overflow:"hidden", margin:"0 24px" }}>
-      <CounterCell end={10}  suffix="+"  label="Levels of Mastery" delay={0} />
-      <CounterCell end={800} suffix="+"  label="Students Trained"   delay={0.1} />
-      <CounterCell end={18}  suffix="yrs" label="Years of Excellence" delay={0.2} />
-      <div style={{ textAlign:"center", padding:"28px 20px" }}>
-        <div style={{ fontFamily:"var(--ab-font-d)", fontSize:"clamp(28px,4vw,44px)", fontWeight:800, letterSpacing:"-.04em" }}><span className="ab-grad-text">3</span></div>
-        <div style={{ fontFamily:"var(--ab-font-m)", fontSize:10, color:"var(--ab-muted)", letterSpacing:".14em", textTransform:"uppercase", marginTop:8 }}>Delhi NCR Branches</div>
-      </div>
+      <CounterCell end={10} label="Levels of Mastery"      delay={0} />
+      <CounterCell end={6}  label="Basic Levels"            delay={0.1} />
+      <CounterCell end={4}  label="Advanced Levels"         delay={0.2} />
+      <CounterCell end={4}  label="Appx Months Per Level"   delay={0.3} />
     </div>
   );
 }
@@ -308,7 +305,7 @@ function LevelMap() {
   const cur = levels[active];
 
   return (
-    <section style={{ padding:"100px 0", background:"var(--ab-bg2)", position:"relative", overflow:"hidden" }}>
+    <section style={{ padding:"100px 0", background:"var(--ab-bg)", position:"relative", overflow:"hidden" }}>
       {/* Top border accent */}
       <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:"70%", height:1, background:"linear-gradient(90deg,transparent,rgba(123,92,229,.4),transparent)" }} />
       {/* BG glow */}
@@ -484,9 +481,8 @@ function Outcomes() {
           {OUTCOMES.map((o, i) => (
             <FadeIn key={i} delay={i*0.08}>
               <div className="ab-card" style={{ padding:"30px" }}>
-                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:16 }}>
+                <div style={{ marginBottom:16 }}>
                   <div style={{ fontSize:36 }}>{o.icon}</div>
-                  <div style={{ fontFamily:"var(--ab-font-d)", fontSize:22, fontWeight:800, color:"var(--ab-muted)", letterSpacing:"-.02em" }}>{o.metric}</div>
                 </div>
                 <h3 style={{ fontFamily:"var(--ab-font-d)", fontSize:17, fontWeight:700, letterSpacing:"-.02em", marginBottom:10, color:"var(--ab-white)" }}>{o.title}</h3>
                 <p style={{ fontSize:13, lineHeight:1.75, color:"var(--ab-white2)" }}>{o.desc}</p>
@@ -502,7 +498,7 @@ function Outcomes() {
 // ─── HOW IT WORKS ────────────────────────────────────────────────────────────
 function HowItWorks() {
   return (
-    <section style={{ padding:"100px 24px", background:"var(--ab-bg2)", position:"relative" }}>
+    <section style={{ padding:"100px 24px", background:"var(--ab-bg)", position:"relative" }}>
       <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:"60%", height:1, background:"linear-gradient(90deg,transparent,rgba(123,92,229,.3),transparent)" }} />
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
         <FadeIn>
@@ -548,7 +544,7 @@ function KitSection() {
               The <span className="ab-grad-text">Complete Kit</span>
             </h2>
             <p style={{ color:"var(--ab-white2)", fontSize:15, maxWidth:400, margin:"14px auto 0", lineHeight:1.7 }}>
-              Everything in hand from Day 1. No extra purchases, no hidden costs.
+              Everything in hand from Day 1. No hidden costs.
             </p>
           </div>
         </FadeIn>
@@ -573,7 +569,7 @@ function KitSection() {
 function FAQSection() {
   const [open, setOpen] = useState<number|null>(0);
   return (
-    <section style={{ padding:"100px 24px", background:"var(--ab-bg2)" }}>
+    <section style={{ padding:"100px 24px", background:"var(--ab-bg)" }}>
       <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:"50%", height:1, background:"linear-gradient(90deg,transparent,rgba(123,92,229,.3),transparent)" }} />
       <div style={{ maxWidth:800, margin:"0 auto" }}>
         <FadeIn>
@@ -608,7 +604,7 @@ function FAQSection() {
 // ─── CTA BANNER ──────────────────────────────────────────────────────────────
 function CTABanner() {
   return (
-    <section style={{ padding:"80px 24px", background:"var(--ab-bg)" }}>
+    <section id="begin-today" style={{ padding:"80px 24px", background:"var(--ab-bg)" }}>
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
         <FadeIn>
           <div className="rsp-cta-inner" style={{ position:"relative", borderRadius:28, overflow:"hidden", background:"linear-gradient(135deg,#1e1050 0%,#110a38 50%,#0a061f 100%)", border:"1px solid rgba(123,92,229,.25)", padding:"72px 64px", boxShadow:"0 40px 100px rgba(0,0,0,.45)" }}>
@@ -627,13 +623,15 @@ function CTABanner() {
                 One free demo class. Experience the method, meet the teacher, and see 18 years of refined instruction in a single hour.
               </p>
               <div style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap", marginBottom:30 }}>
-                <button className="ab-btn-p" style={{ fontSize:15, padding:"15px 32px", background:"white", color:"#190c48", fontWeight:700 }}
+                <a href="https://wa.me/919266117055" className="ab-btn-p" style={{ fontSize:15, padding:"15px 32px", background:"white", color:"#190c48", fontWeight:700, textDecoration:"none" }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform="translateY(-3px)"; (e.currentTarget as HTMLElement).style.boxShadow="0 14px 42px rgba(255,255,255,.18)"; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform="none"; (e.currentTarget as HTMLElement).style.boxShadow="none"; }}>
-                  Book Free Session →
-                </button>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{flexShrink:0}}><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                  Get in Touch
+                </a>
                 <a href="tel:+919266117055" className="ab-btn-s" style={{ borderColor:"rgba(255,255,255,.22)", color:"rgba(255,255,255,.8)", textDecoration:"none", fontSize:15 }}>
-                  📞 +91 92661 17055
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{flexShrink:0}}><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                  Call Us
                 </a>
               </div>
               <div style={{ display:"flex", gap:28, justifyContent:"center", flexWrap:"wrap" }}>
@@ -677,7 +675,7 @@ function Hero() {
           {/* Tag pill */}
           <div style={{ opacity:loaded?1:0, transform:loaded?"none":"translateY(14px)", transition:"all .55s ease .08s", display:"inline-flex", alignItems:"center", gap:8, background:"rgba(123,92,229,.1)", border:"1px solid rgba(123,92,229,.22)", borderRadius:100, padding:"7px 16px", marginBottom:30 }}>
             <div style={{ width:7, height:7, borderRadius:"50%", background:"var(--ab-p)", animation:"ab-pulse 2s infinite" }} />
-            <span style={{ fontFamily:"var(--ab-font-m)", fontSize:11, color:"var(--ab-p2)", letterSpacing:".05em" }}>Ages 5–15 · Class 1 Onwards · 3 Delhi NCR Branches</span>
+            <span style={{ fontFamily:"var(--ab-font-m)", fontSize:11, color:"var(--ab-p2)", letterSpacing:".05em" }}>Ages 5–15 · Class 1 Onwards</span>
           </div>
 
           {/* Headline */}
@@ -695,19 +693,11 @@ function Hero() {
           </p>
 
           <div style={{ display:"flex", gap:12, flexWrap:"wrap", opacity:loaded?1:0, transition:"opacity .7s ease .42s" }}>
-            <button className="ab-btn-p">Enroll in Abacus →</button>
-            <button className="ab-btn-s">Book Free Demo Class</button>
+            <button className="ab-btn-p" onClick={() => document.getElementById('begin-today')?.scrollIntoView({behavior:'smooth'})}>Enroll in Abacus →</button>
+            <a href="/tools/soroban" className="ab-btn-s" style={{ textDecoration:"none" }}>Try Abacus Tool</a>
           </div>
 
-          {/* Mini stats */}
-          <div style={{ display:"flex", gap:32, marginTop:44, paddingTop:34, borderTop:"1px solid var(--ab-border)", opacity:loaded?1:0, transition:"opacity .8s ease .58s" }}>
-            {[["10","Levels"],["4 Mo","Per Level"],["5–15","Age Range"],["800+","Students"]].map(([v,l]) => (
-              <div key={l}>
-                <div style={{ fontFamily:"var(--ab-font-d)", fontSize:26, fontWeight:800, letterSpacing:"-.04em", color:"var(--ab-white)" }}>{v}</div>
-                <div style={{ fontFamily:"var(--ab-font-m)", fontSize:9, color:"var(--ab-muted)", letterSpacing:".12em", textTransform:"uppercase", marginTop:2 }}>{l}</div>
-              </div>
-            ))}
-          </div>
+
         </div>
 
         {/* ── RIGHT — Abacus visualizer card ── */}
@@ -718,7 +708,7 @@ function Hero() {
             {/* Scan line */}
             <div style={{ position:"absolute", left:0, right:0, height:2, background:"linear-gradient(90deg,transparent,rgba(123,92,229,.4),transparent)", animation:"ab-scan 3.5s ease-in-out infinite", pointerEvents:"none" }} />
 
-            <div className="ab-lbl" style={{ marginBottom:22 }}>Live Mental Abacus Visualizer</div>
+            <div className="ab-lbl" style={{ marginBottom:22 }}>Abacus Visualizer</div>
 
             {/* Bead grid wrapper */}
             <div style={{ background:"rgba(123,92,229,.04)", border:"1px solid rgba(123,92,229,.12)", borderRadius:18, padding:"20px 16px" }}>
@@ -729,11 +719,11 @@ function Hero() {
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginTop:24, flexWrap:"wrap", gap:12 }}>
               <div>
                 <div style={{ fontFamily:"var(--ab-font-m)", fontSize:10, color:"var(--ab-muted)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:5 }}>Mental Calculation</div>
-                <div style={{ fontFamily:"var(--ab-font-d)", fontSize:28, fontWeight:800, letterSpacing:"-.04em" }} className="ab-grad-text">4,827 + 6,394</div>
+                <div style={{ fontFamily:"var(--ab-font-d)", fontSize:28, fontWeight:800, letterSpacing:"-.04em" }} className="ab-grad-text">4827 + 6394</div>
               </div>
               <div style={{ textAlign:"right" }}>
                 <div style={{ fontFamily:"var(--ab-font-m)", fontSize:10, color:"var(--ab-muted)", letterSpacing:".1em", marginBottom:5 }}>Result</div>
-                <div style={{ fontFamily:"var(--ab-font-d)", fontSize:24, fontWeight:800, letterSpacing:"-.04em", color:"var(--ab-p3)" }}>= 11,221</div>
+                <div style={{ fontFamily:"var(--ab-font-d)", fontSize:24, fontWeight:800, letterSpacing:"-.04em", color:"var(--ab-p3)" }}>= 11221</div>
               </div>
             </div>
           </div>
@@ -743,17 +733,9 @@ function Hero() {
             🏅 Level 1–10 Track
           </div>
 
-          {/* Float badge — dark */}
-          <div style={{ position:"absolute", bottom:70, left:-28, background:"rgba(6,7,15,.94)", backdropFilter:"blur(18px)", border:"1px solid rgba(123,92,229,.22)", borderRadius:16, padding:"14px 18px", animation:"ab-float2 5s ease-in-out infinite 1.2s", boxShadow:"0 10px 32px rgba(0,0,0,.45)", zIndex:10 }}>
-            <div style={{ fontFamily:"var(--ab-font-m)", fontSize:9, color:"var(--ab-p2)", letterSpacing:".12em", textTransform:"uppercase", marginBottom:5 }}>Monthly Test</div>
-            <div style={{ fontFamily:"var(--ab-font-d)", fontSize:14, fontWeight:700, color:"white" }}>Last Sunday</div>
-          </div>
 
-          {/* Float badge — teal */}
-          <div style={{ position:"absolute", bottom:-16, right:20, background:`rgba(15,184,160,.12)`, border:`1px solid rgba(15,184,160,.25)`, backdropFilter:"blur(12px)", borderRadius:14, padding:"10px 16px", animation:"ab-float2 6s ease-in-out infinite 0.6s", zIndex:10 }}>
-            <div style={{ fontFamily:"var(--ab-font-m)", fontSize:9, color:"var(--ab-teal)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:4 }}>Olympiad Ready</div>
-            <div style={{ fontFamily:"var(--ab-font-d)", fontSize:13, fontWeight:700, color:"white" }}>From Level 1 ✓</div>
-          </div>
+
+
         </div>
       </div>
     </section>

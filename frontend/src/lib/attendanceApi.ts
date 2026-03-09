@@ -155,6 +155,7 @@ export interface SessionCreatePayload {
 }
 
 export interface BulkAttendanceItem {
+  session_id: number;          // required by AttendanceRecordCreate schema
   student_profile_id: number;
   status: AttendanceStatus;
   t_shirt_worn?: boolean;

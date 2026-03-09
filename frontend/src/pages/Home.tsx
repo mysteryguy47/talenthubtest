@@ -523,7 +523,7 @@ function WhySection() {
 function Toolkit() {
   const [, setLocation] = useLocation();
   return (
-    <section style={{ padding: "96px 24px", background: "var(--th-bg2)", position: "relative" }}>
+    <section style={{ padding: "96px 24px", background: "var(--th-bg)", position: "relative" }}>
       <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "50%", height: 1, background: "linear-gradient(90deg, transparent, var(--th-purple-glow), transparent)" }} />
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <InView>
@@ -643,7 +643,7 @@ function Testimonials() {
   const others = TESTIMONIALS.filter((_, i) => i !== active).slice(0, 2);
 
   return (
-    <section style={{ padding: "96px 24px", background: "var(--th-bg2)" }}>
+    <section style={{ padding: "96px 24px", background: "var(--th-bg)" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <InView>
           <div style={{ textAlign: "center", marginBottom: 56 }}>

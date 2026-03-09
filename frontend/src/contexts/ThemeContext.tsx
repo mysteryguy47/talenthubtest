@@ -5,7 +5,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.classList.remove("light");
     document.documentElement.classList.add("dark");
-    document.body.style.backgroundColor = "#020617";
+    document.body.style.backgroundColor = "#07070F";
     localStorage.removeItem("theme");
   }, []);
   return <>{children}</>;

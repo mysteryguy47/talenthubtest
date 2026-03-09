@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { LoadingScreen } from "../components/LoadingScreen";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
 import { getStudentDashboardData, getPracticeSessionDetail, StudentStats, PracticeSessionDetail, StudentDashboardData, getOverallLeaderboard, getWeeklyLeaderboard, LeaderboardEntry, getMyCertificates, CertificateRecord, getPointsLogs, PointsSummaryResponse } from "../lib/userApi";
@@ -248,31 +249,12 @@ export default function StudentDashboard() {
   // Removed debug logging useEffect - it was causing unnecessary re-renders and console noise
 
   if (loading) {
-    return (
-      <div style={{minHeight:"100vh",background:"#0c0e1a",paddingTop:"8rem",paddingBottom:"5rem",padding:"8rem 1.5rem 5rem"}}>
-        <div style={{maxWidth:"1280px",margin:"0 auto"}}>
-          <div style={{marginBottom:"2.5rem",display:"flex",flexDirection:"column",gap:"0.75rem"}}>
-            <div style={{height:"2.5rem",width:"18rem",background:"#1a1d30",borderRadius:"0.75rem",animation:"pulse 1.5s ease-in-out infinite"}} />
-            <div style={{height:"1.25rem",width:"24rem",background:"#1a1d30",borderRadius:"0.75rem",animation:"pulse 1.5s ease-in-out infinite"}} />
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1.5rem",marginBottom:"3rem"}}>
-            {Array.from({length:4}).map((_,i)=>(
-              <div key={`stats-skeleton-${i}`} style={{height:"9rem",background:"#131629",borderRadius:"1.5rem",animation:"pulse 1.5s ease-in-out infinite",animationDelay:`${i*0.1}s`}} />
-            ))}
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:"8fr 4fr",gap:"2rem"}}>
-            {Array.from({length:2}).map((_,i)=>(
-              <div key={`panel-skeleton-${i}`} style={{height:"14rem",background:"#131629",borderRadius:"1.5rem",animation:"pulse 1.5s ease-in-out infinite",animationDelay:`${i*0.15}s`}} />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!stats) {
     return (
-      <div style={{minHeight:"100vh",background:"#0c0e1a",display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <div style={{minHeight:"100vh",background:"#07070F",display:"flex",alignItems:"center",justifyContent:"center"}}>
         <div style={{textAlign:"center",padding:"2rem"}}>
           <div style={{width:"4rem",height:"4rem",background:"rgba(239,68,68,0.1)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 1rem",border:"2px solid rgba(239,68,68,0.3)"}}>
             <span style={{fontSize:"1.5rem"}}>⚠</span>
@@ -459,9 +441,9 @@ export default function StudentDashboard() {
   const displaySessions = showAllSessions ? filteredSessions : filteredSessions.slice(0, 5);
 
   const DB = {
-    bg: "#0c0e1a",
-    surf: "#131629",
-    surf2: "#181b2e",
+    bg: "#07070F",
+    surf: "#0c0e1a",
+    surf2: "#0f1020",
     border: "rgba(255,255,255,0.07)",
     purple: "#7c5af6",
     purpleDim: "rgba(124,90,246,0.13)",
