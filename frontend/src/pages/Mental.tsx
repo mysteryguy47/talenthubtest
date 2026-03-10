@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from "react";
-import { ArrowLeft, CheckCircle2, XCircle, Clock, Trophy, Sparkles, Play, Zap, Target, Loader2, RotateCcw, Square, Star, AlertTriangle } from "lucide-react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { ArrowLeft, CheckCircle2, XCircle, Clock, Trophy, Sparkles, Play, Zap, Target, Loader2, RotateCcw, Square, Star, AlertTriangle, Maximize, Minimize, BookOpen } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "../contexts/AuthContext";
 import { savePracticeSession, PracticeSessionData } from "../lib/userApi";
@@ -454,6 +454,9 @@ export default function Mental() {
   const [studentName, setStudentName] = useState("");
   const [studentNameError, setStudentNameError] = useState("");
   const [numQuestions, setNumQuestions] = useState(10);
+  const [showExitWarning, setShowExitWarning] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   
   // Multiplication/Division inputs
   const [multiplicandDigits, setMultiplicandDigits] = useState(2);
@@ -1842,6 +1845,54 @@ export default function Mental() {
     setSessionElapsedTime(0);
   };
 
+  const handleBack = () => {
+    if (isStarted) {
+      setShowExitWarning(true);
+    } else {
+      exitPractice();
+    }
+  };
+
+  const confirmExit = () => {
+    setShowExitWarning(false);
+    if (results.length > 0) {
+      endGame(results);
+    } else {
+      exitPractice();
+    }
+  };
+
+  // Fullscreen toggle
+  const toggleFullScreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+      setIsFullScreen(true);
+    } else {
+      document.exitFullscreen().catch(() => {});
+      setIsFullScreen(false);
+    }
+  }, []);
+
+  // Listen for fullscreen changes & F key
+  useEffect(() => {
+    const onFSChange = () => setIsFullScreen(!!document.fullscreenElement);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "f" || e.key === "F") {
+        if (!isStarted) return;
+        const tag = (e.target as HTMLElement)?.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+        e.preventDefault();
+        toggleFullScreen();
+      }
+    };
+    document.addEventListener("fullscreenchange", onFSChange);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFSChange);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [isStarted, toggleFullScreen]);
+
   const resetGame = () => {
     isProcessingSubmissionRef.current = false; // Reset processing flag
     setIsStarted(false);
@@ -2362,10 +2413,10 @@ export default function Mental() {
     // Shared sticky top bar (matches BurstMode)
     const stickyHeader = (
       <>
-        <div style={{position:"sticky",top:0,zIndex:40,background:"rgba(6,7,15,.9)",backdropFilter:"blur(20px)",borderBottom:"1px solid var(--mm-bdr)",height:64,display:"grid",gridTemplateColumns:"80px 1fr 120px",alignItems:"center",padding:"0 24px"}}>
+        <div style={{position:"sticky",top:0,zIndex:40,background:"rgba(6,7,15,.9)",backdropFilter:"blur(20px)",borderBottom:"1px solid var(--mm-bdr)",height:64,display:"grid",gridTemplateColumns:"80px 1fr 160px",alignItems:"center",padding:"0 24px"}}>
           {/* Back / exit button */}
           <button
-            onClick={exitPractice}
+            onClick={handleBack}
             title="Exit Practice"
             style={{width:36,height:36,borderRadius:10,background:"var(--mm-surf2)",border:"1px solid var(--mm-bdr)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--mm-muted)",cursor:"pointer",transition:"all .2s"}}
             onMouseEnter={e=>{const b=e.currentTarget as HTMLButtonElement;b.style.borderColor="rgba(123,92,229,.3)";b.style.color="var(--mm-pur2)";b.style.background="rgba(123,92,229,.06)";}}
@@ -2381,8 +2432,17 @@ export default function Mental() {
             </span>
           </div>
 
-          {/* Live scores */}
-          <div style={{display:"flex",alignItems:"center",gap:14,justifyContent:"flex-end"}}>
+          {/* Fullscreen + Live scores */}
+          <div style={{display:"flex",alignItems:"center",gap:10,justifyContent:"flex-end"}}>
+            <button
+              onClick={toggleFullScreen}
+              title={isFullScreen ? "Exit Fullscreen (F)" : "Fullscreen (F)"}
+              style={{width:32,height:32,borderRadius:8,background:"var(--mm-surf2)",border:"1px solid var(--mm-bdr)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--mm-muted)",cursor:"pointer",transition:"all .2s"}}
+              onMouseEnter={e=>{const b=e.currentTarget as HTMLButtonElement;b.style.borderColor="rgba(123,92,229,.3)";b.style.color="var(--mm-pur2)";}}
+              onMouseLeave={e=>{const b=e.currentTarget as HTMLButtonElement;b.style.borderColor="var(--mm-bdr)";b.style.color="var(--mm-muted)";}}
+            >
+              {isFullScreen ? <Minimize style={{width:14,height:14}} /> : <Maximize style={{width:14,height:14}} />}
+            </button>
             <div style={{display:"flex",alignItems:"center",gap:5}}>
               <span style={{fontFamily:"var(--mm-fm)",fontSize:16,fontWeight:800,color:"var(--mm-grn)"}}>{results.filter(r=>r.isCorrect).length}</span>
               <CheckCircle2 style={{width:13,height:13,color:"var(--mm-grn)"}} />
@@ -2422,11 +2482,37 @@ export default function Mental() {
       </div>
     );
 
+    // Exit warning modal
+    const exitWarningModal = showExitWarning ? (
+      <div style={{position:"fixed",inset:0,zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,.75)",backdropFilter:"blur(16px)"}}>
+        <div style={{background:"var(--mm-surf)",border:"1px solid var(--mm-bdr2)",borderRadius:24,padding:36,maxWidth:360,width:"calc(100vw - 48px)",boxShadow:"0 40px 80px rgba(0,0,0,.5)",animation:"mm-scale-in .2s ease both"}}>
+          <AlertTriangle style={{width:44,height:44,color:"var(--mm-gld)",display:"block",margin:"0 auto 16px"}} />
+          <h3 style={{fontFamily:"var(--mm-fd)",fontSize:22,fontWeight:800,textAlign:"center",color:"var(--mm-whi)",margin:"0 0 8px"}}>Exit Mental Math?</h3>
+          <p style={{fontFamily:"var(--mm-fb)",fontSize:14,color:"var(--mm-muted)",textAlign:"center",margin:"0 0 24px",lineHeight:1.6}}>
+            {results.length > 0
+              ? `You've answered ${results.length} question${results.length !== 1 ? "s" : ""}. Your progress will be saved.`
+              : "Your session will be lost."}
+          </p>
+          <div style={{display:"flex",gap:10}}>
+            <button
+              onClick={() => setShowExitWarning(false)}
+              style={{flex:1,padding:"12px 0",borderRadius:12,border:"1px solid var(--mm-bdr2)",background:"var(--mm-surf2)",fontFamily:"var(--mm-fb)",fontSize:14,fontWeight:600,color:"var(--mm-whi2)",cursor:"pointer",transition:"all .2s"}}
+            >Continue</button>
+            <button
+              onClick={confirmExit}
+              style={{flex:1,padding:"12px 0",borderRadius:12,border:"none",background:"linear-gradient(135deg, var(--mm-red), #B91C1C)",fontFamily:"var(--mm-fb)",fontSize:14,fontWeight:600,color:"white",cursor:"pointer",transition:"all .2s"}}
+            >Exit</button>
+          </div>
+        </div>
+      </div>
+    ) : null;
+
     // Handle Add/Sub question display (row by row)
     if ((currentQuestion.type === "add_sub" || currentQuestion.type === "integer_add_sub") && !isShowingAnswerTime) {
       return (
         <div style={{minHeight:"100vh",background:"var(--mm-bg)",position:"relative",display:"flex",flexDirection:"column"}}>
           <div style={{position:"fixed",inset:0,background:"radial-gradient(ellipse 50% 40% at 50% 20%, rgba(123,92,229,.05), transparent 70%)",pointerEvents:"none"}} />
+          {exitWarningModal}
           {stickyHeader}
 
           <div style={{maxWidth:720,margin:"0 auto",padding:"24px 20px 60px",flex:1,width:"100%",boxSizing:"border-box"}}>
@@ -2555,6 +2641,7 @@ export default function Mental() {
     return (
       <div style={{minHeight:"100vh",background:"var(--mm-bg)",position:"relative",display:"flex",flexDirection:"column"}}>
         <div style={{position:"fixed",inset:0,background:"radial-gradient(ellipse 50% 40% at 50% 20%, rgba(123,92,229,.05), transparent 70%)",pointerEvents:"none"}} />
+        {exitWarningModal}
         {stickyHeader}
 
         <div style={{maxWidth:640,margin:"0 auto",padding:"24px 20px 60px",flex:1,width:"100%",boxSizing:"border-box"}}>
@@ -2663,6 +2750,44 @@ export default function Mental() {
   return (
     <div style={{minHeight:"100vh",background:"var(--mm-bg)"}}>
 
+      {/* Guide Modal */}
+      {showGuide && (
+        <div style={{position:"fixed",inset:0,zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,.75)",backdropFilter:"blur(16px)"}}>
+          <div style={{background:"var(--mm-surf)",border:"1px solid var(--mm-bdr2)",borderRadius:24,padding:0,maxWidth:520,width:"calc(100vw - 40px)",maxHeight:"85vh",boxShadow:"0 40px 80px rgba(0,0,0,.5)",animation:"mm-scale-in .2s ease both",display:"flex",flexDirection:"column"}}>
+            <div style={{padding:"28px 32px 0",flexShrink:0}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
+                <div style={{display:"flex",alignItems:"center",gap:10}}>
+                  <div style={{width:36,height:36,borderRadius:10,background:"rgba(123,92,229,.15)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                    <BookOpen style={{width:18,height:18,color:"var(--mm-pur2)"}} />
+                  </div>
+                  <h3 style={{fontFamily:"var(--mm-fd)",fontSize:20,fontWeight:800,color:"var(--mm-whi)",margin:0}}>How to Practice</h3>
+                </div>
+                <button onClick={() => setShowGuide(false)} style={{width:32,height:32,borderRadius:8,border:"1px solid var(--mm-bdr2)",background:"var(--mm-surf2)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"var(--mm-muted)",fontSize:16,fontWeight:700}}>✕</button>
+              </div>
+            </div>
+            <div style={{padding:"0 32px 28px",overflowY:"auto",flex:1}}>
+              {[
+                {step:"1",title:"Enter Your Name",desc:"Type your name so your session results and points can be tracked."},
+                {step:"2",title:"Choose Operation",desc:"Select the math operation you want to practice — Multiplication, Division, Add/Sub, Decimals, LCM, GCD, Roots, or Percentages."},
+                {step:"3",title:"Select Config Mode",desc:"Standard mode uses verified presets that earn points. Custom mode gives full control but earns 0 points."},
+                {step:"4",title:"Pick Difficulty / Presets",desc:"In Standard mode, choose a preset (Easy/Medium/Hard) that sets digits automatically. Use the time slider to adjust speed. Easy/Medium/Hard/Custom buttons control the timer preset."},
+                {step:"5",title:"Set Question Count",desc:"Choose 1–50 questions. You need at least 10 questions in Standard mode to earn points."},
+                {step:"6",title:"Start & Solve",desc:"Hit Start Practice. A 3-2-1 countdown begins, then questions appear one by one. Type your answer and press Enter or click Submit. For Add/Sub, numbers flash one at a time — watch carefully and answer at the end."},
+                {step:"7",title:"Fullscreen & Review",desc:"Press F during a session to toggle fullscreen for distraction-free practice. After finishing, review your results — correct, wrong, and missed answers are shown with the right answers."},
+              ].map(({step,title,desc}) => (
+                <div key={step} style={{display:"flex",gap:14,marginBottom:18}}>
+                  <div style={{width:28,height:28,borderRadius:8,background:"rgba(123,92,229,.12)",border:"1px solid rgba(123,92,229,.2)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"var(--mm-fm)",fontSize:12,fontWeight:700,color:"var(--mm-pur2)",flexShrink:0}}>{step}</div>
+                  <div>
+                    <div style={{fontFamily:"var(--mm-fd)",fontSize:14,fontWeight:700,color:"var(--mm-whi)",marginBottom:3}}>{title}</div>
+                    <div style={{fontFamily:"var(--mm-fb)",fontSize:13,color:"var(--mm-muted)",lineHeight:1.5}}>{desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hero banner — Glow Crown */}
       <div style={{position:"relative",overflow:"hidden",borderRadius:"0 0 28px 28px",padding:"52px 32px 56px",background:"linear-gradient(145deg,#12103A 0%,#1A1050 40%,#0E0B28 100%)",borderBottom:"1px solid rgba(123,92,229,.2)"}}>
         {/* Atmospheric glow */}
@@ -2676,7 +2801,16 @@ export default function Mental() {
             <Sparkles style={{width:28,height:28,color:"var(--mm-pur2)"}} />
           </div>
           <h1 style={{fontFamily:"var(--mm-fd)",fontSize:"clamp(28px,4vw,44px)",fontWeight:800,color:"var(--mm-whi)",margin:"0 0 10px",letterSpacing:"-.03em"}}>Mental Math Practice</h1>
-          <p style={{fontFamily:"var(--mm-fb)",fontSize:16,fontWeight:300,color:"rgba(255,255,255,.5)",margin:0}}>Challenge yourself with timed questions</p>
+          <p style={{fontFamily:"var(--mm-fb)",fontSize:16,fontWeight:300,color:"rgba(255,255,255,.5)",margin:"0 0 16px"}}>Challenge yourself with timed questions</p>
+          <button
+            onClick={() => setShowGuide(true)}
+            style={{display:"inline-flex",alignItems:"center",gap:6,padding:"8px 18px",borderRadius:10,border:"1px solid rgba(123,92,229,.3)",background:"rgba(123,92,229,.1)",fontFamily:"var(--mm-fm)",fontSize:12,fontWeight:600,color:"var(--mm-pur2)",cursor:"pointer",transition:"all .2s",letterSpacing:".02em"}}
+            onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.background="rgba(123,92,229,.2)";(e.currentTarget as HTMLButtonElement).style.borderColor="rgba(123,92,229,.5)"}}
+            onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.background="rgba(123,92,229,.1)";(e.currentTarget as HTMLButtonElement).style.borderColor="rgba(123,92,229,.3)"}}
+          >
+            <BookOpen style={{width:14,height:14}} />
+            How to Use
+          </button>
         </div>
       </div>
 
@@ -2688,7 +2822,7 @@ export default function Mental() {
 
                 {/* Student Name */}
                 <div>
-                  <label style={{display:"flex",alignItems:"center",gap:6,fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>
+                  <label style={{display:"flex",alignItems:"center",gap:6,fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>
                     <span style={{width:5,height:5,borderRadius:"50%",background:"var(--mm-red)",flexShrink:0}} />
                     Your Name
                   </label>
@@ -2722,7 +2856,7 @@ export default function Mental() {
 
                 {/* Operation Type */}
                 <div>
-                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Operation Type</label>
+                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Operation Type</label>
                   <select
                     value={operationType}
                     onChange={(e) => setOperationType(e.target.value as OperationType)}
@@ -2749,7 +2883,7 @@ export default function Mental() {
 
             {/* Standard / Custom Toggle */}
             <div>
-              <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Config Mode</label>
+              <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Config Mode</label>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:0,background:"var(--mm-surf2)",borderRadius:12,padding:3,border:"1.5px solid var(--mm-bdr2)"}}>
                 {(["standard","custom"] as ConfigMode[]).map(m => (
                   <button key={m} onClick={() => setConfigMode(m)} style={{
@@ -2779,7 +2913,7 @@ export default function Mental() {
 
             {/* Number of Questions */}
                 <div>
-                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Number of Questions <span style={{fontWeight:400,opacity:.6}}>(1–50)</span></label>
+                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Number of Questions <span style={{fontWeight:400,opacity:.6}}>(1–50)</span></label>
               <NumericInput
                 value={numQuestions}
                 onChange={setNumQuestions}
@@ -2815,7 +2949,7 @@ export default function Mental() {
                     /* Add/Sub & Integer Add/Sub: free-form digit + row inputs */
                     <>
                       <div>
-                        <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Number of Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
+                        <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Number of Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
                         <NumericInput
                           value={curDigits}
                           onChange={setDigits}
@@ -2826,7 +2960,7 @@ export default function Mental() {
                         />
                       </div>
                       <div>
-                        <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Number of Rows <span style={{fontWeight:400,opacity:.6}}>(3–20)</span></label>
+                        <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Number of Rows <span style={{fontWeight:400,opacity:.6}}>(3–20)</span></label>
                         <NumericInput
                           value={curRows}
                           onChange={setRows}
@@ -2840,7 +2974,7 @@ export default function Mental() {
                   ) : (
                     /* All other operations: preset tile grid */
                     <div>
-                      <label style={{display:"flex",alignItems:"center",gap:6,fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:10}}>
+                      <label style={{display:"flex",alignItems:"center",gap:6,fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:10}}>
                         <Star style={{width:12,height:12,color:"#F59E0B"}} />
                         Select Difficulty Preset
                       </label>
@@ -2927,7 +3061,7 @@ export default function Mental() {
                 {operationType === "multiplication" ? (
                   <>
                     <div>
-                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Multiplicand Digits <span style={{fontWeight:400,opacity:.6}}>(2–10)</span></label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Multiplicand Digits <span style={{fontWeight:400,opacity:.6}}>(2–10)</span></label>
                       <NumericInput
                         value={multiplicandDigits}
                         onChange={setMultiplicandDigits}
@@ -2938,7 +3072,7 @@ export default function Mental() {
                       />
                     </div>
                     <div>
-                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Multiplier Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Multiplier Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
                       <NumericInput
                         value={multiplierDigits}
                         onChange={setMultiplierDigits}
@@ -2952,7 +3086,7 @@ export default function Mental() {
                 ) : (
                   <>
                     <div>
-                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Dividend Digits <span style={{fontWeight:400,opacity:.6}}>(2–10)</span></label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Dividend Digits <span style={{fontWeight:400,opacity:.6}}>(2–10)</span></label>
                       <NumericInput
                         value={dividendDigits}
                         onChange={setDividendDigits}
@@ -2963,7 +3097,7 @@ export default function Mental() {
                       />
                     </div>
                     <div>
-                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Divisor Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Divisor Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
                       <NumericInput
                         value={divisorDigits}
                         onChange={setDivisorDigits}
@@ -2992,7 +3126,7 @@ export default function Mental() {
             {operationType === "decimal_multiplication" && (
               <>
                 <div>
-                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Multiplicand Digits <span style={{fontWeight:400,opacity:.6}}>(2–20)</span></label>
+                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Multiplicand Digits <span style={{fontWeight:400,opacity:.6}}>(2–20)</span></label>
                     <NumericInput
                       value={decimalMultMultiplicandDigits}
                       onChange={setDecimalMultMultiplicandDigits}
@@ -3003,7 +3137,7 @@ export default function Mental() {
                     />
                 </div>
                 <div>
-                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Multiplier Digits <span style={{fontWeight:400,opacity:.6}}>(0–20, 0 = whole)</span></label>
+                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Multiplier Digits <span style={{fontWeight:400,opacity:.6}}>(0–20, 0 = whole)</span></label>
                     <NumericInput
                       value={decimalMultMultiplierDigits}
                       onChange={setDecimalMultMultiplierDigits}
@@ -3029,7 +3163,7 @@ export default function Mental() {
             {operationType === "decimal_division" && (
               <>
                 <div>
-                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Dividend Digits <span style={{fontWeight:400,opacity:.6}}>(2–20)</span></label>
+                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Dividend Digits <span style={{fontWeight:400,opacity:.6}}>(2–20)</span></label>
                     <NumericInput
                       value={decimalDivDividendDigits}
                       onChange={setDecimalDivDividendDigits}
@@ -3040,7 +3174,7 @@ export default function Mental() {
                     />
                     </div>
                     <div>
-                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Divisor Digits <span style={{fontWeight:400,opacity:.6}}>(1–20)</span></label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Divisor Digits <span style={{fontWeight:400,opacity:.6}}>(1–20)</span></label>
                       <NumericInput
                         value={decimalDivDivisorDigits}
                         onChange={setDecimalDivDivisorDigits}
@@ -3066,7 +3200,7 @@ export default function Mental() {
             {operationType === "integer_add_sub" && (
               <>
                     <div>
-                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Number of Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Number of Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
                     <NumericInput
                       value={integerAddSubDigits}
                       onChange={setIntegerAddSubDigits}
@@ -3077,7 +3211,7 @@ export default function Mental() {
                     />
                     </div>
                     <div>
-                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Number of Rows <span style={{fontWeight:400,opacity:.6}}>(3–20)</span></label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Number of Rows <span style={{fontWeight:400,opacity:.6}}>(3–20)</span></label>
                       <NumericInput
                         value={integerAddSubRows}
                         onChange={setIntegerAddSubRows}
@@ -3104,7 +3238,7 @@ export default function Mental() {
             {(operationType === "lcm" || operationType === "gcd") && (
               <>
                     <div>
-                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>First Number Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>First Number Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
                     <NumericInput
                       value={lcmGcdFirstDigits}
                       onChange={setLcmGcdFirstDigits}
@@ -3115,7 +3249,7 @@ export default function Mental() {
                     />
                     </div>
                     <div>
-                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Second Number Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Second Number Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
                       <NumericInput
                         value={lcmGcdSecondDigits}
                         onChange={setLcmGcdSecondDigits}
@@ -3141,7 +3275,7 @@ export default function Mental() {
             {(operationType === "square_root" || operationType === "cube_root") && (
               <>
                 <div>
-                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Root Digits <span style={{fontWeight:400,opacity:.6}}>(2–30)</span></label>
+                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Root Digits <span style={{fontWeight:400,opacity:.6}}>(2–30)</span></label>
                     <NumericInput
                       value={rootDigits}
                       onChange={setRootDigits}
@@ -3167,7 +3301,7 @@ export default function Mental() {
             {operationType === "percentage" && (
               <>
                     <div>
-                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Percentage Min <span style={{fontWeight:400,opacity:.6}}>(1–100)</span></label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Percentage Min <span style={{fontWeight:400,opacity:.6}}>(1–100)</span></label>
                     <NumericInput
                       value={percentageMin}
                       onChange={setPercentageMin}
@@ -3178,7 +3312,7 @@ export default function Mental() {
                     />
                     </div>
                     <div>
-                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Percentage Max <span style={{fontWeight:400,opacity:.6}}>(1–100)</span></label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Percentage Max <span style={{fontWeight:400,opacity:.6}}>(1–100)</span></label>
                       <NumericInput
                         value={percentageMax}
                         onChange={setPercentageMax}
@@ -3189,7 +3323,7 @@ export default function Mental() {
                     />
                     </div>
                     <div>
-                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Number Digits <span style={{fontWeight:400,opacity:.6}}>(2–10)</span></label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Number Digits <span style={{fontWeight:400,opacity:.6}}>(2–10)</span></label>
                       <NumericInput
                         value={percentageNumberDigits}
                         onChange={setPercentageNumberDigits}
@@ -3215,7 +3349,7 @@ export default function Mental() {
             {operationType === "add_sub" && (
               <>
                 <div>
-                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Number of Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
+                  <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Number of Digits <span style={{fontWeight:400,opacity:.6}}>(1–10)</span></label>
                     <NumericInput
                       value={addSubDigits}
                       onChange={setAddSubDigits}
@@ -3226,7 +3360,7 @@ export default function Mental() {
                     />
                     </div>
                     <div>
-                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"var(--mm-muted)",marginBottom:8}}>Number of Rows <span style={{fontWeight:400,opacity:.6}}>(3–20)</span></label>
+                      <label style={{display:"block",fontFamily:"var(--mm-fm)",fontSize:10,fontWeight:600,letterSpacing:".14em",textTransform:"uppercase",color:"#c8cce0",marginBottom:8}}>Number of Rows <span style={{fontWeight:400,opacity:.6}}>(3–20)</span></label>
                       <NumericInput
                         value={addSubRows}
                         onChange={setAddSubRows}

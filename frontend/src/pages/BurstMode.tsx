@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Zap, ArrowLeft, CheckCircle2, XCircle, Clock, Trophy, Flame, RotateCcw, Play, AlertTriangle } from "lucide-react";
+import { Zap, ArrowLeft, CheckCircle2, XCircle, Clock, Trophy, Flame, RotateCcw, Play, AlertTriangle, Maximize, Minimize, BookOpen, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "../contexts/AuthContext";
 import { savePracticeSession, PracticeSessionData } from "../lib/userApi";
@@ -52,14 +52,14 @@ const BURST_DURATION = 60; // 60 seconds
 const BURST_OPERATIONS: Record<BurstOperationType, BurstConfig> = {
   burst_tables: {
     label: "Tables",
-    description: "Speed through multiplication tables",
+    description: "",
     icon: "📊",
     gradient: "from-violet-500 to-purple-600",
     options: [{ label: "1 × 1", value: "1x1" }],
   },
   burst_multiplication: {
     label: "Multiplication",
-    description: "Rapid-fire multiplication",
+    description: "",
     icon: "✖️",
     gradient: "from-blue-500 to-cyan-500",
     options: [
@@ -73,7 +73,7 @@ const BURST_OPERATIONS: Record<BurstOperationType, BurstConfig> = {
   },
   burst_division: {
     label: "Division",
-    description: "Quick division challenges",
+    description: "",
     icon: "➗",
     gradient: "from-emerald-500 to-teal-500",
     options: [
@@ -86,8 +86,8 @@ const BURST_OPERATIONS: Record<BurstOperationType, BurstConfig> = {
     ],
   },
   burst_decimal_multiplication: {
-    label: "Decimal ×",
-    description: "Decimal multiplication sprint",
+    label: "Decimal Multiplication",
+    description: "",
     icon: "🔢",
     gradient: "from-amber-500 to-orange-500",
     options: [
@@ -100,8 +100,8 @@ const BURST_OPERATIONS: Record<BurstOperationType, BurstConfig> = {
     ],
   },
   burst_decimal_division: {
-    label: "Decimal ÷",
-    description: "Decimal division race",
+    label: "Decimal Division",
+    description: "",
     icon: "📐",
     gradient: "from-rose-500 to-pink-500",
     options: [
@@ -115,7 +115,7 @@ const BURST_OPERATIONS: Record<BurstOperationType, BurstConfig> = {
   },
   burst_lcm: {
     label: "LCM",
-    description: "Least Common Multiple blitz",
+    description: "",
     icon: "🔗",
     gradient: "from-indigo-500 to-blue-600",
     options: [
@@ -127,7 +127,7 @@ const BURST_OPERATIONS: Record<BurstOperationType, BurstConfig> = {
   },
   burst_gcd: {
     label: "GCD",
-    description: "Greatest Common Divisor rush",
+    description: "",
     icon: "🎯",
     gradient: "from-sky-500 to-blue-500",
     options: [
@@ -139,7 +139,7 @@ const BURST_OPERATIONS: Record<BurstOperationType, BurstConfig> = {
   },
   burst_square_root: {
     label: "Square Root",
-    description: "Perfect square root speed",
+    description: "",
     icon: "√",
     gradient: "from-fuchsia-500 to-purple-600",
     options: [
@@ -154,7 +154,7 @@ const BURST_OPERATIONS: Record<BurstOperationType, BurstConfig> = {
   },
   burst_cube_root: {
     label: "Cube Root",
-    description: "Perfect cube root challenge",
+    description: "",
     icon: "∛",
     gradient: "from-lime-500 to-green-600",
     options: [
@@ -168,7 +168,7 @@ const BURST_OPERATIONS: Record<BurstOperationType, BurstConfig> = {
   },
   burst_percentage: {
     label: "Percentage",
-    description: "Percentage calculation frenzy",
+    description: "",
     icon: "%",
     gradient: "from-teal-500 to-emerald-600",
     options: [
@@ -472,6 +472,8 @@ export default function BurstMode() {
   // Backend-synced points (overrides local estimate once save completes)
   const [backendPoints, setBackendPoints] = useState<number | null>(null);
   const [exitConfirm, setExitConfirm] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
   // Refs
   const inputRef = useRef<HTMLInputElement>(null);
@@ -519,7 +521,7 @@ export default function BurstMode() {
       @keyframes bm-lightning-in { from{opacity:0;transform:rotate(-10deg) scale(.6)} to{opacity:1;transform:rotate(0) scale(1)} }
       @keyframes bm-bg-breathe { 0%,100%{opacity:.6} 50%{opacity:1} }
       @keyframes bm-card-hover-glow { 0%,100%{box-shadow:0 0 20px rgba(249,115,22,0)} 50%{box-shadow:0 0 28px rgba(249,115,22,.18)} }
-      .bm-mode-card { all: unset; display: block; box-sizing: border-box; }
+      .bm-mode-card { all: unset; display: block; box-sizing: border-box; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease !important; }
       .bm-mode-card:hover { transform: translateY(-6px) !important; border-color: rgba(249,115,22,.3) !important; box-shadow: 0 16px 48px rgba(0,0,0,.35), 0 0 32px rgba(249,115,22,.08) !important; animation: bm-card-hover-glow 2s ease infinite !important; }
       .bm-mode-card:active { transform: translateY(-3px) scale(.98) !important; }
       .bm-mode-card:hover .bm-card-accent { opacity: 1 !important; }
@@ -554,6 +556,7 @@ export default function BurstMode() {
     const config = BURST_OPERATIONS[op];
     setSelectedOption(config.options[0].value);
     setPhase("config");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // ── Start game ───────────────────────────────────────────────────────────
@@ -571,6 +574,7 @@ export default function BurstMode() {
     setBackendPoints(null);     // Reset backend-synced points
     setExitConfirm(false);
     recentTextsRef.current = [];
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Countdown effect
@@ -784,6 +788,37 @@ export default function BurstMode() {
     if (timerRef.current) clearInterval(timerRef.current);
   };
 
+  // Fullscreen toggle
+  const toggleFullScreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+      setIsFullScreen(true);
+    } else {
+      document.exitFullscreen().catch(() => {});
+      setIsFullScreen(false);
+    }
+  }, []);
+
+  // Listen for fullscreen changes & F key
+  useEffect(() => {
+    const onFSChange = () => setIsFullScreen(!!document.fullscreenElement);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "f" || e.key === "F") {
+        if (phase !== "playing") return;
+        const tag = (e.target as HTMLElement)?.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+        e.preventDefault();
+        toggleFullScreen();
+      }
+    };
+    document.addEventListener("fullscreenchange", onFSChange);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFSChange);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [phase, toggleFullScreen]);
+
   // ── Computed ─────────────────────────────────────────────────────────────
 
   const correctCount = results.filter((r) => r.isCorrect).length;
@@ -797,6 +832,43 @@ export default function BurstMode() {
   if (phase === "select") {
     return (
       <div style={{ minHeight: "100vh", background: "var(--bm-bg)", position: "relative", overflowX: "hidden" }}>
+
+        {/* Tutorial Guide Modal */}
+        {showGuide && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,.75)", backdropFilter: "blur(16px)" }}>
+            <div style={{ background: "var(--bm-surf)", border: "1px solid var(--bm-bdr)", borderRadius: 24, padding: 0, maxWidth: 520, width: "calc(100vw - 40px)", maxHeight: "85vh", boxShadow: "0 40px 80px rgba(0,0,0,.5)", animation: "bm-scale-in .2s ease both", display: "flex", flexDirection: "column" }}>
+              <div style={{ padding: "28px 32px 0", flexShrink: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(249,115,22,.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <BookOpen style={{ width: 18, height: 18, color: "var(--bm-burst2)" }} />
+                    </div>
+                    <h3 style={{ fontFamily: "var(--bm-fd)", fontSize: 20, fontWeight: 800, color: "var(--bm-white)", margin: 0 }}>How to Use Burst Mode</h3>
+                  </div>
+                  <button onClick={() => setShowGuide(false)} style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid var(--bm-bdr)", background: "var(--bm-surf2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--bm-muted)", fontSize: 16, fontWeight: 700 }}>✕</button>
+                </div>
+              </div>
+              <div style={{ padding: "0 32px 28px", overflowY: "auto", flex: 1 }}>
+                {[
+                  { step: "1", title: "Select a Mode", desc: "Choose one of the 10 available math operations to practice — Multiplication, Division, Decimals, LCM, GCD, and more." },
+                  { step: "2", title: "Pick Difficulty", desc: "Select your preferred difficulty level (Easy, Medium, or Hard) to match your skill level." },
+                  { step: "3", title: "Start the Burst", desc: "Click 'Start Burst' to begin. A 3-2-1 countdown will prepare you for the challenge." },
+                  { step: "4", title: "Answer Quickly", desc: "You have 60 seconds to answer as many questions as possible. Type your answer and press Enter or click the arrow button." },
+                  { step: "5", title: "Track Your Progress", desc: "Watch the timer and your score update in real-time as you solve each question correctly." },
+                  { step: "6", title: "Review Results", desc: "When time's up, review your final score, accuracy, and see which answers you got right or wrong." },
+                ].map(({ step, title, desc }) => (
+                  <div key={step} style={{ display: "flex", gap: 14, marginBottom: 18 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(249,115,22,.12)", border: "1px solid rgba(249,115,22,.2)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--bm-fm)", fontSize: 12, fontWeight: 700, color: "var(--bm-burst2)", flexShrink: 0 }}>{step}</div>
+                    <div>
+                      <div style={{ fontFamily: "var(--bm-fd)", fontSize: 14, fontWeight: 700, color: "var(--bm-white)", marginBottom: 3 }}>{title}</div>
+                      <div style={{ fontFamily: "var(--bm-fb)", fontSize: 13, color: "var(--bm-muted)", lineHeight: 1.5 }}>{desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Hero banner — Glow Crown */}
         <div style={{ position: "relative", overflow: "hidden", borderRadius: "0 0 28px 28px", padding: "52px 32px 56px", background: "linear-gradient(145deg, #1A1008 0%, #1F1510 40%, #0E0B08 100%)", borderBottom: "1px solid rgba(249,115,22,.2)" }}>
@@ -819,13 +891,37 @@ export default function BurstMode() {
             <p style={{ fontFamily: "var(--bm-fb)", fontSize: 16, fontWeight: 300, color: "rgba(255,255,255,.5)", margin: "0 0 16px" }}>
               60 seconds. Unlimited questions. Push your speed to the limit.
             </p>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--bm-burstdim)", border: "1px solid rgba(249,115,22,.22)", borderRadius: 100, padding: "6px 16px", fontFamily: "var(--bm-fm)", fontSize: 12, color: "var(--bm-burst2)" }}>
-              ⚡ 10 modes available · 60s each
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--bm-burstdim)", border: "1px solid rgba(249,115,22,.22)", borderRadius: 100, padding: "6px 16px", fontFamily: "var(--bm-fm)", fontSize: 12, color: "var(--bm-burst2)" }}>
+                ⚡ 10 modes available · 60s each
+              </div>
+              <button
+                onClick={() => setShowGuide(true)}
+                style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 10, border: "1px solid rgba(249,115,22,.25)", background: "rgba(249,115,22,.08)", fontFamily: "var(--bm-fm)", fontSize: 11, fontWeight: 600, color: "var(--bm-burst2)", cursor: "pointer", transition: "all .2s", letterSpacing: ".02em" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(249,115,22,.15)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(249,115,22,.4)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(249,115,22,.08)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(249,115,22,.25)"; }}
+              >
+                <BookOpen style={{ width: 13, height: 13 }} />
+                How to Use
+              </button>
             </div>
           </div>
         </div>
 
         <div style={{ position: "relative", zIndex: 1 }}>
+
+          {/* Back to Dashboard - moved above cards on left */}
+          <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 20px" }}>
+            <Link href="/dashboard">
+              <span
+                style={{ display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "var(--bm-fb)", fontSize: 14, fontWeight: 500, color: "var(--bm-muted)", textDecoration: "none", cursor: "pointer", transition: "color .2s, gap .2s" }}
+                onMouseEnter={(e) => { const el = e.currentTarget as HTMLSpanElement; el.style.color = "var(--bm-white2)"; el.style.gap = "10px"; }}
+                onMouseLeave={(e) => { const el = e.currentTarget as HTMLSpanElement; el.style.color = "var(--bm-muted)"; el.style.gap = "8px"; }}
+              >
+                ← Back to Dashboard
+              </span>
+            </Link>
+          </div>
 
           {/* Mode cards grid */}
           <div className="bm-modes-grid" style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px 16px" }}>
@@ -863,24 +959,10 @@ export default function BurstMode() {
                     {config.icon}
                   </div>
                   <div style={{ fontFamily: "var(--bm-fd)", fontSize: 16, fontWeight: 700, color: "var(--bm-white)", marginBottom: 6, lineHeight: 1.2 }}>{config.label}</div>
-                  <div style={{ fontFamily: "var(--bm-fb)", fontSize: 12, fontWeight: 300, color: "var(--bm-muted)", lineHeight: 1.5 }}>{config.description}</div>
                 </button>
                 );
               }
             )}
-          </div>
-
-          {/* Back link */}
-          <div style={{ textAlign: "center", margin: "40px 0 24px" }}>
-            <Link href="/dashboard">
-              <span
-                style={{ display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "var(--bm-fb)", fontSize: 14, fontWeight: 500, color: "var(--bm-muted)", textDecoration: "none", cursor: "pointer", transition: "color .2s, gap .2s" }}
-                onMouseEnter={(e) => { const el = e.currentTarget as HTMLSpanElement; el.style.color = "var(--bm-white2)"; el.style.gap = "12px"; }}
-                onMouseLeave={(e) => { const el = e.currentTarget as HTMLSpanElement; el.style.color = "var(--bm-muted)"; el.style.gap = "8px"; }}
-              >
-                ← Back to Dashboard
-              </span>
-            </Link>
           </div>
         </div>
       </div>
@@ -1057,7 +1139,7 @@ export default function BurstMode() {
         )}
 
         {/* Top bar */}
-        <div style={{ position: "sticky", top: 0, zIndex: 10, background: "rgba(6,7,15,.9)", backdropFilter: "blur(20px)", borderBottom: "1px solid var(--bm-bdr)", height: 64, display: "grid", gridTemplateColumns: "80px 1fr 120px", alignItems: "center", padding: "0 24px" }}>
+        <div style={{ position: "sticky", top: 0, zIndex: 10, background: "rgba(6,7,15,.9)", backdropFilter: "blur(20px)", borderBottom: "1px solid var(--bm-bdr)", height: 64, display: "grid", gridTemplateColumns: "80px 1fr 160px", alignItems: "center", padding: "0 24px" }}>
           {/* Back button */}
           <button
             onClick={handleBack}
@@ -1075,8 +1157,17 @@ export default function BurstMode() {
             </span>
           </div>
 
-          {/* Live scores */}
-          <div style={{ display: "flex", alignItems: "center", gap: 14, justifyContent: "flex-end" }}>
+          {/* Fullscreen + Live scores */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "flex-end" }}>
+            <button
+              onClick={toggleFullScreen}
+              title={isFullScreen ? "Exit Fullscreen (F)" : "Fullscreen (F)"}
+              style={{ width: 32, height: 32, borderRadius: 8, background: "var(--bm-surf2)", border: "1px solid var(--bm-bdr)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--bm-muted)", cursor: "pointer", transition: "all .2s" }}
+              onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor = "rgba(249,115,22,.3)"; b.style.color = "var(--bm-burst2)"; }}
+              onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor = "var(--bm-bdr)"; b.style.color = "var(--bm-muted)"; }}
+            >
+              {isFullScreen ? <Minimize style={{ width: 14, height: 14 }} /> : <Maximize style={{ width: 14, height: 14 }} />}
+            </button>
             <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
               <span style={{ fontFamily: "var(--bm-fm)", fontSize: 16, fontWeight: 800, color: "var(--bm-green)" }}>{correctCount}</span>
               <CheckCircle2 style={{ width: 13, height: 13, color: "var(--bm-green)" }} />
@@ -1119,33 +1210,35 @@ export default function BurstMode() {
 
             {/* Answer input row */}
             <div style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", maxWidth: 500, margin: "0 auto" }}>
-              <input
-                ref={inputRef}
-                type="text"
-                inputMode="decimal"
-                value={userInput}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  if (v === "" || v === "-" || v === "." || v === "-." || /^-?\d*\.?\d*$/.test(v)) {
-                    setUserInput(v);
-                  }
-                }}
-                onKeyDown={handleKeyDown}
-                placeholder="?"
-                autoComplete="off"
-                className={`bm-input${flashColor === "green" ? " correct" : flashColor === "red" ? " wrong" : ""}`}
-                style={{ flex: 1 }}
-              />
-              <button
-                onClick={handleSubmit}
-                style={{ all: "unset", padding: "14px 24px", borderRadius: 14, background: "linear-gradient(135deg, var(--bm-green), #059669)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer", fontFamily: "var(--bm-fd)", fontSize: 15, fontWeight: 800, color: "#fff", transition: "all .2s ease", flexShrink: 0, boxSizing: "border-box", boxShadow: "0 4px 16px rgba(16,185,129,.2)", letterSpacing: "-.01em" } as React.CSSProperties}
-                onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = "translateY(-2px)"; b.style.boxShadow = "0 8px 28px rgba(16,185,129,.35)"; }}
-                onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = ""; b.style.boxShadow = "0 4px 16px rgba(16,185,129,.2)"; }}
-                onMouseDown={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = "scale(.96)"; }}
-                onMouseUp={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = ""; }}
-              >
-                Submit
-              </button>
+              <div style={{ position: "relative", flex: 1 }}>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  inputMode="decimal"
+                  value={userInput}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === "" || v === "-" || v === "." || v === "-." || /^-?\d*\.?\d*$/.test(v)) {
+                      setUserInput(v);
+                    }
+                  }}
+                  onKeyDown={handleKeyDown}
+                  placeholder="?"
+                  autoComplete="off"
+                  className={`bm-input${flashColor === "green" ? " correct" : flashColor === "red" ? " wrong" : ""}`}
+                  style={{ flex: 1, paddingRight: 56 }}
+                />
+                <button
+                  onClick={handleSubmit}
+                  style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg, var(--bm-green), #059669)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff", transition: "all .2s ease", boxShadow: "0 4px 16px rgba(16,185,129,.2)" } as React.CSSProperties}
+                  onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = "translateY(-50%) scale(1.05)"; b.style.boxShadow = "0 6px 20px rgba(16,185,129,.35)"; }}
+                  onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.transform = "translateY(-50%)"; b.style.boxShadow = "0 4px 16px rgba(16,185,129,.2)"; }}
+                  onMouseDown={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-50%) scale(.96)"; }}
+                  onMouseUp={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-50%)"; }}
+                >
+                  <ChevronRight style={{ width: 20, height: 20 }} />
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -247,11 +247,11 @@ function StatCell({ end, suffix="", label, last=false }: { end:number;suffix?:st
   const { ref, inView } = useInView();
   const count = useCounter(end, 1400, inView);
   return (
-    <div ref={ref} style={{ textAlign:"center", padding:"26px 16px", borderRight:last?"none":"1px solid var(--st-bdr)" }}>
-      <div style={{ fontFamily:"var(--st-font-d)", fontSize:"clamp(26px,3.2vw,38px)", fontWeight:800, letterSpacing:"-.04em", lineHeight:1 }} className="st-orange-text">
+    <div ref={ref} style={{ textAlign:"center", padding:"22px 12px", borderRight:last?"none":"1px solid var(--st-bdr)" }}>
+      <div style={{ fontFamily:"var(--st-font-d)", fontSize:"clamp(20px,2.4vw,30px)", fontWeight:800, letterSpacing:"-.04em", lineHeight:1.1 }} className="st-orange-text">
         {count}{suffix}
       </div>
-      <div style={{ fontFamily:"var(--st-font-m)", fontSize:9, color:"var(--st-muted)", letterSpacing:".14em", textTransform:"uppercase", marginTop:7 }}>{label}</div>
+      <div style={{ fontFamily:"var(--st-font-m)", fontSize:9, color:"var(--st-muted)", letterSpacing:".14em", textTransform:"uppercase", marginTop:6 }}>{label}</div>
     </div>
   );
 }
@@ -259,17 +259,17 @@ function StatsBar() {
   return (
     <div className="rsp-stats-grid" style={{ background:"var(--st-surf)", border:"1px solid var(--st-bdr)", borderRadius:18, display:"grid", gridTemplateColumns:"repeat(4,1fr)", overflow:"hidden" }}>
       <StatCell end={5} label="Courses Available" />
-      <div style={{ textAlign:"center", padding:"26px 16px", borderRight:"1px solid var(--st-bdr)" }}>
-        <div style={{ fontFamily:"var(--st-font-d)", fontSize:"clamp(26px,3.2vw,38px)", fontWeight:800, letterSpacing:"-.04em", lineHeight:1 }} className="st-orange-text">4–18 yrs</div>
-        <div style={{ fontFamily:"var(--st-font-m)", fontSize:9, color:"var(--st-muted)", letterSpacing:".14em", textTransform:"uppercase", marginTop:7 }}>Age Span</div>
+      <div style={{ textAlign:"center", padding:"22px 12px", borderRight:"1px solid var(--st-bdr)" }}>
+        <div style={{ fontFamily:"var(--st-font-d)", fontSize:"clamp(20px,2.4vw,30px)", fontWeight:800, letterSpacing:"-.04em", lineHeight:1.1 }} className="st-orange-text">4–18 yrs</div>
+        <div style={{ fontFamily:"var(--st-font-m)", fontSize:9, color:"var(--st-muted)", letterSpacing:".14em", textTransform:"uppercase", marginTop:6 }}>Age Span</div>
       </div>
-      <div style={{ textAlign:"center", padding:"26px 16px", borderRight:"1px solid var(--st-bdr)" }}>
-        <div style={{ fontFamily:"var(--st-font-d)", fontSize:"clamp(26px,3.2vw,38px)", fontWeight:800, letterSpacing:"-.04em", lineHeight:1 }} className="st-orange-text">AI/ML</div>
-        <div style={{ fontFamily:"var(--st-font-m)", fontSize:9, color:"var(--st-muted)", letterSpacing:".14em", textTransform:"uppercase", marginTop:7 }}>Driven Curriculum</div>
+      <div style={{ textAlign:"center", padding:"22px 12px", borderRight:"1px solid var(--st-bdr)" }}>
+        <div style={{ fontFamily:"var(--st-font-d)", fontSize:"clamp(20px,2.4vw,30px)", fontWeight:800, letterSpacing:"-.04em", lineHeight:1.1 }} className="st-orange-text">AI/ML</div>
+        <div style={{ fontFamily:"var(--st-font-m)", fontSize:9, color:"var(--st-muted)", letterSpacing:".14em", textTransform:"uppercase", marginTop:6 }}>Driven Curriculum</div>
       </div>
-      <div style={{ textAlign:"center", padding:"26px 16px" }}>
-        <div style={{ fontFamily:"var(--st-font-d)", fontSize:"clamp(26px,3.2vw,38px)", fontWeight:800, letterSpacing:"-.04em", lineHeight:1 }} className="st-orange-text">8–12wk</div>
-        <div style={{ fontFamily:"var(--st-font-m)", fontSize:9, color:"var(--st-muted)", letterSpacing:".14em", textTransform:"uppercase", marginTop:7 }}>Per Course</div>
+      <div style={{ textAlign:"center", padding:"22px 12px" }}>
+        <div style={{ fontFamily:"var(--st-font-d)", fontSize:"clamp(20px,2.4vw,30px)", fontWeight:800, letterSpacing:"-.04em", lineHeight:1.1 }} className="st-orange-text">8–12wk</div>
+        <div style={{ fontFamily:"var(--st-font-m)", fontSize:9, color:"var(--st-muted)", letterSpacing:".14em", textTransform:"uppercase", marginTop:6 }}>Per Course</div>
       </div>
     </div>
   );
@@ -307,7 +307,7 @@ function Hero() {
         <div key={i} style={{ position:"absolute", width:p.w, height:p.h, borderRadius:"50%", background:p.c, top:p.top, left:(p as any).left||"auto", right:(p as any).right||"auto", animation:`st-float ${p.dur} ease-in-out infinite ${p.d}`, pointerEvents:"none" }} />
       ))}
 
-      <div className="rsp-hero-grid" style={{ maxWidth:1200, margin:"0 auto", padding:"80px 56px 80px 24px", width:"100%", display:"grid", gridTemplateColumns:"55% 45%", gap:56, alignItems:"center" }}>
+      <div className="rsp-hero-grid" style={{ maxWidth:1200, margin:"0 auto", padding:"10px 56px 80px 24px", width:"100%", display:"grid", gridTemplateColumns:"55% 45%", gap:56, alignItems:"center" }}>
         {/* ── LEFT ── */}
         <div>
           {/* Terminal boot block */}

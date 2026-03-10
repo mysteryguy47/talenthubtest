@@ -642,6 +642,7 @@ export default function PaperCreate() {
   const [step, setStep] = useState<1 | 2>(1);
   const [showAnswers, setShowAnswers] = useState<boolean>(false);
   const [downloadDropdownOpen, setDownloadDropdownOpen] = useState<boolean>(false);
+  const [showGuide, setShowGuide] = useState(false);
   // Validation errors: { blockIndex: { fieldName: errorMessage } }
   const [validationErrors, setValidationErrors] = useState<Record<number, Record<string, string>>>({});
 
@@ -765,6 +766,38 @@ export default function PaperCreate() {
       title: generateSectionName({ type: defaultType, constraints: defaultConstraints, count: 10, id: "", title: "" } as BlockConfig),
     };
     setBlocks([...blocks, newBlock]);
+  };
+
+  const addBlockAfter = (index: number) => {
+    let defaultType: BlockConfig["type"];
+    if (isVedicPage) {
+      if (level === "Vedic-Level-2") defaultType = "vedic_fun_with_9_equal";
+      else if (level === "Vedic-Level-3") defaultType = "vedic_multiply_by_111_999";
+      else if (level === "Vedic-Level-4") defaultType = "vedic_multiplication_level4";
+      else defaultType = "vedic_multiply_by_11";
+    } else if (isJuniorPage) {
+      defaultType = "direct_add_sub";
+    } else {
+      defaultType = "add_sub";
+    }
+    const defaultConstraints: any = {
+      digits: isJuniorPage ? 1 : 2,
+      rows: 5,
+      multiplicandDigits: 2,
+      multiplierDigits: 1,
+      dividendDigits: 2,
+      divisorDigits: 1,
+    };
+    const newBlock: BlockConfig = {
+      id: `block-${Date.now()}`,
+      type: defaultType,
+      count: 10,
+      constraints: defaultConstraints,
+      title: generateSectionName({ type: defaultType, constraints: defaultConstraints, count: 10, id: "", title: "" } as BlockConfig),
+    };
+    const newBlocks = [...blocks];
+    newBlocks.splice(index + 1, 0, newBlock);
+    setBlocks(newBlocks);
   };
 
 
@@ -1252,7 +1285,7 @@ export default function PaperCreate() {
         .pc-input{background:#141729;border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;color:#F0F2FF;font-family:'DM Sans',sans-serif;font-size:15px;padding:12px 16px;width:100%;outline:none;transition:all 0.2s;-webkit-appearance:none;appearance:none}
         .pc-input:focus{border-color:#7B5CE5;box-shadow:0 0 0 3px rgba(123,92,229,0.12)}
         .pc-input option{background:#141729;color:#F0F2FF}
-        .pc-label{font-size:12px;font-weight:600;color:#525870;font-family:'DM Sans',sans-serif;letter-spacing:0.06em;text-transform:uppercase;display:block;margin-bottom:8px}
+        .pc-label{font-size:12px;font-weight:600;color:#c8cce0;font-family:'DM Sans',sans-serif;letter-spacing:0.06em;text-transform:uppercase;display:block;margin-bottom:8px}
         .pc-block-card{background:#0F1120;border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:24px 28px;transition:all 0.25s;animation:pc-fade-up 0.4s ease both;position:relative;overflow:hidden}
         .pc-block-card:hover{border-color:rgba(123,92,229,0.3);box-shadow:0 8px 40px rgba(123,92,229,0.12)}
         .pc-block-card.dragging{opacity:0.45;transform:scale(0.97)}
@@ -1260,11 +1293,12 @@ export default function PaperCreate() {
         .pc-action-btn:hover.up,.pc-action-btn:hover.down{background:rgba(123,92,229,0.2);border-color:rgba(123,92,229,0.4);color:#9D7FF0}
         .pc-action-btn:hover.dup{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.35);color:#10B981}
         .pc-action-btn:hover.del{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.35);color:#EF4444}
+        .pc-action-btn:hover.add{background:rgba(123,92,229,0.2);border-color:rgba(123,92,229,0.4);color:#9D7FF0}
         .pc-action-btn:disabled{opacity:0.3;cursor:not-allowed}
         .pc-section-label{font-size:11px;font-weight:700;color:#7B5CE5;font-family:'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px}
-        .pc-field-label{font-size:12px;color:#525870;font-family:'DM Sans',sans-serif;font-weight:500;margin-bottom:6px;display:block}
+        .pc-field-label{font-size:12px;color:#c8cce0;font-family:'DM Sans',sans-serif;font-weight:500;margin-bottom:6px;display:block}
         .pc-error-text{font-size:12px;color:#EF4444;font-family:'DM Sans',sans-serif;margin-top:4px}
-        .pc-block-card label{font-size:12px!important;color:#525870!important;font-family:'DM Sans',sans-serif!important;font-weight:500!important}
+        .pc-block-card label{font-size:12px!important;color:#c8cce0!important;font-family:'DM Sans',sans-serif!important;font-weight:500!important}
         .pc-block-card input[type="text"],.pc-block-card input[type="number"]{background:#141729!important;border:1.5px solid rgba(255,255,255,0.08)!important;border-radius:10px!important;color:#F0F2FF!important;font-family:'DM Sans',sans-serif!important;font-size:14px!important;padding:10px 14px!important;outline:none!important;transition:all 0.2s!important;ring:none!important;box-shadow:none!important}
         .pc-block-card input:focus{border-color:#7B5CE5!important;box-shadow:0 0 0 3px rgba(123,92,229,0.12)!important}
         .pc-block-card select{background:#141729!important;border:1.5px solid rgba(255,255,255,0.08)!important;border-radius:10px!important;color:#F0F2FF!important;font-family:'DM Sans',sans-serif!important;font-size:14px!important;padding:10px 14px!important;outline:none!important;-webkit-appearance:none;appearance:none!important;transition:all 0.2s!important}
@@ -1278,7 +1312,7 @@ export default function PaperCreate() {
 
       {/* Sticky header */}
       {/* Hero banner */}
-      <div style={{ position:"relative", overflow:"hidden", padding:"52px 32px 56px", background:"linear-gradient(145deg,#0E0C2A 0%,#130F38 40%,#0A0820 100%)", borderBottom:"1px solid rgba(123,92,229,.2)" }}>
+      <div style={{ position:"relative", overflow:"hidden", borderRadius:"0 0 28px 28px", padding:"52px 32px 56px", background:"linear-gradient(145deg,#0E0C2A 0%,#130F38 40%,#0A0820 100%)", borderBottom:"1px solid rgba(123,92,229,.2)" }}>
         {/* Atmospheric glow */}
         <div style={{ position:"absolute", top:"-20%", left:"50%", transform:"translateX(-50%)", width:500, height:400, background:"radial-gradient(ellipse at center, rgba(123,92,229,.15) 0%, rgba(123,92,229,.04) 50%, transparent 70%)", pointerEvents:"none" }} />
         {/* Grid pattern */}
@@ -1290,7 +1324,7 @@ export default function PaperCreate() {
             <FileDown style={{ width:28, height:28, color:"#9D7FF0" }} />
           </div>
           <h1 style={{ fontFamily:"'Playfair Display', Georgia, serif", fontSize:"clamp(28px,4vw,44px)", fontWeight:800, color:"#F0F2FF", margin:"0 0 10px", letterSpacing:"-.03em" }}>Abacus Paper Generator</h1>
-          <p style={{ fontFamily:"'DM Sans', sans-serif", fontSize:16, fontWeight:300, color:"rgba(255,255,255,.5)", margin:0 }}>Build custom practice papers · Print-ready PDF</p>
+          <p style={{ fontFamily:"'DM Sans', sans-serif", fontSize:16, fontWeight:300, color:"rgba(255,255,255,.5)", margin:0 }}>Build custom practice papers · Print-ready PDF · Live Attempt</p>
         </div>
       </div>
 
@@ -1340,8 +1374,14 @@ export default function PaperCreate() {
             style={{display:'flex',alignItems:'center',padding:'5px 13px',borderRadius:999,fontSize:13,fontWeight:600,fontFamily:"'DM Sans',sans-serif",background:isVedicPage?'rgba(123,92,229,0.22)':'rgba(255,255,255,0.04)',border:isVedicPage?'1.5px solid rgba(123,92,229,0.55)':'1.5px solid rgba(255,255,255,0.07)',color:isVedicPage?'#C4A8FF':'#9DA3BC',cursor:'pointer',transition:'all 0.18s',outline:'none'}}
           >Vedic Maths</button>
 
-          {/* Block count — pushed to right */}
-          <div style={{marginLeft:'auto',flexShrink:0}}>
+          {/* Block count + guide — pushed to right */}
+          <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:8,flexShrink:0}}>
+            <button
+              onClick={() => setShowGuide(true)}
+              style={{display:'flex',alignItems:'center',gap:5,padding:'5px 13px',borderRadius:20,fontSize:12,fontWeight:600,fontFamily:"'DM Sans',sans-serif",background:'rgba(123,92,229,0.08)',border:'1px solid rgba(123,92,229,0.25)',color:'#9D7FF0',cursor:'pointer',transition:'all 0.18s',outline:'none'}}
+            >
+              How to Use
+            </button>
             {blocks.length > 0 && (
               <div style={{padding:'5px 12px',background:'rgba(123,92,229,0.1)',border:'1px solid rgba(123,92,229,0.25)',borderRadius:20,fontSize:12,color:'#9D7FF0',fontFamily:'JetBrains Mono, monospace',fontWeight:600}}>
                 {blocks.length} block{blocks.length!==1?'s':''} · {blocks.reduce((s,b)=>s+b.count,0)} Qs
@@ -1570,6 +1610,13 @@ export default function PaperCreate() {
                           >
                             <Trash2 style={{width:14,height:14,color:'#EF4444'}} />
                           </button>
+                          <button
+                            onClick={() => addBlockAfter(index)}
+                            className="pc-action-btn add"
+                            title="Add Block Below"
+                          >
+                            <Plus style={{width:14,height:14,color:'#9D7FF0'}} />
+                          </button>
                         </div>
                       </div>
                       <div style={{marginBottom:16}}>
@@ -1595,8 +1642,6 @@ export default function PaperCreate() {
                                 <>
                                   <optgroup label="Basic Operations">
                                     <option value="add_sub">Add/Sub</option>
-                                    <option value="addition">Addition</option>
-                                    <option value="subtraction">Subtraction</option>
                                     <option value="multiplication">Multiplication</option>
                                     <option value="division">Division</option>
                                   </optgroup>
@@ -1615,8 +1660,6 @@ export default function PaperCreate() {
                               ) : (
                                 <optgroup label="Basic Operations">
                                   <option value="add_sub">Add/Sub</option>
-                                  <option value="addition">Addition</option>
-                                  <option value="subtraction">Subtraction</option>
                                   <option value="multiplication">Multiplication</option>
                                   <option value="division">Division</option>
                                 </optgroup>
@@ -1909,8 +1952,6 @@ export default function PaperCreate() {
                           ) : (
                             <optgroup label="Basic Operations">
                               <option value="add_sub">Add/Sub</option>
-                              <option value="addition">Addition</option>
-                              <option value="subtraction">Subtraction</option>
                               <option value="multiplication">Multiplication</option>
                               <option value="division">Division</option>
                             </optgroup>
@@ -4579,6 +4620,105 @@ export default function PaperCreate() {
           </div>
         )}
       </div>
+
+      {/* ── Tutorial / How to Use Modal ── */}
+      {showGuide && (
+        <div
+          onClick={() => setShowGuide(false)}
+          style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.72)',backdropFilter:'blur(6px)',display:'flex',alignItems:'center',justifyContent:'center',padding:'20px'}}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{background:'#0F1120',border:'1px solid rgba(123,92,229,0.25)',borderRadius:24,maxWidth:580,width:'100%',maxHeight:'85vh',overflowY:'auto',position:'relative',boxShadow:'0 32px 80px rgba(0,0,0,0.6)',animation:'pc-scale-in 0.25s ease'}}
+          >
+            {/* Top bar */}
+            <div style={{height:3,background:'linear-gradient(90deg,#7B5CE5,#9D7FF0)',borderRadius:'24px 24px 0 0'}} />
+            <div style={{padding:'28px 32px 32px'}}>
+              {/* Header */}
+              <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:28}}>
+                <div style={{display:'flex',alignItems:'center',gap:14}}>
+                  <div style={{width:44,height:44,borderRadius:14,background:'rgba(123,92,229,0.18)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                    <FileDown style={{width:20,height:20,color:'#9D7FF0'}} />
+                  </div>
+                  <div>
+                    <h2 style={{fontSize:18,fontWeight:800,color:'#F0F2FF',fontFamily:"'Playfair Display', Georgia, serif",margin:'0 0 3px'}}>How to Use</h2>
+                    <p style={{fontSize:12,color:'#7B5CE5',fontFamily:'DM Sans, sans-serif',margin:0,fontWeight:600}}>Abacus Paper Generator</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowGuide(false)}
+                  style={{width:32,height:32,borderRadius:8,background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',flexShrink:0,color:'#B8BDD8'}}
+                >
+                  <XCircle style={{width:16,height:16}} />
+                </button>
+              </div>
+
+              {/* Steps */}
+              {[
+                {
+                  num: '1',
+                  title: 'Set Paper Details',
+                  body: 'Enter a title for your paper and select the level (e.g. AB-1, Junior, Custom). The level controls which preset blocks are loaded automatically.'
+                },
+                {
+                  num: '2',
+                  title: 'Add Question Blocks',
+                  body: 'Each block is one section of questions. Click "Add Block" to add a new block at the end. Use the "+" button on any existing block to insert a new one right below it.'
+                },
+                {
+                  num: '3',
+                  title: 'Configure Each Block',
+                  body: 'For every block, choose the operation type (e.g. Add/Sub, Multiplication), set the number of questions, and adjust digit / row settings to match the difficulty you need.'
+                },
+                {
+                  num: '4',
+                  title: 'Reorder & Organise',
+                  body: 'Use the ↑↓ arrows to move blocks up or down. Duplicate a block with the copy icon. Delete unwanted blocks with the trash icon.'
+                },
+                {
+                  num: '5',
+                  title: 'Generate Preview',
+                  body: 'Click "Generate Preview" to see all questions rendered. Toggle "Show Answers" to verify answers. Go back to edit and regenerate at any time.'
+                },
+                {
+                  num: '6',
+                  title: 'Live Attempt',
+                  body: 'In the preview, click "Attempt Paper" to take the generated paper as a timed live session — questions appear one by one and your score is recorded.'
+                },
+                {
+                  num: '7',
+                  title: 'Download PDF',
+                  body: 'Use "Download PDF" to export the paper. Choose "Questions Only" or "Questions + Answer Key" to get a print-ready PDF for classroom use.'
+                },
+              ].map(step => (
+                <div key={step.num} style={{display:'flex',gap:16,marginBottom:20}}>
+                  <div style={{width:28,height:28,borderRadius:8,background:'linear-gradient(135deg,#7B5CE5,#9D7FF0)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:13,fontWeight:800,color:'white',fontFamily:'JetBrains Mono, monospace'}}>
+                    {step.num}
+                  </div>
+                  <div>
+                    <h3 style={{fontSize:14,fontWeight:700,color:'#E8EAFF',fontFamily:'DM Sans, sans-serif',margin:'0 0 4px'}}>{step.title}</h3>
+                    <p style={{fontSize:13,color:'rgba(255,255,255,0.42)',fontFamily:'DM Sans, sans-serif',margin:0,lineHeight:1.6}}>{step.body}</p>
+                  </div>
+                </div>
+              ))}
+
+              {/* Footer tip */}
+              <div style={{marginTop:8,padding:'12px 16px',background:'rgba(123,92,229,0.08)',border:'1px solid rgba(123,92,229,0.2)',borderRadius:12}}>
+                <p style={{fontSize:12,color:'#9D7FF0',fontFamily:'DM Sans, sans-serif',margin:0,fontWeight:500}}>
+                  💡 Tip — Changing the Level dropdown auto-loads preset blocks for that level. Switch to "Custom" to start with a blank slate.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setShowGuide(false)}
+                style={{marginTop:20,width:'100%',padding:'12px',background:'linear-gradient(135deg,#7B5CE5,#9D7FF0)',color:'white',border:'none',borderRadius:12,fontWeight:700,fontSize:14,fontFamily:'DM Sans, sans-serif',cursor:'pointer'}}
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

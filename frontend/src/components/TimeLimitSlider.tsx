@@ -190,62 +190,39 @@ export default function TimeLimitSlider({
         `}</style>
       </div>
 
-      {/* Difficulty Preset Buttons - Premium Design */}
-      <div className="pt-2">
-        <div className="text-sm font-semibold  text-slate-300 mb-3">Difficulty Presets:</div>
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <button
-            onClick={() => handlePresetClick("easy")}
-            className={`group relative px-3.5 py-2 text-sm font-bold rounded-xl transition-all duration-300 transform whitespace-nowrap ${
-              difficultyMode === "easy"
-                ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-xl scale-105 ring-2  ring-green-500/50"
-                : "bg-gradient-to-r from-green-50 to-emerald-50 from-green-900/30 to-emerald-900/30  text-green-400 hover:from-green-100 hover:to-emerald-100 hover:from-green-900/50 hover:to-emerald-900/50 hover:shadow-lg hover:scale-105 border-2  border-green-700"
-            } hover:-translate-y-0.5 active:scale-100`}
-          >
-            <span className="relative z-10">{presets.easy.label}</span>
-            {difficultyMode === "easy" && (
-              <span className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></span>
-            )}
-          </button>
-          <button
-            onClick={() => handlePresetClick("medium")}
-            className={`group relative px-3.5 py-2 text-sm font-bold rounded-xl transition-all duration-300 transform whitespace-nowrap ${
-              difficultyMode === "medium"
-                ? "bg-gradient-to-r from-yellow-500 to-orange-600 text-white shadow-xl scale-105 ring-2  ring-yellow-500/50"
-                : "bg-gradient-to-r from-yellow-50 to-orange-50 from-yellow-900/30 to-orange-900/30  text-yellow-400 hover:from-yellow-100 hover:to-orange-100 hover:from-yellow-900/50 hover:to-orange-900/50 hover:shadow-lg hover:scale-105 border-2  border-yellow-700"
-            } hover:-translate-y-0.5 active:scale-100`}
-          >
-            <span className="relative z-10">{presets.medium.label}</span>
-            {difficultyMode === "medium" && (
-              <span className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></span>
-            )}
-          </button>
-          <button
-            onClick={() => handlePresetClick("hard")}
-            className={`group relative px-3.5 py-2 text-sm font-bold rounded-xl transition-all duration-300 transform whitespace-nowrap ${
-              difficultyMode === "hard"
-                ? "bg-gradient-to-r from-red-500 to-pink-600 text-white shadow-xl scale-105 ring-2  ring-red-500/50"
-                : "bg-gradient-to-r from-red-50 to-pink-50 from-red-900/30 to-pink-900/30  text-red-400 hover:from-red-100 hover:to-pink-100 hover:from-red-900/50 hover:to-pink-900/50 hover:shadow-lg hover:scale-105 border-2  border-red-700"
-            } hover:-translate-y-0.5 active:scale-100`}
-          >
-            <span className="relative z-10">{presets.hard.label}</span>
-            {difficultyMode === "hard" && (
-              <span className="absolute inset-0 bg-gradient-to-r from-red-400 to-pink-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></span>
-            )}
-          </button>
-          <button
-            onClick={handleCustomClick}
-            className={`group relative px-3.5 py-2 text-sm font-bold rounded-xl transition-all duration-300 transform whitespace-nowrap ${
-              difficultyMode === "custom"
-                ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-xl scale-105 ring-2  ring-indigo-500/50"
-                : "bg-gradient-to-r from-indigo-50 to-purple-50 from-indigo-900/30 to-purple-900/30  text-indigo-400 hover:from-indigo-100 hover:to-purple-100 hover:from-indigo-900/50 hover:to-purple-900/50 hover:shadow-lg hover:scale-105 border-2  border-indigo-700"
-            } hover:-translate-y-0.5 active:scale-100`}
-          >
-            <span className="relative z-10">Custom</span>
-            {difficultyMode === "custom" && (
-              <span className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></span>
-            )}
-          </button>
+      {/* Difficulty Preset Buttons */}
+      <div style={{paddingTop:8}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:6,background:"rgba(15,17,32,.6)",borderRadius:12,padding:3,border:"1px solid rgba(255,255,255,.06)"}}>
+          {([
+            {mode:"easy" as const,label:presets.easy.label,color:"#10B981",bg:"rgba(16,185,129,.12)",bdr:"rgba(16,185,129,.3)"},
+            {mode:"medium" as const,label:presets.medium.label,color:"#F59E0B",bg:"rgba(245,158,11,.12)",bdr:"rgba(245,158,11,.3)"},
+            {mode:"hard" as const,label:presets.hard.label,color:"#EF4444",bg:"rgba(239,68,68,.12)",bdr:"rgba(239,68,68,.3)"},
+            {mode:"custom" as const,label:"Custom",color:"#7B5CE5",bg:"rgba(123,92,229,.12)",bdr:"rgba(123,92,229,.3)"},
+          ]).map(({mode,label,color,bg,bdr})=>{
+            const active = difficultyMode === mode;
+            return (
+              <button
+                key={mode}
+                onClick={() => mode === "custom" ? handleCustomClick() : handlePresetClick(mode)}
+                style={{
+                  padding:"9px 0",
+                  borderRadius:10,
+                  border: active ? `1px solid ${bdr}` : "1px solid transparent",
+                  background: active ? bg : "transparent",
+                  fontFamily:"'DM Sans',sans-serif",
+                  fontSize:12,
+                  fontWeight:700,
+                  letterSpacing:".02em",
+                  cursor:"pointer",
+                  transition:"all .2s",
+                  color: active ? color : "rgba(200,204,224,.5)",
+                  textAlign:"center",
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
       </div>
 

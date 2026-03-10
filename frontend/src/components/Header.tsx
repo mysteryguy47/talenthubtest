@@ -110,6 +110,32 @@ export default function Header() {
           active ? "text-primary bg-primary/10 shadow-sm" : "text-card-foreground hover:bg-primary/10 hover:shadow-sm"}`;
 
   return (
+    <>
+<style>{`
+  @keyframes nav-ring-spin { to { transform: rotate(360deg); } }
+  .nav-pill-ring {
+    position: absolute;
+    inset: -1.5px;
+    border-radius: 9999px;
+    pointer-events: none;
+    z-index: 0;
+    padding: 1.5px;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      transparent 340deg,
+      rgba(167, 139, 250, 0.3) 350deg,
+      rgba(255, 255, 255, 0.95) 357deg,
+      rgba(167, 139, 250, 0.3) 360deg
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: nav-ring-spin 4s linear infinite;
+  }
+`}</style>
     <header
       className={`sticky top-0 z-[200] py-4 transition-all duration-500 ${
         scrolled
@@ -145,7 +171,8 @@ export default function Header() {
           </Link>
 
           {/* ── Center Nav Pill (Desktop) ─────────────────────────────── */}
-          <nav className="hidden lg:flex items-center gap-2 bg-secondary/50 backdrop-blur-md p-1.5 rounded-full border border-border/50 absolute left-1/2 transform -translate-x-1/2">
+          <nav className="hidden lg:flex items-center gap-2 bg-secondary/90 backdrop-blur-md p-1.5 rounded-full absolute left-1/2 -translate-x-1/2 z-[10]">
+            <div className="nav-pill-ring" aria-hidden="true" />
 
             {/* COURSES */}
             <div ref={coursesDropdownRef} className="relative" onMouseEnter={handleCoursesEnter} onMouseLeave={handleCoursesLeave}>
@@ -354,10 +381,21 @@ export default function Header() {
                       {userMenuOpen && (
                         <div className="absolute right-0 top-full mt-2 w-64 bg-card backdrop-blur-2xl border-2 border-border/60 rounded-2xl shadow-2xl overflow-hidden z-[200]"
                           style={CARD_STYLE} onMouseEnter={handleUserMenuEnter} onMouseLeave={handleUserMenuLeave}>
-                          <div className="p-4 border-b-2 border-border/50 bg-gradient-to-br from-primary/5 to-transparent">
-                            <div className="font-semibold text-card-foreground text-sm">{displayName}</div>
-                            <div className="text-xs text-muted-foreground">{user.email}</div>
-                            <div className="mt-2"><span className="text-xs font-medium text-primary">{user.total_points} points</span></div>
+                          <div className="p-4 border-b-2 border-border/50" style={{ background: "rgba(124,58,237,0.06)" }}>
+                            <div style={{ color: "#e2e8f0", fontSize: 13.5, fontWeight: 600, marginBottom: 2 }}>{displayName}</div>
+                            <div style={{ color: "rgba(255,255,255,0.48)", fontSize: 12, marginBottom: 10 }}>{user.email}</div>
+                            {user.public_id && (
+                              <div style={{ fontSize: 11.5, marginBottom: 8 }}>
+                                <span style={{ color: "rgba(255,255,255,0.35)" }}>ID: </span>
+                                <span style={{ fontFamily: "monospace", color: "#a78bfa", fontWeight: 600 }}>{user.public_id}</span>
+                              </div>
+                            )}
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 2 }}>
+                              <span style={{ fontSize: 11, fontWeight: 600, color: "#a78bfa", background: "rgba(167,139,250,0.13)", border: "1px solid rgba(167,139,250,0.25)", borderRadius: 6, padding: "2px 9px" }}>{user.total_points} pts</span>
+                              {user.branch && <span style={{ fontSize: 11, color: "rgba(255,255,255,0.62)", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, padding: "2px 9px" }}>{user.branch}</span>}
+                              {user.course && <span style={{ fontSize: 11, color: "rgba(255,255,255,0.62)", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, padding: "2px 9px" }}>{user.course}</span>}
+                              {user.level && <span style={{ fontSize: 11, color: "rgba(255,255,255,0.62)", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, padding: "2px 9px" }}>Lvl {user.level}</span>}
+                            </div>
                           </div>
                           <div className="p-1.5">
                             <Link href="/dashboard">
@@ -491,5 +529,6 @@ export default function Header() {
         )}
       </div>
     </header>
+    </>
   );
 }

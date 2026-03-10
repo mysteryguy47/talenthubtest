@@ -254,11 +254,11 @@ function StatCell({ end, suffix="", label, last=false }: { end:number; suffix?:s
   const { ref, inView } = useInView();
   const count = useCounter(end, 1400, inView);
   return (
-    <div ref={ref} style={{ textAlign:"center", padding:"26px 20px", borderRight:last?"none":"1px solid var(--hw-border)" }}>
-      <div style={{ fontFamily:"var(--hw-font-s)", fontSize:"clamp(26px,3.5vw,40px)", fontWeight:700, letterSpacing:"-.02em", lineHeight:1 }} className="hw-teal-text">
+    <div ref={ref} style={{ textAlign:"center", padding:"22px 12px", borderRight:last?"none":"1px solid var(--hw-border)" }}>
+      <div style={{ fontFamily:"var(--hw-font-s)", fontSize:"clamp(20px,2.4vw,30px)", fontWeight:700, letterSpacing:"-.02em", lineHeight:1.1 }} className="hw-teal-text">
         {count}{suffix}
       </div>
-      <div style={{ fontFamily:"var(--hw-font-m)", fontSize:10, color:"var(--hw-ink2)", letterSpacing:".13em", textTransform:"uppercase", marginTop:7 }}>{label}</div>
+      <div style={{ fontFamily:"var(--hw-font-m)", fontSize:9, color:"var(--hw-ink2)", letterSpacing:".13em", textTransform:"uppercase", marginTop:6 }}>{label}</div>
     </div>
   );
 }
@@ -308,7 +308,7 @@ function Hero() {
         <div key={i} style={{ position:"absolute", width:p.w, height:p.h, borderRadius:"50%", background:p.c, top:p.top, left:(p as any).left||"auto", right:(p as any).right||"auto", animation:`hw-float ${p.dur} ease-in-out infinite ${p.d}`, pointerEvents:"none" }} />
       ))}
 
-      <div className="rsp-hero-grid" style={{ maxWidth:1200, margin:"0 auto", padding:"80px 56px 80px 24px", width:"100%", display:"grid", gridTemplateColumns:"52% 48%", gap:56, alignItems:"center" }}>
+      <div className="rsp-hero-grid" style={{ maxWidth:1200, margin:"0 auto", padding:"10px 56px 80px 24px", width:"100%", display:"grid", gridTemplateColumns:"52% 48%", gap:56, alignItems:"center" }}>
 
         {/* ── LEFT ── */}
         <div>

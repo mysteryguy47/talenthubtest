@@ -374,7 +374,7 @@ export default function StudentProfile() {
   const labelStyle: React.CSSProperties = {
     display: "block", fontSize: 11, fontWeight: 600,
     fontFamily: D.mono, letterSpacing: "0.1em",
-    textTransform: "uppercase", color: D.muted, marginBottom: 7,
+    textTransform: "uppercase", color: "#e2e8f0", marginBottom: 7,
   };
 
   const valueStyle: React.CSSProperties = {
@@ -402,7 +402,7 @@ export default function StudentProfile() {
         .sp-input:disabled { opacity: 0.45; cursor: not-allowed; }
         .sp-select option { background: #12142a; color: #e2e8f0; }
       `}</style>
-      <div style={{ minHeight: "100vh", background: D.bg, paddingTop: "7rem", paddingBottom: "4rem" }}>
+      <div style={{ minHeight: "100vh", background: D.bg, paddingTop: "4rem", paddingBottom: "4rem" }}>
         <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 1.5rem" }}>
 
           {/* Page Header */}

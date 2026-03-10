@@ -198,6 +198,7 @@ export default function Footer() {
             {([
               ["Privacy Policy",   "/privacy-policy"],
               ["Terms of Service", "/terms-of-service"],
+              ["About Us",         "/about"],
             ] as [string, string][]).map(([label, href]) => (
               <a key={label} href={href}
                 style={{ fontFamily: fontMono, fontSize: 11.5, color: D.muted, textDecoration: "none", transition: "color 0.2s" }}
