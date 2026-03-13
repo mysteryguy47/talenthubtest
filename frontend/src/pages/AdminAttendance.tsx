@@ -867,27 +867,28 @@ export default function AdminAttendance() {
   return (
     <div className="min-h-screen" style={{ background: '#07070F' }}>
       {/* Page Header */}
-      <div className="bg-[#0c0e1a] border-b  border-slate-800 px-6 py-4">
-        <div className="max-w-screen-xl mx-auto flex items-center justify-between">
+      <div className="bg-[#0c0e1a] border-b  border-slate-800 px-4 py-3">
+        <div className="max-w-screen-xl mx-auto flex items-center justify-between gap-3">
           <div>
-            <h1 className="text-xl font-semibold  text-slate-100">Attendance Management</h1>
-            <p className="text-sm  text-slate-400 mt-0.5">
+            <h1 className="text-lg sm:text-xl font-semibold  text-slate-100">Attendance Management</h1>
+            <p className="text-xs sm:text-sm  text-slate-400 mt-0.5">
               Create sessions and mark student attendance
             </p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition-colors shadow-sm"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition-colors shadow-sm flex-shrink-0"
           >
             <Plus className="w-4 h-4" />
-            New Session
+            <span className="hidden sm:inline">New Session</span>
+            <span className="sm:hidden">New</span>
           </button>
         </div>
       </div>
 
       {/* Filter bar */}
-      <div className="bg-[#0c0e1a] border-b  border-slate-800 px-6 py-3">
-        <div className="max-w-screen-xl mx-auto flex items-center gap-3 flex-wrap">
+      <div className="bg-[#0c0e1a] border-b  border-slate-800 px-3 sm:px-6 py-2 sm:py-3">
+        <div className="max-w-screen-xl mx-auto flex items-center gap-2 sm:gap-3 flex-wrap">
           <Filter className="w-4 h-4 text-slate-400 flex-shrink-0" />
 
           <select value={filterBranch} onChange={e => { setFilterBranch(e.target.value); setSelectedSessionId(null); }}
@@ -916,10 +917,10 @@ export default function AdminAttendance() {
         </div>
       </div>
 
-      {/* Main split layout */}
-      <div className="max-w-screen-xl mx-auto flex" style={{ height: "calc(100vh - 148px)" }}>
+      {/* Main split layout - stacked on mobile, side-by-side on desktop */}
+      <div className="max-w-screen-xl mx-auto flex flex-col lg:flex-row lg:h-[calc(100dvh-148px)] overflow-hidden">
         {/* Sessions Sidebar */}
-        <div className="w-80 flex-shrink-0 border-r  border-slate-800  bg-slate-900 flex flex-col overflow-hidden">
+        <div className="w-full lg:w-80 flex-shrink-0 border-b lg:border-b-0 lg:border-r  border-slate-800  bg-slate-900 flex flex-col overflow-hidden max-h-72 lg:max-h-none">
           <div className="px-4 py-3 border-b  border-slate-800 flex items-center justify-between">
             <span className="text-xs font-semibold  text-slate-400 uppercase tracking-wider">
               Sessions
@@ -959,7 +960,7 @@ export default function AdminAttendance() {
         </div>
 
         {/* Attendance Sheet Area */}
-        <div className="flex-1  bg-slate-900 flex flex-col overflow-hidden">
+        <div className="flex-1  bg-slate-900 flex flex-col overflow-hidden min-h-[50vh] lg:min-h-0">
           {selectedSession ? (
             <SheetPanel session={selectedSession} />
           ) : (

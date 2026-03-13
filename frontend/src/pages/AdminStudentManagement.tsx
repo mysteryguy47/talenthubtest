@@ -1060,10 +1060,10 @@ export default function AdminStudentManagement() {
     "px-3 py-2  bg-slate-800 border  border-slate-600 rounded-lg  text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all";
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
+    <div className="min-h-screen bg-background pt-4 sm:pt-8 pb-8 px-4">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* ── Header ─────────────────────────────────────────────────────── */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setLocation("/admin")}
@@ -1073,8 +1073,8 @@ export default function AdminStudentManagement() {
               <ArrowLeft className="w-4 h-4 text-muted-foreground" />
             </button>
             <div>
-              <h1 className="text-2xl font-black tracking-tight text-foreground flex items-center gap-2">
-                <Users className="w-6 h-6 text-primary" />
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-foreground flex items-center gap-2">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                 Student Management
               </h1>
               <p className="text-sm text-muted-foreground">
@@ -1082,7 +1082,7 @@ export default function AdminStudentManagement() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 self-end sm:self-auto">
             <button
               onClick={() => loadStudents(true)}
               disabled={refreshing}
@@ -1093,7 +1093,7 @@ export default function AdminStudentManagement() {
             </button>
             <button
               onClick={() => { setShowAdd(true); setAddForm(blankForm()); setAddError(null); setAddValidLevels([]); }}
-              className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl font-bold text-sm hover:bg-primary/90 transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl font-bold text-sm hover:bg-primary/90 transition-colors"
             >
               <UserPlus className="w-4 h-4" />
               Add Student

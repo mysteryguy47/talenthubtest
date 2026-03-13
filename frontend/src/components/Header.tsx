@@ -53,6 +53,16 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileMenuOpen]);
+
   useEffect(() => {
     const onFSChange = () => setIsFullscreenActive(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", onFSChange);
@@ -147,12 +157,15 @@ export default function Header() {
   }
 `}</style>
     <header
-      className={`sticky top-0 z-[200] py-4 transition-all duration-500 backdrop-blur-md ${
+      className={`sticky top-0 z-[200] transition-all duration-500 backdrop-blur-md ${
         scrolled
           ? "border-b border-border/50 shadow-lg"
           : ""
       }`}
-      style={{ background: scrolled ? "rgba(7,8,15,0.92)" : "rgba(7,8,15,0.72)" }}
+      style={{
+        background: scrolled ? "rgba(7,8,15,0.92)" : "rgba(7,8,15,0.72)",
+        paddingTop: "env(safe-area-inset-top, 0px)",
+      }}
     >
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 relative">
@@ -464,10 +477,28 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ── Mobile Menu ───────────────────────────────────────────── */}
+        {/* ── Mobile Menu — fixed overlay so only IT scrolls, background is locked ── */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-border pt-4 pb-4 mt-2">
-            <div className="flex flex-col gap-1">
+          <div
+            className="lg:hidden fixed inset-0 z-[190]"
+            style={{ top: 0 }}
+            onClick={(e) => { if (e.target === e.currentTarget) setMobileMenuOpen(false); }}
+          >
+            {/* Dark backdrop */}
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            {/* Scrollable drawer from top, positioned below header */}
+            <div
+              className="absolute left-0 right-0 overflow-y-auto"
+              style={{
+                top: `calc(env(safe-area-inset-top, 0px) + 80px)`,
+                maxHeight: "calc(100dvh - env(safe-area-inset-top, 0px) - 80px - env(safe-area-inset-bottom, 0px))",
+                background: "rgba(7,8,15,0.97)",
+                borderTop: "1px solid rgba(255,255,255,0.08)",
+                borderBottom: "1px solid rgba(255,255,255,0.06)",
+                WebkitOverflowScrolling: "touch",
+              }}
+            >
+            <div className="flex flex-col gap-1 px-2 py-3">
               <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Courses</div>
               <Link href="/courses/abacus" onClick={() => setMobileMenuOpen(false)}>
                 <div className="px-4 py-2.5 text-sm font-medium text-card-foreground hover:bg-secondary rounded-lg flex items-center gap-3 transition-colors"><Calculator className="w-4 h-4" />Study Abacus</div>
@@ -528,6 +559,9 @@ export default function Header() {
                   </Link>
                 </div>
               )}
+              {/* Bottom safe-area spacer */}
+              <div style={{ height: "env(safe-area-inset-bottom, 0px)", minHeight: 16 }} />
+            </div>
             </div>
           </div>
         )}

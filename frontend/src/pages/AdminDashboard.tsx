@@ -225,56 +225,56 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-32 pb-20 px-6 transition-colors duration-300">
+    <div className="min-h-screen bg-background pt-6 sm:pt-16 pb-10 px-4 sm:px-6 transition-colors duration-300">
       <div className="container mx-auto">
         {/* Page Header */}
-        <header className="mb-12">
-          <h1 className="text-5xl font-black tracking-tighter uppercase italic text-foreground mb-2 flex items-center gap-3">
-            <Shield className="w-10 h-10 text-primary" />
+        <header className="mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tighter uppercase italic text-foreground mb-2 flex items-center gap-3">
+            <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
             Admin Dashboard
           </h1>
-          <p className="text-muted-foreground text-lg font-medium">Monitor all student activity and progress</p>
+          <p className="text-muted-foreground text-base sm:text-lg font-medium">Monitor all student activity and progress</p>
         </header>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div className="bg-card border border-border rounded-[2.5rem] p-8 shadow-xl hover:border-primary transition-all group">
-            <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-all">
-              <Users className="w-6 h-6  text-blue-400" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
+          <div className="bg-card border border-border rounded-2xl sm:rounded-[2.5rem] p-5 sm:p-8 shadow-xl hover:border-primary transition-all group">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg group-hover:scale-110 transition-all">
+              <Users className="w-5 h-5 sm:w-6 sm:h-6  text-blue-400" />
             </div>
             <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Total Students</div>
-            <div className="text-3xl font-black italic text-card-foreground">{stats.total_students}</div>
+            <div className="text-2xl sm:text-3xl font-black italic text-card-foreground">{stats.total_students}</div>
           </div>
 
-          <div className="bg-card border border-border rounded-[2.5rem] p-8 shadow-xl hover:border-primary transition-all group">
-            <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-all">
-              <BarChart3 className="w-6 h-6  text-green-400" />
+          <div className="bg-card border border-border rounded-2xl sm:rounded-[2.5rem] p-5 sm:p-8 shadow-xl hover:border-primary transition-all group">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500/10 rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg group-hover:scale-110 transition-all">
+              <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6  text-green-400" />
             </div>
             <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Total Sessions</div>
-            <div className="text-3xl font-black italic text-card-foreground">{stats.total_sessions}</div>
+            <div className="text-2xl sm:text-3xl font-black italic text-card-foreground">{stats.total_sessions}</div>
           </div>
 
-          <div className="bg-card border border-border rounded-[2.5rem] p-8 shadow-xl hover:border-primary transition-all group">
-            <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-all">
-              <Target className="w-6 h-6  text-purple-400" />
+          <div className="bg-card border border-border rounded-2xl sm:rounded-[2.5rem] p-5 sm:p-8 shadow-xl hover:border-primary transition-all group">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg group-hover:scale-110 transition-all">
+              <Target className="w-5 h-5 sm:w-6 sm:h-6  text-purple-400" />
             </div>
             <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Avg Accuracy</div>
-            <div className="text-3xl font-black italic text-card-foreground">{stats?.average_accuracy?.toFixed(1) || '0.0'}%</div>
+            <div className="text-2xl sm:text-3xl font-black italic text-card-foreground">{stats?.average_accuracy?.toFixed(1) || '0.0'}%</div>
           </div>
 
-          <div className="bg-card border border-border rounded-[2.5rem] p-8 shadow-xl hover:border-primary transition-all group">
-            <div className="w-12 h-12 bg-orange-500/10 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-all">
-              <TrendingUp className="w-6 h-6  text-orange-400" />
+          <div className="bg-card border border-border rounded-2xl sm:rounded-[2.5rem] p-5 sm:p-8 shadow-xl hover:border-primary transition-all group">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500/10 rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg group-hover:scale-110 transition-all">
+              <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6  text-orange-400" />
             </div>
             <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Active Today</div>
-            <div className="text-3xl font-black italic text-card-foreground">{stats.active_students_today}</div>
+            <div className="text-2xl sm:text-3xl font-black italic text-card-foreground">{stats.active_students_today}</div>
           </div>
         </div>
 
         {/* ── Premium Leaderboard Panel ─────────────────────────────── */}
         <div className="mb-8 bg-card border border-border rounded-[2.5rem] shadow-xl overflow-hidden">
           {/* Header */}
-          <div className="px-8 pt-8 pb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div className="px-4 sm:px-8 pt-5 sm:pt-8 pb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <h2 className="text-2xl font-black tracking-tight text-card-foreground flex items-center gap-3">
               <Trophy className="w-6 h-6 text-amber-500" />
               Leaderboard
@@ -316,7 +316,7 @@ export default function AdminDashboard() {
 
           {/* Table */}
           {(leaderboardTab === "overall" ? lbOverallLoading : lbWeeklyLoading) ? (
-            <div className="px-8 pb-8 space-y-3">
+            <div className="px-4 sm:px-8 pb-8 space-y-3">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="h-14 bg-background/50 rounded-2xl animate-pulse" />
               ))}
@@ -324,7 +324,7 @@ export default function AdminDashboard() {
           ) : (
             <>
               {/* Column header */}
-              <div className="px-8 pb-2 grid grid-cols-[2.5rem_1fr_auto] sm:grid-cols-[2.5rem_1fr_auto_auto] gap-3 items-center">
+              <div className="px-4 sm:px-8 pb-2 grid grid-cols-[2.5rem_1fr_auto] sm:grid-cols-[2.5rem_1fr_auto_auto] gap-3 items-center">
                 <div className="text-xs font-black uppercase tracking-widest text-muted-foreground text-center">#</div>
                 <div className="text-xs font-black uppercase tracking-widest text-muted-foreground">Student</div>
                 <div className="hidden sm:block text-xs font-black uppercase tracking-widest text-muted-foreground text-right">Total</div>
@@ -434,34 +434,34 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Students List */}
           <div className="lg:col-span-2">
-            <div className="bg-card border border-border rounded-[2.5rem] p-8 shadow-xl">
-              <div className="flex items-center justify-between mb-8">
+            <div className="bg-card border border-border rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-8 shadow-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
                 <div className="flex items-center gap-4">
-                  <h2 className="text-2xl font-black tracking-tight text-card-foreground flex items-center gap-3">
-                    <Users className="w-6 h-6 text-primary" />
+                  <h2 className="text-xl sm:text-2xl font-black tracking-tight text-card-foreground flex items-center gap-3">
+                    <Users className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                     Students
                   </h2>
                   <span className="text-sm font-bold text-muted-foreground">{students.length} total</span>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   <button
                     onClick={() => setLocation("/admin/students")}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl text-sm font-bold transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl text-xs sm:text-sm font-bold transition-colors"
                   >
-                    <Users className="w-4 h-4" />
-                    Manage Students
+                    <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    Manage
                   </button>
                   <button
                     onClick={() => setLocation("/admin/student-ids")}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20  text-blue-400 rounded-xl text-sm font-bold transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-2 bg-blue-500/10 hover:bg-blue-500/20  text-blue-400 rounded-xl text-xs sm:text-sm font-bold transition-colors"
                   >
-                    <IdCard className="w-4 h-4" />
-                    Student IDs
+                    <IdCard className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    IDs
                   </button>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as "id" | "name" | "points")}
-                    className="px-3 py-2  bg-slate-800 border border-border rounded-xl text-sm font-medium text-card-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className="px-2 py-1.5 sm:px-3 sm:py-2  bg-slate-800 border border-border rounded-xl text-xs sm:text-sm font-medium text-card-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="id">Sort by ID</option>
                     <option value="name">Sort by Name</option>
@@ -515,7 +515,7 @@ export default function AdminDashboard() {
           {/* Student Details Sidebar */}
           <div className="lg:col-span-1">
             {selectedStudent && studentStats ? (
-              <div className="bg-card border border-border rounded-[2.5rem] p-8 shadow-xl">
+              <div className="bg-card border border-border rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-8 shadow-xl">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-black tracking-tight text-card-foreground flex items-center gap-2">
                     <UserIcon className="w-5 h-5 text-primary" />

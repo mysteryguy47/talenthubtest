@@ -529,7 +529,7 @@ export default function AdminAccessControl() {
   return (
     <div className="min-h-screen" style={{ background: "#07070f", color: "#fff" }}>
       {/* Page header */}
-      <div className="px-4 pt-8 pb-4 max-w-7xl mx-auto">
+      <div className="px-4 pt-4 sm:pt-8 pb-4 max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-1">
           <div className="p-2 rounded-xl" style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)" }}>
             <Shield className="w-5 h-5 text-violet-400" />
@@ -544,7 +544,7 @@ export default function AdminAccessControl() {
       {/* Two-column layout */}
       <div className="max-w-7xl mx-auto px-4 pb-16 flex flex-col lg:flex-row gap-6 items-start">
         {/* ── Left sidebar ─────────────────────────────────────────────────── */}
-        <div className="w-full lg:w-80 shrink-0 space-y-4 lg:sticky lg:top-24">
+        <div className="w-full lg:w-80 shrink-0 space-y-4 lg:sticky lg:top-20">
           {/* Access Mode card */}
           <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
             <p className="text-xs text-slate-500 uppercase tracking-wider mb-3">Access Mode</p>
@@ -697,7 +697,8 @@ export default function AdminAccessControl() {
           </div>
 
           {/* Table */}
-          <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
+          <div className="overflow-x-auto -mx-1">
+          <div className="rounded-2xl overflow-hidden min-w-[500px]" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
             {/* Header */}
             <div
               className="grid text-xs text-slate-500 uppercase tracking-wider px-4 py-3"
@@ -773,6 +774,7 @@ export default function AdminAccessControl() {
               ))
             )}
           </div>
+          </div>{/* end overflow-x-auto */}
 
           {/* Pagination */}
           {totalPages > 1 && (

@@ -130,7 +130,7 @@ function AppContent() {
         onDismiss={dismissWarning} 
       />
       <div className="flex flex-col min-h-screen transition-colors duration-300" style={{ background: '#07070F' }}>
-        <Header />        <GraceBanner />        <main className="flex-grow">
+        <Header />        <GraceBanner />        <main className="flex-grow" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
           <ErrorBoundary>
             <Suspense fallback={<LoadingScreen />}>
             <Switch>
